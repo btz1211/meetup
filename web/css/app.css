@@ -1,0 +1,76 @@
+body{
+  background-color: #F1F1F1;
+}
+.top-half{
+  padding-top:100px;
+  padding-bottom:60px;
+  background-color:#8CB55E;
+}
+
+.bottom-half{
+  padding-top:75px;
+  width:40%;
+  color:#8CB55E;
+}
+
+.bottom-half .input-group {
+  width:100%;
+  position:relative;
+
+}
+
+.bottom-half .input-group .btn-login,.btn-signup, .btn-cancel{
+  width: 100%;
+  border: 0px;
+}
+
+.no-padding{
+  padding:0 !important;
+}
+
+/**meetup page styling**/
+#main-content{
+    padding-top:120px;
+}
+
+.container .meetup-container{
+  background-color: #F9F9F9;
+  border: 1px solid #e6e6e6;
+  box-shadow: #dddddd 0px 1px 0px 0px;
+}
+
+.meetup-container .page-header {
+  margin-top:10px;
+  margin-left:5px;
+}
+
+.meetup-container .group-title{
+  color:rgba(255, 152, 0, 0.87);
+}
+
+.meetup-container .plus-btn{
+  margin-top:36px;
+  padding:3px 10px;
+}
+
+.meetup-container .empty-message{
+  color:#727272;
+  font-size:17px;
+}
+
+.meetup-container .meetuper-info{
+}
+.meetup-container .meetuper-info .meetuper-header{
+  color:#2D6784;
+  font-weight: bold;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #BBBBBB;
+}
+.meetup-container .meetuper-info .table{
+  font-size: 13px;
+}
+
+/**new meetup page styling**/
+.new-meetup-form .btn{
+  margin:5px;
+}
