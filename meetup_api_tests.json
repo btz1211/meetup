@@ -1,0 +1,375 @@
+{
+	"id": "b6742caa-df3e-eced-d940-1aae4689cc35",
+	"name": "Meetup API Test",
+	"description": "",
+	"order": [
+		"e215ea1d-c4a8-b098-a76a-1c214a3d9bf3",
+		"1f45735e-4efe-84e1-b469-5fac558a979e",
+		"502df984-64c6-b5b9-c737-d5a0c18e39c9",
+		"d3a21768-ace4-146d-c9fd-a18bda7e10fa",
+		"2a7b2778-d140-745b-1aab-577dcd0c7b39",
+		"b019bb79-d470-1bb3-135c-81272e15ae8e",
+		"e011d92d-742d-31de-bbc3-87ebd3d4b9af",
+		"03d1d375-db52-e368-6306-6f24b4b688c7",
+		"728b514d-1c99-361c-efe6-07b656344477",
+		"a3c5944e-2e8d-f763-428a-175b2636873c",
+		"b579a0cd-7d9a-f464-5d86-7930238d1b84"
+	],
+	"folders": [],
+	"timestamp": 1453579703371,
+	"owner": "",
+	"remoteLink": "",
+	"public": false,
+	"requests": [
+		{
+			"id": "03d1d375-db52-e368-6306-6f24b4b688c7",
+			"headers": "",
+			"url": "http://localhost:8002/api/users/alph",
+			"pathVariables": {},
+			"preRequestScript": "",
+			"method": "GET",
+			"collectionId": "b6742caa-df3e-eced-d940-1aae4689cc35",
+			"data": [],
+			"dataMode": "params",
+			"name": "get user with no data",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1453677271358,
+			"version": 2,
+			"responses": [],
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {}
+		},
+		{
+			"id": "1f45735e-4efe-84e1-b469-5fac558a979e",
+			"headers": "",
+			"url": "http://localhost:8002/api/users",
+			"pathVariables": {},
+			"preRequestScript": "",
+			"method": "POST",
+			"collectionId": "b6742caa-df3e-eced-d940-1aae4689cc35",
+			"data": [
+				{
+					"key": "userId",
+					"value": "alpha",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "password",
+					"value": null,
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "firstName",
+					"value": null,
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "lastName",
+					"value": "Zheng",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"name": "create user with missing fields",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1453677082721,
+			"version": 2,
+			"responses": [],
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {}
+		},
+		{
+			"id": "2a7b2778-d140-745b-1aab-577dcd0c7b39",
+			"headers": "",
+			"url": "http://localhost:8002/api/relationships",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "source",
+					"value": "56ac2c24107bb68019d1271d",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "target",
+					"value": "56ac2c2f107bb68019d1271e",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "type",
+					"value": "friends",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1454647170444,
+			"name": "create relationship",
+			"description": "",
+			"collectionId": "b6742caa-df3e-eced-d940-1aae4689cc35",
+			"responses": []
+		},
+		{
+			"id": "502df984-64c6-b5b9-c737-d5a0c18e39c9",
+			"headers": "",
+			"url": "http://localhost:8002/api/meetups",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "name",
+					"value": "my first meetup",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "address",
+					"value": "285 Grove st. 1st FL",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "status",
+					"value": "pending",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "latitude",
+					"value": "0.0",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "longitude",
+					"value": "1.0",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "owner",
+					"value": "56ac2c24107bb68019d1271d",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "startTime",
+					"value": "1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "endTime",
+					"value": "2",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1454646563723,
+			"name": "create meetup",
+			"description": "create a simple meetup by invoking the API's post method",
+			"collectionId": "b6742caa-df3e-eced-d940-1aae4689cc35",
+			"responses": []
+		},
+		{
+			"id": "728b514d-1c99-361c-efe6-07b656344477",
+			"headers": "",
+			"url": "http://localhost:8002/api/users/beta/beta",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "params",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1454125853780,
+			"name": "authenticate user",
+			"description": "",
+			"collectionId": "b6742caa-df3e-eced-d940-1aae4689cc35",
+			"responses": []
+		},
+		{
+			"id": "a3c5944e-2e8d-f763-428a-175b2636873c",
+			"headers": "",
+			"url": "http://localhost:8002/api/friends/alpha",
+			"pathVariables": {},
+			"preRequestScript": "",
+			"method": "GET",
+			"collectionId": "b6742caa-df3e-eced-d940-1aae4689cc35",
+			"data": [],
+			"dataMode": "urlencoded",
+			"name": "get friends",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1454297757478,
+			"version": 2,
+			"responses": [],
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {}
+		},
+		{
+			"id": "b019bb79-d470-1bb3-135c-81272e15ae8e",
+			"headers": "",
+			"url": "http://localhost:8002/api/users/gamma",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "params",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1454125858516,
+			"name": "get user",
+			"description": "",
+			"collectionId": "b6742caa-df3e-eced-d940-1aae4689cc35",
+			"responses": []
+		},
+		{
+			"id": "b579a0cd-7d9a-f464-5d86-7930238d1b84",
+			"headers": "",
+			"url": "http://localhost:8002/api/relationships/56aed2a0632b62642de70993",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "PUT",
+			"data": [],
+			"dataMode": "urlencoded",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1454383153742,
+			"name": "verify friendship",
+			"description": "",
+			"collectionId": "b6742caa-df3e-eced-d940-1aae4689cc35",
+			"responses": []
+		},
+		{
+			"id": "d3a21768-ace4-146d-c9fd-a18bda7e10fa",
+			"headers": "",
+			"url": "http://localhost:8002/api/meetupers",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "meetup",
+					"value": "56b426166d4e509809d020bc",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "meetuper",
+					"value": "56ac2c3d107bb68019d1271f",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "meetuper",
+					"value": "56ac2c24107bb68019d1271d",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1454773303235,
+			"name": "create meetuper",
+			"description": "",
+			"collectionId": "b6742caa-df3e-eced-d940-1aae4689cc35",
+			"responses": []
+		},
+		{
+			"id": "e011d92d-742d-31de-bbc3-87ebd3d4b9af",
+			"headers": "",
+			"url": "http://localhost:8002/api/meetups/56ac2c24107bb68019d1271d",
+			"pathVariables": {},
+			"preRequestScript": "",
+			"method": "GET",
+			"collectionId": "b6742caa-df3e-eced-d940-1aae4689cc35",
+			"data": [],
+			"dataMode": "urlencoded",
+			"name": "get meetups",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1455506012752,
+			"version": 2,
+			"responses": [],
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {}
+		},
+		{
+			"id": "e215ea1d-c4a8-b098-a76a-1c214a3d9bf3",
+			"headers": "",
+			"url": "http://localhost:8002/api/users",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "userId",
+					"value": "delta",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "password",
+					"value": "delta",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "firstName",
+					"value": "James",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "lastName",
+					"value": "Hill",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1454125867469,
+			"name": "create user",
+			"description": "create a new user by invoking the meetup API",
+			"collectionId": "b6742caa-df3e-eced-d940-1aae4689cc35",
+			"responses": []
+		}
+	]
+}
