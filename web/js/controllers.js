@@ -17,9 +17,9 @@ myApp.controller('newMeetupCtrl', function($scope, $log, meetupApiService){
 });
 
 /*controller for the main meetup page*/
-myApp.controller('meetupCtrl', function($scope, $log, $window, $cookieStore, meetupApiService){
+myApp.controller('meetupCtrl', function($scope, $log, $window, $cookies, meetupApiService){
   $scope.selectedMeetup = "";
-  $scope.loggedInUser = $cookieStore.get('loggedInUser');
+  $scope.loggedInUser = $cookies.getObject('loggedInUser');
 
   meetupApiService.getMeetups($scope.loggedInUser._id).
   $promise.then(
@@ -45,7 +45,7 @@ myApp.controller('meetupCtrl', function($scope, $log, $window, $cookieStore, mee
 });
 
 /*controller for the login page*/
-myApp.controller('loginCtrl', function($scope, $window, $log, $cookieStore, meetupApiService){
+myApp.controller('loginCtrl', function($scope, $window, $log, $cookies, meetupApiService){
   $scope.isNewUser = false;
   $scope.errors;
   $scope.user = {};
@@ -61,7 +61,7 @@ myApp.controller('loginCtrl', function($scope, $window, $log, $cookieStore, meet
     result.$promise.then(
       function(response){
         $log.info(response);
-        $cookieStore.put('loggedInUser', response.data);
+        $cookies.putObject('loggedInUser', response.data);
         //sharedDataService.setLoggedInUser();
         $window.location.href = '#/viewMeetups';
       }

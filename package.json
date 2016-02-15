@@ -1,0 +1,9 @@
+{
+  "name":"meetup-api",
+  "author":"Baote (Terry) Zheng",
+  "dependencies":{
+    "express":">=1.2.0",
+    "body-parser":">=1.9.2",
+    "mongoose":">=4.4.3"
+  }
+}

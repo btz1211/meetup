@@ -8,19 +8,28 @@ var Relationship = mongoose.model('Relationship');
 /*-------------------meetup--------------------*/
 //get user's meetups
 module.exports.getMeetups = function(req, res){
-  var userId = req.params.userId;
-  console.log('[INFO] - received request for user::' + userId);
+  var id = req.params.userId;
+  console.log('[INFO] - received request for user::' + id);
 
-  Meetup.find({userId:userId}, function(error, meetups){
+  Meetuper.find({user:id}, 'meetup')
+  .populate('meetup').exec(function(error, meetupers){
     if(error){
       handleError(res, error); return;
     }
-    if(meetups){
+    if(meetupers){
+      console.log("[INFO] - meetups::" + JSON.stringify(meetupers));
+
+      //map the returned array to contain only meetup data
+      var meetups = meetupers.map(function(meetuper){
+        var meetup = {};
+        meetup = meetuper.meetup;
+        return meetup;
+      });
+      
       respond(res, 200, {success:true, data:meetups});
     }else{
       respond(res, 204, {success:false});
     }
-
   });
 };
 

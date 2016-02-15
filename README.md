@@ -1,5 +1,4 @@
 # meetup
 repository for meetup that contains:
-1. android code base
-2. Restful web service code base
-3. Mysql test scripts and table definitions
+1. node js web api for meetup services
+2. web app for meetup
