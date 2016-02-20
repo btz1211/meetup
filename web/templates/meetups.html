@@ -22,7 +22,7 @@
   </div>
 </nav>
 
-<div class="container" id="main-content">
+<div class="container" id="meetups-container">
 
   <div class="container meetup-container">
 
@@ -64,7 +64,7 @@
           </th>
         </tr>
       </thead>
-      <tbody ng-repeat="meetup in meetups | orderBy:'meetupers' | filter:query" ng-click="toggleMeetupInfo(meetup)">
+      <tbody ng-repeat="meetup in meetups | orderBy:'meetupers' | filter:query" ng-click="showMeetupInfo(meetup)">
         <tr >
           <td>
             {{meetup.name}}
@@ -88,45 +88,6 @@
             {{meetup.status}}
           </td>
         </tr>
-
-        <tr class="meetuper-info" ng-show="isSelectedMeetup(meetup)">
-          <td colspan="1000">
-            <h5 class="meetuper-header">Meetupers</h5>
-            <table class="table table-striped">
-              <thead>
-                <th>
-                  name
-                </th>
-                <th>
-                  lastKnownLatitude
-                </th>
-                <th>
-                  lastKnownLongitude
-                </th>
-                <th>
-                  status
-                </th>
-              </thead>
-              <tbody>
-                <tr ng-repeat="meetuper in meetup.meetupers">
-                  <td>
-                    {{meetuper.name}}
-                  </td>
-                  <td>
-                    {{meetuper.lastKnownLatitude}}
-                  </td>
-                  <td>
-                    {{meetuper.lastKnownLongitude}}
-                  </td>
-                  <td>
-                    {{meetuper.status}}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-
       </tbody>
     </table>
     <div class="empty-message" ng-show="meetups==null || meetups.length ==0">

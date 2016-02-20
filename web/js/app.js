@@ -4,8 +4,11 @@ var myApp = angular.module('myApp', ['ngResource', 'ngRoute', 'ngCookies'])
     .when('/login',{
       templateUrl: 'templates/login.html',
       controller: 'loginCtrl'
-    }).when('/viewMeetups', {
+    }).when('/meetups', {
       templateUrl: 'templates/meetups.html',
+      controller: 'meetupsCtrl'
+    }).when('/meetup/:meetupId',{
+      templateUrl: 'templates/meetup.html',
       controller: 'meetupCtrl'
     }).otherwise({redirectTo:'/login'});
 });

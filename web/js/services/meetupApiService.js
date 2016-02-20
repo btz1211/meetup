@@ -1,15 +1,20 @@
 'use strict';
 
 myApp.factory('meetupApiService', function($resource){
-  var getMeetupResource = $resource("/api/meetups/:userId", {userId:"@userId"});
+  var getMeetupResource = $resource("/api/meetup/:meetupId", {meetupId:"@meetupId"});
+  var getMeetupsResource = $resource("/api/meetups/:userId", {userId:"@userId"});
   var createMeetupResource = $resource("/api/meetups");
   var getUserResource = $resource("/api/users/:userId", {userId:"@userId"});
   var authenicateUserResource = $resource("/api/users/:userId/:password", {userId:"@userId", password:"@password"});
   var createUserResource = $resource("/api/users");
 
   return{
+    getMeetup: function(targetMeetupId){
+      return getMeetupResource.get({meetupId:targetMeetupId});
+    },
+    
     getMeetups: function(targetUserId){
-      return getMeetupResource.get({userId:targetUserId});
+      return getMeetupsResource.get({userId:targetUserId});
     },
 
     saveMeetup: function(meetup){

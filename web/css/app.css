@@ -29,45 +29,76 @@ body{
 }
 
 /**meetup page styling**/
-#main-content{
+#meetups-container{
     padding-top:120px;
 }
 
-.container .meetup-container{
+#meetups-container .container{
   background-color: #F9F9F9;
   border: 1px solid #e6e6e6;
   box-shadow: #dddddd 0px 1px 0px 0px;
 }
 
-.meetup-container .page-header {
+#meetups-container .page-header {
   margin-top:10px;
   margin-left:5px;
 }
 
-.meetup-container .group-title{
+#meetups-container .group-title{
   color:rgba(255, 152, 0, 0.87);
 }
 
-.meetup-container .plus-btn{
+#meetups-container .plus-btn{
   margin-top:36px;
   padding:3px 10px;
 }
 
-.meetup-container .empty-message{
+#meetups-container .empty-message{
   color:#727272;
   font-size:17px;
 }
 
-.meetup-container .meetuper-info{
+#meetups-container .meetuper-info{
 }
-.meetup-container .meetuper-info .meetuper-header{
+#meetups-container .meetuper-info .meetuper-header{
   color:#2D6784;
   font-weight: bold;
   padding-bottom: 5px;
   border-bottom: 1px solid #BBBBBB;
 }
-.meetup-container .meetuper-info .table{
+#meetups-container .meetuper-info .table{
   font-size: 13px;
+}
+
+/**meetup page styling**/
+#meetup-container{
+  padding-top: 120px;
+}
+
+#meetup-container .col-lg-2{
+  width:18%;
+}
+#meetup-container hr{
+  border-top:1px solid #CCCCCC;
+  margin-top:-15px;
+}
+
+#meetup-container .row{
+  padding:10px;
+}
+
+#meetup-container label{
+  line-height:45px;
+  font-size:13px;
+}
+#meetup-container p{
+  border: 1px solid lightgray;
+  padding: 10px;
+  background-color: rgba(255,255,255,0.15);
+}
+#meetup-container #map{
+  height:45%;
+  margin:15px;
 }
 
 /**new meetup page styling**/

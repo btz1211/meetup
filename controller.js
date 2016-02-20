@@ -8,11 +8,11 @@ var Relationship = mongoose.model('Relationship');
 /*-------------------meetup--------------------*/
 //get user's meetups
 module.exports.getMeetups = function(req, res){
-  var id = req.params.userId;
-  console.log('[INFO] - received request for user::' + id);
+  var id = mongoose.Types.ObjectId(req.params.userId);
+  console.log('[INFO] - received request for user id::' + id);
 
-  Meetuper.find({user:id}, 'meetup')
-  .populate('meetup').exec(function(error, meetupers){
+  Meetuper.find({user:id}, 'meetup').populate('meetup')
+  .exec(function(error, meetupers){
     if(error){
       handleError(res, error); return;
     }
@@ -25,13 +25,41 @@ module.exports.getMeetups = function(req, res){
         meetup = meetuper.meetup;
         return meetup;
       });
-      
+
       respond(res, 200, {success:true, data:meetups});
     }else{
       respond(res, 204, {success:false});
     }
   });
 };
+
+//get meetup
+module.exports.getMeetup = function(req, res){
+  var meetupId = req.params.meetupId;
+
+  if(mongoose.connection.readyState){
+    Meetup.findOne({_id:meetupId}).lean().exec(function(error, meetup){
+      if(error){
+        handleError(res, error);return;
+      }
+      if(meetup){
+        Meetuper.find({meetup:meetupId}, 'user status modifiedDate')
+        .populate({path:'user', select: 'userId firstName lastName lastKnownLatitude lastKnownLongitude'})
+        .exec(function(error, meetupers){
+          if(error){
+            handleError(res, error);return;
+          };
+          meetup.meetupers = meetupers;
+          console.log('meetupers::'+ JSON.stringify(meetup));
+
+          respond(res, 200, {success:true, data:meetup});
+        });
+      }else{
+        respond(res, 204, {success:false});
+      }
+    })
+  }
+}
 
 module.exports.createMeetup = function(req, res){
   var meetup = req.body;
@@ -162,7 +190,7 @@ module.exports.createMeetupers = function(req, res){
       var meetupers = users.map(function(user){
         var meetuper = {};
         meetuper.user = user._id;
-        meetuper.meetup = meetupId;
+        meetuper.meetup = mongoose.Types.ObjectId(meetupId);
         meetuper.status = "PENDING";
         return meetuper;
       });
