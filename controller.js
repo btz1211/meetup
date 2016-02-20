@@ -11,26 +11,30 @@ module.exports.getMeetups = function(req, res){
   var id = mongoose.Types.ObjectId(req.params.userId);
   console.log('[INFO] - received request for user id::' + id);
 
-  Meetuper.find({user:id}, 'meetup').populate('meetup')
-  .exec(function(error, meetupers){
-    if(error){
-      handleError(res, error); return;
-    }
-    if(meetupers){
-      console.log("[INFO] - meetups::" + JSON.stringify(meetupers));
+  if(mongoose.connection.readyState){
+    Meetuper.find({user:id}, 'meetup').populate('meetup')
+    .exec(function(error, meetupers){
+      if(error){
+        handleError(res, error); return;
+      }
+      if(meetupers){
+        console.log("[INFO] - meetups::" + JSON.stringify(meetupers));
 
-      //map the returned array to contain only meetup data
-      var meetups = meetupers.map(function(meetuper){
-        var meetup = {};
-        meetup = meetuper.meetup;
-        return meetup;
-      });
+        //map the returned array to contain only meetup data
+        var meetups = meetupers.map(function(meetuper){
+          var meetup = {};
+          meetup = meetuper.meetup;
+          return meetup;
+        });
 
-      respond(res, 200, {success:true, data:meetups});
-    }else{
-      respond(res, 204, {success:false});
-    }
-  });
+        respond(res, 200, {success:true, data:meetups});
+      }else{
+        respond(res, 204, {success:false});
+      }
+    });
+  }else{
+    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+  }
 };
 
 //get meetup
@@ -57,10 +61,13 @@ module.exports.getMeetup = function(req, res){
       }else{
         respond(res, 204, {success:false});
       }
-    })
+    });
+  }else{
+    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
 }
 
+/*create meetup*/
 module.exports.createMeetup = function(req, res){
   var meetup = req.body;
 
@@ -129,8 +136,7 @@ module.exports.authenticateUser = function(req, res){
   if(mongoose.connection.readyState){
     User.findOne({userId: userId, password: password}, 'userId firstName lastName createDate',function(error, user){
       if(error){
-        handleError(res, error);
-        return;
+        handleError(res, error);return;
       }else{
         if(user){
           respond(res, 200, {success:true, data:user});
@@ -144,6 +150,40 @@ module.exports.authenticateUser = function(req, res){
   }
 };
 
+module.exports.updateLocation = function(req, res){
+  var userId = req.params.userId;
+  console.log('[INFO] - received update location request for user::' + JSON.stringify(req.body));
+
+  if(! req.body.latitude || ! req.body.longitude){
+    respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"please provide values for [latitude] and [longitude]"}]});
+    return;
+  }
+  if(mongoose.connection.readyState){
+    User.findOne({_id: userId}, function(error, user){
+      if(error){
+        handleError(res, error); return;
+      }else{
+        if(user){
+          user.lastKnownLatitude = req.body.latitude;
+          user.lastKnownLongitude = req.body.longitude;
+          user.save(function(error){
+            if(error){
+              handleError(res, error); return;
+            }else{
+              respond(res, 200);
+            }
+          });
+        }else{
+          respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid user"}]});
+          return;
+        }
+      }
+    });
+  }else{
+    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+  }
+}
+
 /*-------------------meetupers--------------------*/
 module.exports.createMeetupers = function(req, res){
   var meetupId = req.body.meetup;
@@ -154,57 +194,61 @@ module.exports.createMeetupers = function(req, res){
     meetuperIds = [].concat(meetuperIds);
   }
 
-  //validate meetup
-  Meetup.findOne({_id:meetupId}, '_id', function(error, meetup){
-    if(error){
-      handleError(res, error); return;
-    }
-    if(!meetup){
-      respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid meetup"}]});
-      return;
-    }
-
-    //validate users
-    User.find({_id:{$in:meetuperIds}}, '_id', function(error, users){
-      if(users == null){ users = [];}
-
-      //convert user array to a hash
-      var userHash = {};
-      for(var i = 0; i<users.length;++i){
-        userHash[users[i]._id] = true;
+  if(mongoose.connection.readyState){
+    //validate meetup
+    Meetup.findOne({_id:meetupId}, '_id', function(error, meetup){
+      if(error){
+        handleError(res, error); return;
       }
-      console.log('[INFO] users found::' + JSON.stringify(userHash));
-
-      var invalidUsers = [];
-      for(var i = 0; i < meetuperIds.length; ++i){
-        if(! userHash.hasOwnProperty(meetuperIds[i])){
-          invalidUsers.push(meetuperIds[i]);
-        }
-      }
-      if(invalidUsers.length > 0){
-        respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid user(s) provided" + JSON.stringify(invalidUsers)}]});
+      if(!meetup){
+        respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid meetup"}]});
         return;
       }
 
-      //map meetuper to proper object for persistence
-      var meetupers = users.map(function(user){
-        var meetuper = {};
-        meetuper.user = user._id;
-        meetuper.meetup = mongoose.Types.ObjectId(meetupId);
-        meetuper.status = "PENDING";
-        return meetuper;
-      });
+      //validate users
+      User.find({_id:{$in:meetuperIds}}, '_id', function(error, users){
+        if(users == null){ users = [];}
 
-      console.log('[INFO] creating meetupers'+JSON.stringify(meetupers));
-      Meetuper.collection.insert(meetupers, function(error, meetupers){
-        if(error){
-          handleError(res, error); return;
+        //convert user array to a hash
+        var userHash = {};
+        for(var i = 0; i<users.length;++i){
+          userHash[users[i]._id] = true;
+        }
+        console.log('[INFO] users found::' + JSON.stringify(userHash));
+
+        var invalidUsers = [];
+        for(var i = 0; i < meetuperIds.length; ++i){
+          if(! userHash.hasOwnProperty(meetuperIds[i])){
+            invalidUsers.push(meetuperIds[i]);
+          }
+        }
+        if(invalidUsers.length > 0){
+          respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid user(s) provided" + JSON.stringify(invalidUsers)}]});
+          return;
         }
 
-        respond(res, 200, {success:true});
+        //map meetuper to proper object for persistence
+        var meetupers = users.map(function(user){
+          var meetuper = {};
+          meetuper.user = user._id;
+          meetuper.meetup = mongoose.Types.ObjectId(meetupId);
+          meetuper.status = "PENDING";
+          return meetuper;
+        });
+
+        console.log('[INFO] creating meetupers'+JSON.stringify(meetupers));
+        Meetuper.collection.insert(meetupers, function(error, meetupers){
+          if(error){
+            handleError(res, error); return;
+          }
+
+          respond(res, 200, {success:true});
+        });
       });
     });
-  });
+  }else{
+    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+  }
 }
 /*-------------------relationship--------------------*/
 //get relationships
@@ -214,26 +258,30 @@ module.exports.verifyFriendship = function(req, res){
   var relationshipId = req.params.relationshipId;
   console.log("received request to update relationship::"+JSON.stringify(relationshipId));
 
-  Relationship.findOne({_id:relationshipId}, function(error, relationship){
-    if(error){
-      handleError(res, error);return;
-    }
-    //make sure relationship is still in a good state
-    if(!relationship || relationship.status != 'PENDING'){
-      respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR",
-                errorMessage:"relationship:"+ relationshipId +" is no longer pending"}]});
-      return;
-    }
-
-    relationship.status='VERIFIED';
-    relationship.save(function(error){
+  if(mongoose.connection.readyState){
+    Relationship.findOne({_id:relationshipId}, function(error, relationship){
       if(error){
         handleError(res, error);return;
-      }else{
-        respond(res, 200);
       }
+      //make sure relationship is still in a good state
+      if(!relationship || relationship.status != 'PENDING'){
+        respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR",
+                  errorMessage:"relationship:"+ relationshipId +" is no longer pending"}]});
+        return;
+      }
+
+      relationship.status='VERIFIED';
+      relationship.save(function(error){
+        if(error){
+          handleError(res, error);return;
+        }else{
+          respond(res, 200);
+        }
+      });
     });
-  });
+  }else{
+    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+  }
 }
 
 //get friends

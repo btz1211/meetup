@@ -3,16 +3,16 @@
 myApp.factory('meetupApiService', function($resource){
   var getMeetupResource = $resource("/api/meetup/:meetupId", {meetupId:"@meetupId"});
   var getMeetupsResource = $resource("/api/meetups/:userId", {userId:"@userId"});
-  var createMeetupResource = $resource("/api/meetups");
-  var getUserResource = $resource("/api/users/:userId", {userId:"@userId"});
-  var authenicateUserResource = $resource("/api/users/:userId/:password", {userId:"@userId", password:"@password"});
-  var createUserResource = $resource("/api/users");
+  var createMeetupResource = $resource("/api/meetup");
+  var getUserResource = $resource("/api/user/:userId", {userId:"@userId"});
+  var authenicateUserResource = $resource("/api/user/:userId/:password", {userId:"@userId", password:"@password"});
+  var createUserResource = $resource("/api/user");
 
   return{
     getMeetup: function(targetMeetupId){
       return getMeetupResource.get({meetupId:targetMeetupId});
     },
-    
+
     getMeetups: function(targetUserId){
       return getMeetupsResource.get({userId:targetUserId});
     },
