@@ -31,8 +31,9 @@ app.put("/api/relationship/:relationshipId", meetupCtrl.verifyFriendship);
 app.put("/api/user/location/:userId", meetupCtrl.updateLocation);
 
 
-app.get('/api/geolocation/:address', function(req, res){
-  var address = req.params.address;
+app.get('/api/geolocation', function(req, res){
+  var address = req.query.address;
+  console.log('[INFO] - received address request::' + JSON.stringify(req.query));
 
   if(!address){
     res.status(400);

@@ -26,6 +26,10 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, meetup
 
   }
 
+  $scope.newMeetup = function(){
+    $window.location.href = '#/meetup/new';
+  }
+
 /*
   $scope.isSelectedMeetup = function(meetup){
     return $scope.selectedMeetup === meetup;

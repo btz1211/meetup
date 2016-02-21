@@ -31,7 +31,7 @@ myApp.factory('mapService', function($log){
 
       });
 
-      /*mark meetupers on the map*/
+      /*mark meetupers on the map
       for(var i = 0; i < meetup.meetupers.length; ++i){
         var meetuper = meetup.meetupers[i];
         if(meetuper.lastKnownLatitude && meetuper.lastKnownLongitude){}
