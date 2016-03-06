@@ -28,16 +28,12 @@ body{
   padding:0 !important;
 }
 
-/**meetup page styling**/
+/**meetup page styling
 #meetups-container{
     padding-top:120px;
 }
 
-#meetups-container .container{
-  background-color: #F9F9F9;
-  border: 1px solid #e6e6e6;
-  box-shadow: #dddddd 0px 1px 0px 0px;
-}
+
 
 #meetups-container .page-header {
   margin-top:10px;
@@ -48,39 +44,82 @@ body{
   color:rgba(255, 152, 0, 0.87);
 }
 
-#meetups-container .plus-btn{
-  margin-top:36px;
+#meetup-container .plus-btn{
+  margin-top:26px;
   padding:3px 10px;
 }
 
-#meetups-container .empty-message{
-  color:#727272;
-  font-size:17px;
+
+
+#meetups-container .col-md-2{
+  width: 16%;
+}**/
+
+/**content container**/
+.content-container{
+  margin-top: 120px;
+  background-color:white;
 }
 
-#meetups-container .meetuper-info{
+.content-container .container{
+  background-color: #F9F9F9;
+  border: 1px solid #e6e6e6;
+  box-shadow: #dddddd 0px 1px 0px 0px;
 }
-#meetups-container .meetuper-info .meetuper-header{
-  color:#2D6784;
+.content-container .col-md-6{
+  padding-left:8px;
+}
+
+.content-container .page-header {
+  margin-top:0;
+  padding-left:0;
+}
+
+.content-container .plus-btn{
+  margin-top:24px;
+  padding:3px 10px;
+}
+
+.content-container .group-title{
+  color:rgba(255, 119, 1, 0.74);
   font-weight: bold;
   padding-bottom: 5px;
-  border-bottom: 1px solid #BBBBBB;
+  padding-right:0;
 }
-#meetups-container .meetuper-info .table{
-  font-size: 13px;
+
+.content-container .empty-message{
+  color:#727272;
+  font-size:17px;
+  padding-left:10px;
+}
+
+/**meetups-container**/
+#meetups-container td{
+  cursor:pointer;
+}
+#meetups-container .col-md-3{
+  width:34%;
+}
+/**friends-container**/
+#friends-container .col-md-3{
+  width:20%;
 }
 
 /**meetup page styling**/
 #meetup-container{
-  padding-top: 120px;
+  margin-top: 120px;
 }
-
 #meetup-container .col-lg-2{
   width:18%;
 }
+
 #meetup-container hr{
   border-top:1px solid #CCCCCC;
-  margin-top:-15px;
+  margin-top:-5px;
+}
+
+#meetup-container legend{
+  border: 0;
 }
 
 #meetup-container .row{
@@ -100,8 +139,14 @@ body{
   height:45%;
   margin:15px;
 }
+#meetup-container a:hover {
+ cursor:pointer;
+}
 
-/**new meetup page styling**/
-.new-meetup-form .btn{
-  margin:5px;
+#meetup-container .create-meetup-btn{
+  float:right;
+  margin-right: 5px;
+}
+#meetup-container .cancel-btn{
+  float:right;
 }

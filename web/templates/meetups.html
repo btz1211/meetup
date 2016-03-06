@@ -14,7 +14,7 @@
     <div class="collapse navbar-collapse" id="navbar-main">
       <ul class="nav navbar-nav">
         <li class="active"><a href="#">Meetups</a></li>
-        <li><a href="#">Friends</a></li>
+        <li><a href="#/friends">Friends</a></li>
         <li><a href="#">Me</a></li>
         <li>{{loggedInUser.userId}}, {{loggedInUser._id}}</li>
       </ul>
@@ -22,18 +22,15 @@
   </div>
 </nav>
 
-<div class="container" id="meetups-container">
-
-  <div class="container meetup-container">
+  <div class="container content-container" id="meetups-container">
 
     <div class="row">
-      <div class="page-header col-md-12">
-        <!--<span class="label label-primary group-title  ">Meetups</span>-->
-        <div class="col-md-2">
-          <h2 class="group-title">Meetups</h2>
+      <div class="col-md-6">
+        <div class="col-md-3">
+          <h2 class="group-title">My Meetups</h2>
         </div>
-        <div class="col-md-2">
-          <button class="btn btn-success plus-btn">+</button>
+        <div class="col-md-3">
+          <button class="btn btn-success plus-btn" ng-click="newMeetup()">+</button>
         </div>
       </div>
     </div>
@@ -46,12 +43,6 @@
           </th>
           <th>
             address
-          </th>
-          <th>
-            latitude
-          </th>
-          <th>
-            longitude
           </th>
           <th>
             start time
@@ -73,16 +64,10 @@
             {{meetup.address}}
           </td>
           <td>
-            {{meetup.latitude | coordinateFilter}}
+            {{meetup.startTime |  date:'medium'}}
           </td>
           <td>
-            {{meetup.longitude | coordinateFilter}}
-          </td>
-          <td>
-            {{meetup.startTime}}
-          </td>
-          <td>
-            {{meetup.endTime}}
+            {{meetup.endTime | date:'medium'}}
           </td>
           <td>
             {{meetup.status}}
@@ -94,4 +79,3 @@
       <p>You current do not have any meet ups</p>
     </div>
   </div>
-</div>

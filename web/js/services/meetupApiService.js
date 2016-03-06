@@ -7,6 +7,8 @@ myApp.factory('meetupApiService', function($resource){
   var getUserResource = $resource("/api/user/:userId", {userId:"@userId"});
   var authenicateUserResource = $resource("/api/user/:userId/:password", {userId:"@userId", password:"@password"});
   var createUserResource = $resource("/api/user");
+  var getFriendsResource = $resource("/api/friends/:userId", {userId:"@userId"});
+  var updateLocationResource = $resource("/api/user/location/:userId", null, {'update':{method:'PUT'}});
 
   return{
     getMeetup: function(targetMeetupId){
@@ -32,8 +34,16 @@ myApp.factory('meetupApiService', function($resource){
     },
 
     createUser: function(user){
-      console.log("[INFO] - saving user:" + JSON.stringify(user));
       return createUserResource.save(user);
+    },
+
+    getFriends: function(targetUserId){
+      return getFriendsResource.get({userId:targetUserId});
+    },
+
+    updateLocation: function(targetUserId, location){
+      console.log("[INFO] - latitude::"+ location.latitude + ", longitude::"+ location.longitude + " for user::" + targetUserId);
+      return updateLocationResource.update({userId:targetUserId}, {'latitude':location.latitude, 'longitude':location.longitude});
     }
   }
 });

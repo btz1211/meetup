@@ -54,8 +54,6 @@ module.exports.getMeetup = function(req, res){
             handleError(res, error);return;
           };
           meetup.meetupers = meetupers;
-          console.log('meetupers::'+ JSON.stringify(meetup));
-
           respond(res, 200, {success:true, data:meetup});
         });
       }else{
@@ -77,11 +75,23 @@ module.exports.createMeetup = function(req, res){
     console.log('[INFO] - creating meetup::'+ JSON.stringify(meetup));
 
     //save meetup
-    newMeetup.save(function(error){
+    newMeetup.save(function(error, meetup){
       if(error){
         handleError(res, error);
       }else{
-        respond(res, 200);
+
+        //create owner as the first meetuper
+        var owner = new Meetuper();
+        owner.user = meetup.owner;
+        owner.meetup = meetup._id;
+        owner.status = "INPROGRESS";
+        owner.save(function(error){
+          if(error){
+            handleError(res, error);
+          }else{
+            respond(res, 200);
+          }
+        });
       }
     });
   }else{
@@ -152,7 +162,7 @@ module.exports.authenticateUser = function(req, res){
 
 module.exports.updateLocation = function(req, res){
   var userId = req.params.userId;
-  console.log('[INFO] - received update location request for user::' + JSON.stringify(req.body));
+  console.log('[INFO] - received update location request for user::'+ userId +" with location::" + JSON.stringify(req.body));
 
   if(! req.body.latitude || ! req.body.longitude){
     respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"please provide values for [latitude] and [longitude]"}]});
@@ -288,7 +298,7 @@ module.exports.verifyFriendship = function(req, res){
 module.exports.getFriends = function(req, res){
   var userId = req.params.userId;
   if(mongoose.connection.readyState){
-    User.findOne({userId:userId}, '_id', function(error, user){
+    User.findOne({_id:userId}, '_id', function(error, user){
       if(error){
         handleError(res, error); return;
       }
@@ -304,24 +314,25 @@ module.exports.getFriends = function(req, res){
       //get friends who are the source
       Relationship.find({status:'VERIFIED', type:'FRIENDS', $or:[{source:user._id}, {target:user._id}]})
       .select('source target')
-      .populate('source target, userId firstName lastName dateOfBirth')
-      .exec(function(error, users){
+      .populate({
+        path:'source target',
+        select: 'userId firstName lastName dateOfBirth'
+      }).exec(function(error, relationships){
         if(error){
           handleError(res, error);return;
         }
+        console.log('[INFO] - friends found::' + JSON.stringify(relationships) + " for user::"+userId);
 
         //retrieve only friends
-        var friends = users.map(function(relationship){
-          var filteredUsers = [];
-          if(userId == relationship.source.userId){
-            filteredUsers.push(relationship.target);
+        var friends = relationships.map(function(relationship){
+          var friend = {};
+          if(userId === relationship.source.id){
+            return relationship.target;
           }else{
-            filteredUsers.push(relationship.source);
+            return relationship.source;
           }
-          return filteredUsers;
         });
 
-        console.log('[INFO] - friends found::' + JSON.stringify(users));
         respond(res, 200, {success:true, data:friends});
       });
     });
@@ -343,16 +354,23 @@ module.exports.createRelationship = function(req, res){
   }
 
   if(mongoose.connection.readyState){
-      relationship.status = "PENDING";
-
-      //create relationship
-      var newRelationship = new Relationship(relationship);
-      newRelationship.save(function(error){
-        if(error){
-          handleError(res, error); return;
-        }else{
-          respond(res, 200);
+      User.find({$or:[{_id:relationship.source}, {_id:relationship.target}]}, '_id', function(error, users){
+        if(!users || users.length != 2){
+          respond(res, 400, {sucess:false, errors:[{errorCode:"INVALID_REQUEST_ERROR",
+            errorMessage:"request contains invalid user" }]});
+          return;
         }
+
+        relationship.status = "PENDING";
+        //create relationship
+        var newRelationship = new Relationship(relationship);
+        newRelationship.save(function(error, relationship){
+          if(error){
+            handleError(res, error); return;
+          }else{
+            respond(res, 200, {data:relationship});
+          }
+        });
       });
   }else{
     respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});

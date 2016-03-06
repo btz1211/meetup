@@ -7,8 +7,14 @@ var myApp = angular.module('myApp', ['ngResource', 'ngRoute', 'ngCookies'])
     }).when('/meetups', {
       templateUrl: 'templates/meetups.html',
       controller: 'meetupsCtrl'
+    }).when('/meetup/new',{
+      templateUrl: 'templates/editMeetup.html',
+      controller: 'editMeetupCtrl'
     }).when('/meetup/:meetupId',{
       templateUrl: 'templates/meetup.html',
       controller: 'meetupCtrl'
+    }).when('/friends',{
+      templateUrl: 'templates/friends.html',
+      controller: 'friendsCtrl'
     }).otherwise({redirectTo:'/login'});
 });

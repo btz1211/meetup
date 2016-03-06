@@ -24,15 +24,15 @@ app.get("/api/friends/:userId", meetupCtrl.getFriends);
 
 app.post("/api/user", meetupCtrl.createUser);
 app.post("/api/meetup", meetupCtrl.createMeetup);
-app.post("/api/meetuper", meetupCtrl.createMeetupers);
+app.post("/api/meetupers", meetupCtrl.createMeetupers);
 app.post("/api/relationship", meetupCtrl.createRelationship);
 
 app.put("/api/relationship/:relationshipId", meetupCtrl.verifyFriendship);
 app.put("/api/user/location/:userId", meetupCtrl.updateLocation);
 
-
-app.get('/api/geolocation/:address', function(req, res){
-  var address = req.params.address;
+/**api for geting coordinates from address**/
+app.get('/api/geolocation', function(req, res){
+  var address = req.query.address;
 
   if(!address){
     res.status(400);
