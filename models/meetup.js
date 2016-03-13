@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var User = require('./user').model;
 var userValidation = require('./user').validation;
+var meetuperSchema = require('./meetuper').schema;
 
 var meetupSchema = mongoose.Schema({
   name: {type: String, required: '{PATH} is required' },
@@ -13,6 +14,7 @@ var meetupSchema = mongoose.Schema({
   owner:{type: mongoose.Schema.Types.ObjectId, ref:'User', required:'{PATH} is required'},
   createDate:{ type:Date, default: Date.now },
   modifiedDate: { type:Date, default: Date.now },
+  meetupers:[meetuperSchema]
 });
 
 //additional validation for owner

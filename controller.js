@@ -90,7 +90,7 @@ module.exports.createMeetup = function(req, res){
           if(error){
             buildResponseWithError(res, error);
           }else{
-            buildResponse(res, 200);
+            buildResponse(res, 200, {data: meetup});
           }
         });
       }
@@ -221,57 +221,35 @@ module.exports.updateLocation = function(req, res){
 /*-------------------meetupers--------------------*/
 module.exports.createMeetupers = function(req, res){
   var meetupId = req.body.meetup;
-  var meetuperIds = req.body.meetuper;
-
-  //convert meetuperIds to array, if its not
-  if(! Array.isArray(meetuperIds)){
-    meetuperIds = [].concat(meetuperIds);
-  }
 
   if(mongoose.connection.readyState){
-    //validate meetup
-    Meetup.findOne({_id:meetupId}, '_id', function(error, meetup){
+    Meetup.find({_id: meetupId}, '_id', function(error, meetup){
       if(error){
         buildResponseWithError(res, error); return;
       }
-      if(!meetup){
-        buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid meetup"}]});
-        return;
+
+      console.log('[INFO] - meetup found::' + JSON.stringify(meetup));
+      if(!meetup || meetup.length == 0){
+        buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid meetup: " + meetupId}]}); return;
       }
 
-      //validate users
+      meetuperIds = [].concat(req.body.meetuper);
       User.find({_id:{$in:meetuperIds}}, '_id', function(error, users){
-        if(users == null){ users = [];}
-
-        //convert user array to a hash
-        var userHash = {};
-        for(var i = 0; i<users.length;++i){
-          userHash[users[i]._id] = true;
+        if(error){
+          buildResponseWithError(res, error); return;
         }
-        console.log('[INFO] users found::' + JSON.stringify(userHash));
-
-        var invalidUsers = [];
-        for(var i = 0; i < meetuperIds.length; ++i){
-          if(! userHash.hasOwnProperty(meetuperIds[i])){
-            invalidUsers.push(meetuperIds[i]);
-          }
-        }
-        if(invalidUsers.length > 0){
-          buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid user(s) provided" + JSON.stringify(invalidUsers)}]});
+        if(!users || (users.length != meetuperIds.length)){
+          buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"request contains invalid user(s)"}]});
           return;
         }
 
         //map meetuper to proper object for persistence
         var meetupers = users.map(function(user){
-          var meetuper = {};
-          meetuper.user = user._id;
-          meetuper.meetup = mongoose.Types.ObjectId(meetupId);
-          meetuper.status = "PENDING";
-          return meetuper;
+          return new Meetuper({user:user._id});
         });
-
         console.log('[INFO] creating meetupers'+JSON.stringify(meetupers));
-        Meetuper.collection.insert(meetupers, function(error, meetupers){
+
+        Meetup.update({_id: meetupId, 'meetupers.user':{$nin: meetuperIds} }, {$push: {meetupers: {$each: meetupers}}}, function(error){
           if(error){
             buildResponseWithError(res, error); return;
           }
