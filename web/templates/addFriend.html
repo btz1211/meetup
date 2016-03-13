@@ -1,0 +1,50 @@
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <!--collpased header-->
+    <div class="navbar-header">
+      <a href="#/meetups" class="navbar-brand"><strong>Meetup</strong> Now!</a>
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+
+    <!--expanded header-->
+    <div class="collapse navbar-collapse" id="navbar-main">
+      <ul class="nav navbar-nav">
+        <li><a href="#/meetups">Meetups</a></li>
+        <li class="active"><a href="#/friends">Friends</a></li>
+        <li><a href="#">Me</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container" id="add-friend-container">
+  <div class="col-lg-12 row">
+    <div class="form-group">
+      <div class="input-group input-group-lg">
+        <input type="text" required class="form-control" required placeholder="Start typing to search" ng-model="name" ng-model-options="{debounce:1000}"  ng-change="search(name)"/>
+        <span class="input-group-addon"><a ng-click="search(name)"><i class="fa fa-search"></i></a></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="search-result-container">
+  <table class="search-result-table table table-striped table-hover" ng-show="users.length>0">
+    <tr>
+      <th>user</th>
+      <th>first name</th>
+      <th>last name</th>
+      <th>action</th>
+    </tr>
+    <tr ng-repeat="user in users">
+      <td>{{user.userId}}</td>
+      <td>{{user.firstName}}</td>
+      <td>{{user.lastName}}</td>
+      <td><button type="button" class="btn btn-success" ng-click="addFriend(user)">add friend</button></td>
+    </tr>
+  </table>
+</div>

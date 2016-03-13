@@ -21,6 +21,7 @@ app.get("/api/meetups/:userId", meetupCtrl.getMeetups);
 app.get("/api/meetup/:meetupId", meetupCtrl.getMeetup);
 //app.get("/api/relationships/:userId", meetupCtrl.getRelationships);
 app.get("/api/friends/:userId", meetupCtrl.getFriends);
+app.get("/api/users/:searchString", meetupCtrl.searchUsers);
 
 app.post("/api/user", meetupCtrl.createUser);
 app.post("/api/meetup", meetupCtrl.createMeetup);

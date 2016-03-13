@@ -16,5 +16,8 @@ var myApp = angular.module('myApp', ['ngResource', 'ngRoute', 'ngCookies'])
     }).when('/friends',{
       templateUrl: 'templates/friends.html',
       controller: 'friendsCtrl'
+    }).when('/friends/add',{
+      templateUrl: 'templates/addFriend.html',
+      controller: 'addFriendCtrl'
     }).otherwise({redirectTo:'/login'});
 });

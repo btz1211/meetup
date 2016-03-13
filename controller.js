@@ -15,25 +15,26 @@ module.exports.getMeetups = function(req, res){
     Meetuper.find({user:id}, 'meetup').populate('meetup')
     .exec(function(error, meetupers){
       if(error){
-        handleError(res, error); return;
-      }
-      if(meetupers){
-        console.log("[INFO] - meetups::" + JSON.stringify(meetupers));
-
-        //map the returned array to contain only meetup data
-        var meetups = meetupers.map(function(meetuper){
-          var meetup = {};
-          meetup = meetuper.meetup;
-          return meetup;
-        });
-
-        respond(res, 200, {success:true, data:meetups});
+        buildResponseWithError(res, error);
       }else{
-        respond(res, 204, {success:false});
+        if(meetupers){
+          console.log("[INFO] - meetups::" + JSON.stringify(meetupers));
+
+          //map the returned array to contain only meetup data
+          var meetups = meetupers.map(function(meetuper){
+            var meetup = {};
+            meetup = meetuper.meetup;
+            return meetup;
+          });
+
+          buildResponse(res, 200, {success:true, data:meetups});
+        }else{
+          buildResponse(res, 204, {success:false});
+        }
       }
     });
   }else{
-    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
 };
 
@@ -44,24 +45,24 @@ module.exports.getMeetup = function(req, res){
   if(mongoose.connection.readyState){
     Meetup.findOne({_id:meetupId}).lean().exec(function(error, meetup){
       if(error){
-        handleError(res, error);return;
+        buildResponseWithError(res, error);return;
       }
       if(meetup){
         Meetuper.find({meetup:meetupId}, 'user status modifiedDate')
         .populate({path:'user', select: 'userId firstName lastName lastKnownLatitude lastKnownLongitude'})
         .exec(function(error, meetupers){
           if(error){
-            handleError(res, error);return;
+            buildResponseWithError(res, error);return;
           };
           meetup.meetupers = meetupers;
-          respond(res, 200, {success:true, data:meetup});
+          buildResponse(res, 200, {success:true, data:meetup});
         });
       }else{
-        respond(res, 204, {success:false});
+        buildResponse(res, 204, {success:false});
       }
     });
   }else{
-    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
 }
 
@@ -77,7 +78,7 @@ module.exports.createMeetup = function(req, res){
     //save meetup
     newMeetup.save(function(error, meetup){
       if(error){
-        handleError(res, error);
+        buildResponseWithError(res, error); return;
       }else{
 
         //create owner as the first meetuper
@@ -87,15 +88,15 @@ module.exports.createMeetup = function(req, res){
         owner.status = "INPROGRESS";
         owner.save(function(error){
           if(error){
-            handleError(res, error);
+            buildResponseWithError(res, error);
           }else{
-            respond(res, 200);
+            buildResponse(res, 200);
           }
         });
       }
     });
   }else{
-    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
 };
 
@@ -107,13 +108,13 @@ module.exports.createUser = function(req, res){
   if(mongoose.connection.readyState){
     newUser.save(function(error){
       if(error){
-        handleError(res, error);
+        buildResponseWithError(res, error);
       }else{
-        respond(res, 200);
+        buildResponse(res, 200);
       }
     });
   }else{
-    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
 };
 
@@ -124,17 +125,17 @@ module.exports.getUser = function(req, res){
   if(mongoose.connection.readyState){
     User.findOne({userId:userId}, 'userId firstName lastName createDate', function(error, user){
       if(error){
-        handleError(res, error);return;
+        buildResponseWithError(res, error);return;
       }else{
         if(user){
-          respond(res, 200, {success:true, data:user});
+          buildResponse(res, 200, {success:true, data:user});
         }else{
-          respond(res, 204, {success:false});
+          buildResponse(res, 204, {success:false});
         }
       }
     });
   }else{
-    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
 }
 
@@ -146,51 +147,74 @@ module.exports.authenticateUser = function(req, res){
   if(mongoose.connection.readyState){
     User.findOne({userId: userId, password: password}, 'userId firstName lastName createDate',function(error, user){
       if(error){
-        handleError(res, error);return;
+        buildResponseWithError(res, error);return;
       }else{
         if(user){
-          respond(res, 200, {success:true, data:user});
+          buildResponse(res, 200, {success:true, data:user});
         }else{
-          respond(res, 401, {sucess:false, errors:[{errorCode:"AUTHENTICATION_ERROR", errorMessage:"user not found"}]});
+          buildResponse(res, 401, {sucess:false, errors:[{errorCode:"AUTHENTICATION_ERROR", errorMessage:"user not found"}]});
         }
       }
     });
   }else{
-    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
 };
+
+module.exports.searchUsers = function(req, res){
+  var searchString = req.params.searchString;
+  console.log('[INFO] - search keywords'+ searchString);
+
+  if(mongoose.connection.readyState){
+    User.find({$text: {$search: searchString, $caseSensitive:false}})
+    .select('id userId firstName lastName')
+    .exec(function(error, users){
+      if(error){
+        buildResponseWithError(res, error); return;
+      }
+
+      if(!users){
+        buildResponse(res, 204, {success:false});
+      }else{
+        buildResponse(res, 200, {success:true, data:users});
+      }
+    })
+  }else{
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+  }
+}
 
 module.exports.updateLocation = function(req, res){
   var userId = req.params.userId;
   console.log('[INFO] - received update location request for user::'+ userId +" with location::" + JSON.stringify(req.body));
 
   if(! req.body.latitude || ! req.body.longitude){
-    respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"please provide values for [latitude] and [longitude]"}]});
+    buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"please provide values for [latitude] and [longitude]"}]});
     return;
   }
   if(mongoose.connection.readyState){
     User.findOne({_id: userId}, function(error, user){
       if(error){
-        handleError(res, error); return;
+        buildResponseWithError(res, error); return;
       }else{
         if(user){
           user.lastKnownLatitude = req.body.latitude;
           user.lastKnownLongitude = req.body.longitude;
           user.save(function(error){
             if(error){
-              handleError(res, error); return;
+              buildResponseWithError(res, error); return;
             }else{
-              respond(res, 200);
+              buildResponse(res, 200);
             }
           });
         }else{
-          respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid user"}]});
+          buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid user"}]});
           return;
         }
       }
     });
   }else{
-    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
 }
 
@@ -208,10 +232,10 @@ module.exports.createMeetupers = function(req, res){
     //validate meetup
     Meetup.findOne({_id:meetupId}, '_id', function(error, meetup){
       if(error){
-        handleError(res, error); return;
+        buildResponseWithError(res, error); return;
       }
       if(!meetup){
-        respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid meetup"}]});
+        buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid meetup"}]});
         return;
       }
 
@@ -233,7 +257,7 @@ module.exports.createMeetupers = function(req, res){
           }
         }
         if(invalidUsers.length > 0){
-          respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid user(s) provided" + JSON.stringify(invalidUsers)}]});
+          buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid user(s) provided" + JSON.stringify(invalidUsers)}]});
           return;
         }
 
@@ -249,15 +273,15 @@ module.exports.createMeetupers = function(req, res){
         console.log('[INFO] creating meetupers'+JSON.stringify(meetupers));
         Meetuper.collection.insert(meetupers, function(error, meetupers){
           if(error){
-            handleError(res, error); return;
+            buildResponseWithError(res, error); return;
           }
 
-          respond(res, 200, {success:true});
+          buildResponse(res, 200, {success:true});
         });
       });
     });
   }else{
-    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
 }
 /*-------------------relationship--------------------*/
@@ -271,11 +295,11 @@ module.exports.verifyFriendship = function(req, res){
   if(mongoose.connection.readyState){
     Relationship.findOne({_id:relationshipId}, function(error, relationship){
       if(error){
-        handleError(res, error);return;
+        buildResponseWithError(res, error);return;
       }
       //make sure relationship is still in a good state
       if(!relationship || relationship.status != 'PENDING'){
-        respond(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR",
+        buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR",
                   errorMessage:"relationship:"+ relationshipId +" is no longer pending"}]});
         return;
       }
@@ -283,14 +307,14 @@ module.exports.verifyFriendship = function(req, res){
       relationship.status='VERIFIED';
       relationship.save(function(error){
         if(error){
-          handleError(res, error);return;
+          buildResponseWithError(res, error);return;
         }else{
-          respond(res, 200);
+          buildResponse(res, 200);
         }
       });
     });
   }else{
-    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
 }
 
@@ -300,11 +324,11 @@ module.exports.getFriends = function(req, res){
   if(mongoose.connection.readyState){
     User.findOne({_id:userId}, '_id', function(error, user){
       if(error){
-        handleError(res, error); return;
+        buildResponseWithError(res, error); return;
       }
 
       if(!user){
-        respond(res, 400, {sucess:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid user id::"+userId}]});
+        buildResponse(res, 400, {sucess:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid user id::"+userId}]});
         return;
       }
 
@@ -319,7 +343,7 @@ module.exports.getFriends = function(req, res){
         select: 'userId firstName lastName dateOfBirth'
       }).exec(function(error, relationships){
         if(error){
-          handleError(res, error);return;
+          buildResponseWithError(res, error);return;
         }
         console.log('[INFO] - friends found::' + JSON.stringify(relationships) + " for user::"+userId);
 
@@ -333,11 +357,11 @@ module.exports.getFriends = function(req, res){
           }
         });
 
-        respond(res, 200, {success:true, data:friends});
+        buildResponse(res, 200, {success:true, data:friends});
       });
     });
   }else{
-    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
 };
 
@@ -348,7 +372,7 @@ module.exports.createRelationship = function(req, res){
 
   //fail if the source equals the target
   if(relationship.source && relationship.source === relationship.target){
-    respond(res, 400, {sucess:false, errors:[{errorCode:"INVALID_REQUEST_ERROR",
+    buildResponse(res, 400, {sucess:false, errors:[{errorCode:"INVALID_REQUEST_ERROR",
       errorMessage:"source user cannot be the same as the target user!" }]});
     return;
   }
@@ -356,7 +380,7 @@ module.exports.createRelationship = function(req, res){
   if(mongoose.connection.readyState){
       User.find({$or:[{_id:relationship.source}, {_id:relationship.target}]}, '_id', function(error, users){
         if(!users || users.length != 2){
-          respond(res, 400, {sucess:false, errors:[{errorCode:"INVALID_REQUEST_ERROR",
+          buildResponse(res, 400, {sucess:false, errors:[{errorCode:"INVALID_REQUEST_ERROR",
             errorMessage:"request contains invalid user" }]});
           return;
         }
@@ -366,19 +390,19 @@ module.exports.createRelationship = function(req, res){
         var newRelationship = new Relationship(relationship);
         newRelationship.save(function(error, relationship){
           if(error){
-            handleError(res, error); return;
+            buildResponseWithError(res, error); return;
           }else{
-            respond(res, 200, {data:relationship});
+            buildResponse(res, 200, {data:relationship});
           }
         });
       });
   }else{
-    respond(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
 }
 
 /*-------------------utilties function (move later)--------------------*/
-var handleError = function(res, error){
+var buildResponseWithError = function(res, error){
   console.log("error::"+ JSON.stringify(error));
 
   var errors = [];
@@ -388,31 +412,31 @@ var handleError = function(res, error){
         for(field in error.errors){
           errors.push({errorCode:"VALIDATION_ERROR", field:field, errorMessage:error.errors[field].message});
         }
-        respond(res, 400, {success:false, errors:errors});
+        buildResponse(res, 400, {success:false, errors:errors});
         break;
       case 'CastError':
         errors.push({errorCode:"VALIDATION_ERROR", errorMessage:"parameter value ["+error.value+"] is invalid, expected type:"+error.kind})
-        respond(res, 400, {success:false, errors:errors});
+        buildResponse(res, 400, {success:false, errors:errors});
         break;
       case 'MongoError':
         switch(error.code){
           case 11000:
             errors.push({errorCode:"DUPLICATION_ERROR", errorMessage:error.errmsg});
-            respond(res, 409, {success:false, errors:errors});
+            buildResponse(res, 409, {success:false, errors:errors});
             break;
           default:
             errors.push({errorCode:"DB_ERROR", errorMessage:"db error occurred::" + error.errmsg});
-            respond(res, 500, {success:false, errors:errors});
+            buildResponse(res, 500, {success:false, errors:errors});
         }
         break;
       default:
         errors.push({errorCode:error.name, errorMessage:error.message});
-        respond(res, 500, {success:false, errors:errors});
+        buildResponse(res, 500, {success:false, errors:errors});
     }
   }
 }
 
-var respond = function(res, statusCode, statusMessage){
+var buildResponse = function(res, statusCode, statusMessage){
   res.setHeader('Content-Type', 'application/json');
   res.status(statusCode);
   res.send(statusMessage);

@@ -7,6 +7,7 @@ myApp.factory('meetupApiService', function($resource){
   var getUserResource = $resource("/api/user/:userId", {userId:"@userId"});
   var authenicateUserResource = $resource("/api/user/:userId/:password", {userId:"@userId", password:"@password"});
   var createUserResource = $resource("/api/user");
+  var searchUsersResource = $resource("/api/users/:searchString", {searchString:"@searchString"});
   var getFriendsResource = $resource("/api/friends/:userId", {userId:"@userId"});
   var updateLocationResource = $resource("/api/user/location/:userId", null, {'update':{method:'PUT'}});
 
@@ -35,6 +36,11 @@ myApp.factory('meetupApiService', function($resource){
 
     createUser: function(user){
       return createUserResource.save(user);
+    },
+
+    searchUsers: function(searchString){
+      console.log("[INFO] - searching:" + searchString);
+      return searchUsersResource.get({searchString: searchString});
     },
 
     getFriends: function(targetUserId){

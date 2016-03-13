@@ -28,33 +28,6 @@ body{
   padding:0 !important;
 }
 
-/**meetup page styling
-#meetups-container{
-    padding-top:120px;
-}
-
-
-
-#meetups-container .page-header {
-  margin-top:10px;
-  margin-left:5px;
-}
-
-#meetups-container .group-title{
-  color:rgba(255, 152, 0, 0.87);
-}
-
-#meetup-container .plus-btn{
-  margin-top:26px;
-  padding:3px 10px;
-}
-
-
-
-#meetups-container .col-md-2{
-  width: 16%;
-}**/
-
 /**content container**/
 .content-container{
   margin-top: 120px;
@@ -149,4 +122,13 @@ body{
 }
 #meetup-container .cancel-btn{
   float:right;
+}
+
+/**add friend container**/
+#add-friend-container{
+  margin-top: 120px;
+}
+
+#add-friend-container a{
+  cursor: pointer;
 }

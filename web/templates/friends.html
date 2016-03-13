@@ -34,9 +34,28 @@
   </div>
 
   <table class="friends-table table table-striped table-hover" ng-show="friends.length > 0">
-    <p>friends</p>
+    <tr>
+      <th>username</th>
+      <th>name</th>
+      <th>status</th>
+    </tr>
+    <tr ng-repeat="friend in friends">
+      <td>{{friend.userId}}
+      <td>{{friend.firstName}} {{friend.lastName}}</td>
+      <td></td>
+    </tr>
   </table>
   <div class="empty-message" ng-show="friends==null || friends.length ==0">
     <p>No friends? It's okay, you add friends by click +</p>
   </div>
+
 </div>
+
+
+  <div class="container content-container" id="pending-relationship-container">
+    <div class="row">
+      <div class="col-md-8">
+        <h2 class="group-title">Pending requests</h2>
+      </div>
+    </div>
+  </div>
