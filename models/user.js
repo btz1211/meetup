@@ -8,12 +8,11 @@ var userSchema = mongoose.Schema({
   lastKnownLatitude: {type:Number, min: [-90, 'the minimum value for {PATH} is -90'], max: [90, 'the maximum value for {PATH} is 90']},
   lastKnownLongitude: {type:Number, min: [-180, 'the minimum value for {PATH} is -180'], max: [180, 'the maximum value for {PATH} is 180']},
   createDate: { type:Date, default: Date.now },
-  modifiedDate: { type:Date, default: Date.now }
+  modifiedDate: { type:Date, default: Date.now },
+  friends:[{type:mongoose.Schema.Types.ObjectId, ref:'User'}]
 });
 var userModel = mongoose.model('User', userSchema);
-module.exports.schema = userSchema;
-module.exports.model = userModel;
-module.exports.validation = function(value, respond){
+var userValidation  = function(value, respond){
   console.log('user validation for::'+value);
   userModel.findOne({_id:value}, function(error, user){
     if(error || !user){
@@ -23,3 +22,9 @@ module.exports.validation = function(value, respond){
     }
   });
 };
+
+userSchema.path('friends').validate(userValidation, 'invalid user');
+
+module.exports.schema = userSchema;
+module.exports.model = userModel;
+module.exports.validation = userValidation;
