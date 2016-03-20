@@ -8,10 +8,10 @@ var Relationship = mongoose.model('Relationship');
 /*-------------------meetup--------------------*/
 //get user's meetups
 module.exports.getMeetups = function(req, res){
-  var id = mongoose.Types.ObjectId(req.params.userId);
-  console.log('[INFO] - received request for user id::' + id);
+  var userId = mongoose.Types.ObjectId(req.params.userId);
+  console.log('[INFO] - received request for user id::' + userId);
 
-  Meetup.find({'meetupers.user':req.params.userId})
+  Meetup.find({$or:[{meetupers:userId}, {owner:userId}]})
   .select('name address status owner startTime endTime latitude longitude')
   .exec(function(error, meetups){
     if(meetups && meetups.length > 0){
@@ -271,7 +271,35 @@ module.exports.getFriends = function(req, res){
   });
 }
 
-module.exports.getPendingFriendships = function(req, res){
+module.exports.getFriendRequests = function(req, res){
+  var userId = mongoose.Types.ObjectId(req.params.userId);
+
+  User.findOne({_id:userId})
+  .select('friends')
+  .exec(function(error, user){
+    if(error){
+      buildResponseWithError(res, error); return;
+    }
+
+    if(!user){
+      buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid user::"+ userId}]});
+      return;
+    }
+
+    var friends = user.friends;
+    User.find({$and:[{_id:{$in:friends}}, {friends:{$nin:[userId]}}]})
+    .select('userId firstName lastName')
+    .exec(function(error, users){
+      if(error){
+        buildResponseWithError(res, error); return;
+      }
+      console.log('[INFO] - found friend requests::' + JSON.stringify(users));
+      buildResponse(res, 200, {data:users});
+    });
+  });
+}
+
+module.exports.getFriendInvitations = function(req, res){
   var userId = mongoose.Types.ObjectId(req.params.userId);
 
   User.findOne({_id:userId})
@@ -293,7 +321,7 @@ module.exports.getPendingFriendships = function(req, res){
       if(error){
         buildResponseWithError(res, error); return;
       }
-      console.log('[INFO] - found pending relationships::' + JSON.stringify(users));
+      console.log('[INFO] - found pending friend invitations::' + JSON.stringify(users));
       buildResponse(res, 200, {data:users});
     });
   });

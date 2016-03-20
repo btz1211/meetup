@@ -20,10 +20,10 @@ app.get("/api/user/:userId", meetupCtrl.getUser);
 app.get("/api/users/:searchString", meetupCtrl.getUsers);
 app.get("/api/user/:userId/:password", meetupCtrl.authenticateUser);
 app.get("/api/friends/:userId", meetupCtrl.getFriends);
-app.get("/api/friends/pending/:userId", meetupCtrl.getPendingFriendships)
+app.get("/api/friend-requests/:userId", meetupCtrl.getFriendRequests);
+app.get("/api/friend-invitations/:userId", meetupCtrl.getFriendInvitations);
 app.put("/api/user/location/:userId", meetupCtrl.updateLocation);
 app.put("/api/friend/add/:source/:target", meetupCtrl.addFriend);
-
 
 //meetup api
 app.post("/api/meetup", meetupCtrl.createMeetup);

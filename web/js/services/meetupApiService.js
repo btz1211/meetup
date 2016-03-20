@@ -5,10 +5,13 @@ myApp.factory('meetupApiService', function($resource){
   var getMeetupsResource = $resource("/api/meetups/:userId", {userId:"@userId"});
   var createMeetupResource = $resource("/api/meetup");
   var getUserResource = $resource("/api/user/:userId", {userId:"@userId"});
-  var authenicateUserResource = $resource("/api/user/:userId/:password", {userId:"@userId", password:"@password"});
-  var createUserResource = $resource("/api/user");
   var searchUsersResource = $resource("/api/users/:searchString", {searchString:"@searchString"});
+  var createUserResource = $resource("/api/user");
+  var authenicateUserResource = $resource("/api/user/:userId/:password", {userId:"@userId", password:"@password"});
+  var addFriendResource = $resource("/api/friend/add/:source/:target", null, {'update':{method:'PUT'}});
   var getFriendsResource = $resource("/api/friends/:userId", {userId:"@userId"});
+  var getFriendRequestsResource = $resource("/api/friend-requests/:userId", {userId:"@userId"});
+  var getFriendInvitationsResource = $resource("/api/friend-invitations/:userId", {userId:"@userId"});
   var updateLocationResource = $resource("/api/user/location/:userId", null, {'update':{method:'PUT'}});
 
   return{
@@ -25,11 +28,6 @@ myApp.factory('meetupApiService', function($resource){
       return createMeetupResource.save(meetup);
     },
 
-    authenticateUser: function(user){
-      console.log("[INFO] - authenticating user:" + JSON.stringify(user));
-      return authenicateUserResource.get({userId:user.userId, password:user.password});
-    },
-
     getUser: function(user){
       return getUserResource.get({userId:user.userId});
     },
@@ -43,8 +41,26 @@ myApp.factory('meetupApiService', function($resource){
       return searchUsersResource.get({searchString: searchString});
     },
 
+    authenticateUser: function(user){
+      console.log("[INFO] - authenticating user:" + JSON.stringify(user));
+      return authenicateUserResource.get({userId:user.userId, password:user.password});
+    },
+
+    addFriend: function(sourceUserId, targetUserId){
+      console.log('[INFO] - source user:' + sourceUserId + ', target user:' + targetUserId);
+      return addFriendResource.update({source:sourceUserId, target:targetUserId}, null);
+    },
+
     getFriends: function(targetUserId){
       return getFriendsResource.get({userId:targetUserId});
+    },
+
+    getFriendRequests: function(targetUserId){
+      return getFriendRequestsResource.get({userId:targetUserId});
+    },
+
+    getFriendInvitations: function(targetUserId){
+      return getFriendInvitationsResource.get({userId:targetUserId});
     },
 
     updateLocation: function(targetUserId, location){

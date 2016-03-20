@@ -23,8 +23,6 @@ var userValidation  = function(value, respond){
   });
 };
 
-userSchema.path('friends').validate(userValidation, 'invalid user');
-
 module.exports.schema = userSchema;
 module.exports.model = userModel;
 module.exports.validation = userValidation;

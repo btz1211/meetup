@@ -36,12 +36,14 @@
   <table class="friends-table table table-striped table-hover" ng-show="friends.length > 0">
     <tr>
       <th>username</th>
-      <th>name</th>
+      <th>first name</th>
+      <th>last name</th>
       <th>status</th>
     </tr>
     <tr ng-repeat="friend in friends">
       <td>{{friend.userId}}
-      <td>{{friend.firstName}} {{friend.lastName}}</td>
+      <td>{{friend.firstName}}</td>
+      <td>{{friend.lastName}}</td>
       <td></td>
     </tr>
   </table>
@@ -55,7 +57,24 @@
   <div class="container content-container" id="pending-relationship-container">
     <div class="row">
       <div class="col-md-8">
-        <h2 class="group-title">Pending requests</h2>
+        <h2 class="group-title">Pending invitations</h2>
       </div>
     </div>
+    <table class="friend-invitations-table table table-striped table-hover" ng-show="friendInvitations.length > 0">
+      <tr>
+        <th>username</th>
+        <th>first name</th>
+        <th>last name</th>
+        <th>action</th>
+      </tr>
+      <tr ng-repeat="invitation in friendInvitations">
+        <td>{{invitation.userId}}
+        <td>{{invitation.firstName}}</td>
+        <td>{{invitation.lastName}}</td>
+        <td>
+          <button type="button" class="btn btn-success" ng-click="accept(invitation)">accept</button>
+          <button type="button" class="btn btn-danger" ng-click="accept(invitation)">reject</button>
+        </td>
+      </tr>
+    </table>
   </div>

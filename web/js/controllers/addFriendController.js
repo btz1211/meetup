@@ -1,6 +1,7 @@
-myApp.controller('addFriendCtrl', function($scope, $log, meetupApiService){
+myApp.controller('addFriendCtrl', function($scope, $log, $cookies, $window, meetupApiService){
   $scope.name="";
   $scope.users = [];
+  $scope.loggedInUser = $cookies.getObject('loggedInUser');
 
   $scope.search = function(searchString){
     console.log("search string:" + searchString);
@@ -17,4 +18,13 @@ myApp.controller('addFriendCtrl', function($scope, $log, meetupApiService){
       $scope.users = [];
     }
   };
+
+  $scope.addFriend = function(user){
+    meetupApiService.addFriend($scope.loggedInUser._id, user._id)
+    .$promise.then(function(response){
+      $window.location.href = '#/friends';
+    }).catch(function(error){
+      $log.error(error);
+    })
+  }
 })
