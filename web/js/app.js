@@ -1,4 +1,4 @@
-var myApp = angular.module('myApp', ['ngResource', 'ngRoute', 'ngCookies'])
+var myApp = angular.module('myApp', ['ngResource', 'ngRoute', 'ngCookies', 'ngAnimate', 'ui.bootstrap'])
 .config(function($routeProvider){
   $routeProvider
     .when('/login',{

@@ -24,7 +24,7 @@ app.get("/api/friend-requests/:userId", meetupCtrl.getFriendRequests);
 app.get("/api/friend-invitations/:userId", meetupCtrl.getFriendInvitations);
 app.put("/api/user/location/:userId", meetupCtrl.updateLocation);
 app.put("/api/friend/add/:source/:target", meetupCtrl.addFriend);
-
+app.get("/api/friends/:userId/search/:searchString", meetupCtrl.searchFriends);
 //meetup api
 app.post("/api/meetup", meetupCtrl.createMeetup);
 app.get("/api/meetup/:meetupId", meetupCtrl.getMeetup);

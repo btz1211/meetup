@@ -70,7 +70,13 @@
             {{meetup.endTime | date:'medium'}}
           </td>
           <td>
-            {{meetup.status}}
+            <p ng-class="['meetup-status',{'text-primary':meetup.status==='INPROGRESS'}, {'text-success':meetup.status==='COMPLETED'},
+                          {'text-danger':meetup.status==='CANCELLED'}]">
+              {{meetup.status | statusFilter }}
+            </p>
+          </td>
+          <td>
+
           </td>
         </tr>
       </tbody>

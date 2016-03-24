@@ -7,6 +7,9 @@ myApp.controller('editMeetupCtrl', function($scope, $log, $window, $cookies, mee
   $scope.map = mapService.getMap($scope.mapElement);
   $scope.marker;
   $scope.loggedInUser = $cookies.getObject('loggedInUser');
+  $scope.selectedFriend;
+  $scope.friends = ['Terry', 'Maggie'];
+  $scope.selectedFriends = [];
 
   $scope.saveMeetup = function(){
     $scope.meetup.owner = $scope.loggedInUser._id;
@@ -67,6 +70,11 @@ myApp.controller('editMeetupCtrl', function($scope, $log, $window, $cookies, mee
       mapService.zoomIn($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, 14);
       $scope.$apply();
     });
+  }
+
+  $scope.searchFriends = function(){
+    return [{"username":"alpha", "firstName":"Terry", "lastName":"Zheng"},
+            {"username":"beta", "firstName":"Maggie", "lastName":"Jiang"}];
   }
 
 });

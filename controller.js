@@ -76,7 +76,6 @@ module.exports.addMeetupers = function(req, res){
         buildResponseWithError(res, error); return;
       }
 
-      console.log('[INFO] - meetup found::' + JSON.stringify(meetup));
       if(!meetup){
         buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid meetup: " + meetupId}]}); return;
       }
@@ -324,6 +323,34 @@ module.exports.getFriendInvitations = function(req, res){
       console.log('[INFO] - found pending friend invitations::' + JSON.stringify(users));
       buildResponse(res, 200, {data:users});
     });
+  });
+}
+
+module.exports.searchFriends = function(req, res){
+  var userId = req.params.userId;
+  var searchString = new RegExp(req.params.searchString, 'i');
+  console.log('[INFO] - search string:' + searchString);
+
+  User.findOne({_id:userId})
+  .select('friends')
+  .populate({
+    path:'friends',
+    select: 'userId firstName lastName',
+    match: {$or:[{firstName:{$in:[searchString]}}, {lastName:{$in:[searchString]}}]},
+    options: {limit: 2}
+  }).exec(function(error, user){
+    if(error){
+      buildResponseWithError(res, error); return;
+    }
+
+    console.log('user:'+JSON.stringify(user));
+    var friends = user.friends;
+    if(!friends || friends.length == 0){
+        buildResponse(res, 204, {success:false});
+    }else{
+        console.log("[INFO] - friends that matches the search string::" + JSON.stringify(friends));
+        buildResponse(res, 200, {success:true, data:friends});
+    }
   });
 }
 

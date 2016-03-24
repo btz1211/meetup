@@ -1,6 +1,7 @@
 body{
   background-color: #F1F1F1;
 }
+
 .top-half{
   padding-top:100px;
   padding-bottom:60px;
@@ -73,6 +74,11 @@ body{
 #meetups-container .col-md-3{
   width:34%;
 }
+
+#meetups-container .meetup-status{
+  font-weight: bold;
+}
+
 /**friends-container**/
 #friends-container .col-md-3{
   width:20%;
@@ -124,6 +130,21 @@ body{
   float:right;
 }
 
+#meetup-container .modal{
+
+}
+
+#meetup-container .modal-header{
+  background-color:#158cba;
+}
+
+#meetup-container .modal-header button{
+  color:white;
+}
+
+#meetup-container .modal-title{
+  color:white;
+}
 /**add friend container**/
 #add-friend-container{
   margin-top: 120px;
