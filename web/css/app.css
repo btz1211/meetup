@@ -29,6 +29,28 @@ body{
   padding:0 !important;
 }
 
+.modal-header{
+  background-color:#158cba;
+}
+
+.modal-header button{
+  color:white !important;
+}
+
+.modal-title{
+  color:white;
+}
+
+#map{
+  height:45%;
+  margin:15px;
+}
+
+#modal-map{
+  height:45%;
+  margin:15px;
+}
+
 /**content container**/
 .content-container{
   margin-top: 120px;
@@ -59,6 +81,8 @@ body{
   font-weight: bold;
   padding-bottom: 5px;
   padding-right:0;
+
+  font-size:28px;
 }
 
 .content-container .empty-message{
@@ -77,6 +101,14 @@ body{
 
 #meetups-container .meetup-status{
   font-weight: bold;
+}
+
+#createMeetupModal .form-group{
+  padding-top:25px;
+}
+
+#createMeetupModal a:hover {
+ cursor:pointer;
 }
 
 /**friends-container**/
@@ -111,15 +143,11 @@ body{
 }
 #meetup-container p{
   border: 1px solid lightgray;
+  border-radius: 5px;
   padding: 10px;
   background-color: rgba(255,255,255,0.15);
-}
-#meetup-container #map{
-  height:45%;
-  margin:15px;
-}
-#meetup-container a:hover {
- cursor:pointer;
+  color: #008EC5;
+  box-shadow: 0px 1px 0px 0px #D4D4D4;
 }
 
 #meetup-container .create-meetup-btn{
@@ -130,21 +158,6 @@ body{
   float:right;
 }
 
-#meetup-container .modal{
-
-}
-
-#meetup-container .modal-header{
-  background-color:#158cba;
-}
-
-#meetup-container .modal-header button{
-  color:white;
-}
-
-#meetup-container .modal-title{
-  color:white;
-}
 /**add friend container**/
 #add-friend-container{
   margin-top: 120px;

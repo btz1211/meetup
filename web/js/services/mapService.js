@@ -5,13 +5,12 @@ myApp.factory('mapService', function($log){
 
   return {
     getMap: function(mapElement, lat, lng, zoom){
-      if(!lat || !lng){ lat = 37.09024, lng = -95.712891 }
-      if(!zoom){zoom = 4 }
-
-      return new google.maps.Map(mapElement, {
+      var map = new google.maps.Map(mapElement, {
         zoom: zoom,
         center: new google.maps.LatLng(lat, lng)
       });
+
+      return map;
     },
 
     getAddress: function(location, callback){
@@ -48,39 +47,16 @@ myApp.factory('mapService', function($log){
       return marker;
     },
 
-    zoomIn: function(map, lat, lng, zoom){
-      var center = new google.maps.LatLng(lat, lng);
+    moveMarker : function(marker, lat, lng){
+      marker.setPosition(new google.maps.LatLng(lat, lng));
+    },
 
+    zoomIn: function(map, lat, lng, zoom){
+      google.maps.event.trigger(map, 'resize');
+      var center = new google.maps.LatLng(lat, lng);
       map.setZoom(zoom);
       map.panTo(center);
-    }
-    /*
-    getMeetupMap: function(meetup, mapElement){
-      var meetupMap = {};
-
-      meetupMap.map =
-
-      /*mark meetup location on the map
-      meetupMap.marker = createMarker(meetupMap.map, meetup.latitude, meetup.longitude, meetup.address, meetup.address);
-      meetupMap.infoWindow = new google.maps.InfoWindow();
-
-      google.maps.event.addListener(meetupMap.marker, 'click', function(){
-        meetupMap.infoWindow.setContent('<h5>'+ meetup.name +'</h5>');
-        meetupMap.infoWindow.open(meetupMap.map, meetupMap.marker);
-      });
-
-      /*mark meetupers on the map
-      if(meetup.meetupers){
-        for(var i = 0; i < meetup.meetupers.length; ++i){
-          var meetuper = meetup.meetupers[i].user;
-          if(meetuper.lastKnownLatitude && meetuper.lastKnownLongitude){
-            meetupMap.meetupMarker[meetuper.userId]= createMarker(meetupMap.map,meetuper.lastKnownLatitude, meetuper.lastKnownLongitude, meetuper.lastName + ',' + meetuper.firstName);
-          }
-        }
-      }
-
-      return meetupMap;
-    }
-    */
+      map.setCenter(center);
+    },
   }
 });

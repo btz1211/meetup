@@ -22,7 +22,17 @@
 </nav>
 
 <div class="container" id="meetup-container">
-  <legend>{{meetup.name}}</legend>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="col-lg-3">
+        <legend>{{meetup.name}}</legend>
+      </div>
+      <div class="col-lg-9">
+        <input type="button" class="btn btn-danger create-meetup-btn" value="back" ng-click="cancel()"></input>
+        <input type="button" class="btn btn-primary create-meetup-btn" value="Invite friends" data-toggle="modal" data-target="#inviteModal"></input>
+      </div>
+    </div>
+  </div>
   <hr></hr>
 
   <!--meetup info-->

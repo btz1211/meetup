@@ -12,6 +12,7 @@ myApp.factory('meetupApiService', function($resource){
   var getFriendsResource = $resource("/api/friends/:userId", {userId:"@userId"});
   var getFriendRequestsResource = $resource("/api/friend-requests/:userId", {userId:"@userId"});
   var getFriendInvitationsResource = $resource("/api/friend-invitations/:userId", {userId:"@userId"});
+  var searchFriendsResource = $resource("/api/friends/:userId/search/:searchString", {userId:"@userId", searchString:"@searchString"});
   var updateLocationResource = $resource("/api/user/location/:userId", null, {'update':{method:'PUT'}});
 
   return{
@@ -51,8 +52,8 @@ myApp.factory('meetupApiService', function($resource){
       return addFriendResource.update({source:sourceUserId, target:targetUserId}, null);
     },
 
-    getFriends: function(targetUserId){
-      return getFriendsResource.get({userId:targetUserId});
+    getFriends: function(targetUserId, lastUserId, limit){
+      return getFriendsResource.get({userId:targetUserId}, {'lastUserId':lastUserId, 'limit':limit});
     },
 
     getFriendRequests: function(targetUserId){
@@ -61,6 +62,10 @@ myApp.factory('meetupApiService', function($resource){
 
     getFriendInvitations: function(targetUserId){
       return getFriendInvitationsResource.get({userId:targetUserId});
+    },
+
+    searchFriends: function(targetUserId, searchString){
+      return searchFriendsResource.get({userId:targetUserId, searchString:searchString});
     },
 
     updateLocation: function(targetUserId, location){

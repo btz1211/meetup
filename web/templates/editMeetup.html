@@ -34,7 +34,6 @@
         <input type="button" class="btn btn-success create-meetup-btn" ng-disabled="meetupForm.$invalid" value="Save Meetup!" ng-click="saveMeetup()"></input>
       </div>
     </div>
-
   </div>
   <hr></hr>
 
@@ -89,6 +88,13 @@
   <!--google map-->
   <div id="map"></div>
 
+  <script type="text/ng-template" id="customTemplate.html">
+    <a>
+      <img ng-src="favicon.ico" width="18">&nbsp;
+      <span ng-bind-html="match.model.fullName | uibTypeaheadHighlight:query"></span>
+    </a>
+  </script>
+
   <!--invite meetupers modal-->
   <div class="modal fade" role="dialog" id="inviteModal">
     <div class="modal-dialog modal-lg">
@@ -100,13 +106,41 @@
         <div class="modal-body">
           <div class="row">
             <div class="col-lg-12">
-              <pre>Model: {{selectedFriend | json}}</pre>
-              <input type="text" ng-model="selectedFriend" placeholder="start typing to search for friends"
-                uib-typeahead="friend for friend in friends | filter:$viewValue"
-                typeahead-loading="loadingFriends" typeahead-no-results="noFriendsFound" class="form-control">
+              <!-- auto-complete friend search-->
+              <input type="text" ng-model="searchString" placeholder="start typing to search for friends"
+                uib-typeahead="friend for friend in searchFriends($viewValue)"
+                typeahead-loading="loadingFriends"
+                typeahead-no-results="noFriendsFound"
+                typeahead-template-url="customTemplate.html"
+                typeahead-on-select='onFriendSelected($item, $model, $label)'
+                class="form-control">
               <i ng-show="loadingFriends" class="glyphicon glyphicon-refresh"></i>
               <div ng-show="noFriendsFound">
                 <i class="fa fa-user"></i> No Results Found
+              </div>
+
+              <!--friends and selected friends-->
+              <div class="row">
+                <div class="col-lg-8">
+                  <h5>Friends</h5>
+                  <hr/>
+                  <table class="friends-table table table-striped table-hover" ng-show="friends.length > 0">
+                    <tr ng-repeat="friend in friends">
+                      <td><img ng-src="favicon.ico" width="18">&nbsp;</td>
+                      <td>{{friend.userId}}</td>
+                      <td>{{friend.firstName + ' ' + friend.lastName}}</td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="col-lg-4">
+                  <h5>Selected Friends ({{selectedFriends.length}})</h5>
+                  <hr/>
+                  <ul>
+                    <li ng-repeat="selectedFriend in selectedFriends">
+                      {{selectedFriend.firstName + ' ' + selectedFriend.lastName}}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>

@@ -65,6 +65,38 @@ module.exports.createMeetup = function(req, res){
   }
 };
 
+module.exports.getMeetupers = function(req, res){
+  var meetupId = req.params.meetupId;
+  if(isStringObjectId(meetupId)){
+    meetupId = mongoose.Types.ObjectId(req.params.meetupId);
+  }else{
+    buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid meetup id: " + meetupId}]});
+    return;
+  }
+
+  if(mongoose.connection.readyState){
+    Meetup.aggregate([
+      {$match:{_id:meetupId}},
+    	{$unwind:"$meetupers"},
+    	{$project:{user:"$meetupers.user", status:"$meetupers.status", _id:0}},
+    	{$lookup:{from:"users", localField:"user", foreignField:"_id", as:"user"}},
+    	{$unwind:"$user"},
+    	{$project:{_id:"$user._id", userId:"$user.userId", firstName:"$user.firstName", lastName:"$user.lastName",
+    		lastKnownLatitude:"$user.lastKnownLatitude", lastKnownLongitude:"$user.lastKnownLongitude", status:1}}
+    ]).exec(function(error, meetups){
+      if(error){
+        buildResponseWithError(res, error); return;
+      }
+
+      console.log('[INFO] - meetups found::' + JSON.stringify(meetups));
+      buildResponse(res, 200, {data:meetups});
+    })
+  }else{
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+  }
+
+}
+
 /*add meetupers*/
 module.exports.addMeetupers = function(req, res){
   var meetupId = req.params.meetupId;
@@ -76,8 +108,10 @@ module.exports.addMeetupers = function(req, res){
         buildResponseWithError(res, error); return;
       }
 
+      //validate meetup
       if(!meetup){
-        buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid meetup: " + meetupId}]}); return;
+        buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid meetup: " + meetupId}]});
+        return;
       }
 
       meetuperIds = [].concat(req.body.meetuper);
@@ -87,6 +121,8 @@ module.exports.addMeetupers = function(req, res){
         if(error){
           buildResponseWithError(res, error); return;
         }
+
+        //make sure all the users are valid
         if(!users || (users.length != meetuperIds.length)){
           buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"request contains invalid user(s)"}]});
           return;
@@ -244,6 +280,10 @@ module.exports.addFriend = function(req, res){
 /*get friends*/
 module.exports.getFriends = function(req, res){
   var userId = mongoose.Types.ObjectId(req.params.userId);
+  var lastUserId = isStringObjectId(req.query.lastUserId) ? mongoose.Types.ObjectId(req.query.lastUserId) : null;
+  var limit = isNumberInt(+req.query.limit) ? +req.query.limit : 20;
+  console.log('[INFO] - limiting response to:' + limit);
+  console.log('[INFO] - last user id:' + JSON.stringify(lastUserId));
 
   User.findOne({_id:userId})
   .select('friends')
@@ -258,8 +298,13 @@ module.exports.getFriends = function(req, res){
     }
 
     var friends = user.friends;
-    User.find({$and:[{_id:{$in:friends}}, {friends:userId}]})
-    .select('userId firstName lastName')
+    var query = User.find({$and:[{_id:{$in:friends}}, {friends:userId}]});
+
+    if(lastUserId){
+      query = query.where({_id:{$gt:lastUserId}});
+    }
+    query.select('userId firstName lastName')
+    .limit(limit)
     .exec(function(error, users){
       if(error){
         buildResponseWithError(res, error); return;
@@ -327,30 +372,34 @@ module.exports.getFriendInvitations = function(req, res){
 }
 
 module.exports.searchFriends = function(req, res){
-  var userId = req.params.userId;
+  var userId = mongoose.Types.ObjectId(req.params.userId);
   var searchString = new RegExp(req.params.searchString, 'i');
   console.log('[INFO] - search string:' + searchString);
 
   User.findOne({_id:userId})
   .select('friends')
-  .populate({
-    path:'friends',
-    select: 'userId firstName lastName',
-    match: {$or:[{firstName:{$in:[searchString]}}, {lastName:{$in:[searchString]}}]},
-    options: {limit: 2}
-  }).exec(function(error, user){
+  .exec(function(error, user){
     if(error){
       buildResponseWithError(res, error); return;
     }
 
-    console.log('user:'+JSON.stringify(user));
-    var friends = user.friends;
-    if(!friends || friends.length == 0){
-        buildResponse(res, 204, {success:false});
-    }else{
-        console.log("[INFO] - friends that matches the search string::" + JSON.stringify(friends));
-        buildResponse(res, 200, {success:true, data:friends});
+    if(!user){
+      buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid user::"+ userId}]});
+      return;
     }
+
+    var friends = user.friends;
+    User.find({$and:[{_id:{$in:friends}}, {friends:userId}]})
+    .where({$or:[{firstName:{$regex:searchString}}, {lastName:{$regex:searchString}}]})
+    .select('userId firstName lastName')
+    .limit(10)
+    .exec(function(error, users){
+      if(error){
+        buildResponseWithError(res, error); return;
+      }
+      console.log('[INFO] - found pending relationships::' + JSON.stringify(users));
+      buildResponse(res, 200, {data:users});
+    });
   });
 }
 
@@ -393,4 +442,18 @@ var buildResponse = function(res, statusCode, statusMessage){
   res.setHeader('Content-Type', 'application/json');
   res.status(statusCode);
   res.send(statusMessage);
+}
+
+var isNumberInt = function(number){
+    return number === +number && number === (number|0);
+}
+
+var isStringObjectId = function(string){
+    if(mongoose.Types.ObjectId.isValid(string)){
+      var convertedObjectId = new mongoose.Types.ObjectId(string);
+      console.log("[INFO] - converted object id:" + convertedObjectId.toString());
+      return string === convertedObjectId.toString();
+    }else{
+      return false;
+    }
 }
