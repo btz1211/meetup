@@ -19,8 +19,13 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, mapSer
     meetupApiService.getMeetups($scope.loggedInUser._id).
     $promise.then(
       function(response){
-        $scope.meetups = response.data;
-        console.log(response);
+        $scope.meetups = response.data.map(function(meetup){
+          meetup.startTime = new Date( Date.parse(meetup.startTime));
+          meetup.endTime = new Date( Date.parse(meetup.endTime));
+          return meetup;
+        });
+
+        console.log($scope.meetups);
       }).catch(
         function(error){
           $log.warn(error);
@@ -29,7 +34,7 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, mapSer
 
   $scope.editMeetup = function(meetup){
     //update meetup
-    $scope.meetup = meetup;
+    $scope.meetup = jQuery.extend(true, {}, meetup);
     $scope.showModal(function(){
       if($scope.marker){
         mapService.moveMarker($scope.marker, $scope.meetup.latitude, $scope.meetup.longitude);
@@ -125,6 +130,10 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, mapSer
     $scope.mapModal.on('hidden.bs.modal', function(){
       $scope.mapModal.unbind();
     });
+  }
+
+  $scope.parseDate = function(date){
+    return new Date( Date.parse( date ) );
   }
 
   $scope.getMeetups();
