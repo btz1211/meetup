@@ -4,37 +4,49 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $log, ma
   $scope.loggedInUser = $cookies.getObject('loggedInUser');
 
   //map
-  $scope.map = {};
-  $scope.mapElement = document.getElementById('map');
   $scope.meetupMarker = {};
-  $scope.meetperMarkers = [];
+  $scope.meetuperMarkers = {};
+  $scope.mapElement = document.getElementById('map');
+  $scope.map = mapService.getMap($scope.mapElement, 40, -95, 4);
 
   //meetup
   $scope.meetup = {};
+  $scope.meetupers = [];
   $scope.friends = [];
-  $scope.selectedFriends = [];
+  $scope.selectedFriends = {};
 
-  meetupApiService.getMeetup($routeParams.meetupId)
-  .$promise.then(function(response){
-    $log.info("meetup:"+ JSON.stringify(response));
-    $scope.meetup = response.data;
-    $scope.map = mapService.getMap( $scope.mapElement, $scope.meetup.latitude, $scope.meetup.longitude, 14);
+  $scope.getMeetup = function(){
+    meetupApiService.getMeetup($routeParams.meetupId)
+    .$promise.then(function(response){
+      $log.info("meetup:"+ JSON.stringify(response));
+      $scope.meetup = response.data;
 
-    //mark meetup
-    $scope.meetupMarker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.meetup.name);
+      //map meetup
+      $scope.meetupMarker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.meetup.name, "", "images/destination-marker.png");
+      mapService.zoomIn( $scope.map, $scope.meetup.latitude, $scope.meetup.longitude, 14);
+    }).catch(
+      function(error){
+        $log.warn(error);
+    });
+  }
 
-    //mark meetupers
-    var meetuper;
-    for(var i = 0; i < $scope.meetup.meetupers.length; ++i){
-      meetuper = $scope.meetup.meetupers[i];
-      if(meetuper.latitude && meetuper.longitude){
-        $scope.meetuperMarkers.push(mapService.addMarker($scope.map, meetuper.lastKnownLatitude, meetuper.lastKnownLongitude, meetuper.lastName + "," +meetuper.firstName));
-      }
-    }
-  }).catch(
-    function(error){
-      $log.warn(error);
-  });
+  $scope.getMeetupers = function(){
+    meetupApiService.getMeetupers($routeParams.meetupId)
+    .$promise.then(function(response){
+      $log.info("meetupers::"+JSON.stringify(response.data));
+      $scope.meetupers = response.data;
+
+      //map meetupers
+      $scope.meetupers.map(function(meetuper){
+        if(meetuper.lastKnownLatitude && meetuper.lastKnownLongitude){
+          $scope.meetuperMarkers[meetuper._id] = mapService.addMarker($scope.map, meetuper.lastKnownLatitude,
+            meetuper.lastKnownLongitude, meetuper.firstName + ' ' +meetuper.lastName,
+            "",
+            "images/meetuper-marker.png");
+        }
+      });
+    });
+  }
 
   $scope.getFriends = function(){
     //getting the last user in the friends array
@@ -66,8 +78,40 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $log, ma
   $scope.onFriendSelected = function(item, model, label){
     $log.info("item:"+JSON.stringify(item) + ":"+JSON.stringify(model) + ":"+JSON.stringify(label));
     $scope.searchString = "";
-    $scope.selectedFriends.push(item);
+
+    if(!$scope.isFriendSelected(item)){
+      $scope.selectedFriends[item._id] = item;
+    }
   }
 
+  $scope.getNumberOfSelectedFriends = function(){
+    return Object.keys($scope.selectedFriends).length;
+  }
+
+  $scope.isFriendSelected = function(friend){
+    return $scope.selectedFriends.hasOwnProperty(friend._id);
+  }
+
+  $scope.addMeetupers = function(){
+    var promises = [];
+    Object.keys($scope.selectedFriends).forEach(function(friend){
+      promises.push(meetupApiService.addMeetuper($routeParams.meetupId, friend).$promise);
+    });
+
+    Promise.all(promises)
+    .then(function(){
+      $scope.getMeetupers();
+    }).catch(function(error){
+      $log.warn(error);
+    })
+  }
+
+  $scope.focusOnMeetuper = function(meetuper){
+    var marker = $scope.meetuperMarkers[meetuper._id];
+    mapService.zoomIn($scope.map, meetuper.lastKnownLatitude, meetuper.lastKnownLongitude);
+    console.log('focusing on meetuper::' + JSON.stringify(meetuper));
+  }
+  $scope.getMeetup();
+  $scope.getMeetupers();
   $scope.getFriends();
 });

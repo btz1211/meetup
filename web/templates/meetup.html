@@ -28,8 +28,7 @@
         <legend>{{meetup.name}}</legend>
       </div>
       <div class="col-lg-9">
-        <input type="button" class="btn btn-danger create-meetup-btn" value="back" ng-click="cancel()"></input>
-        <input type="button" class="btn btn-primary create-meetup-btn" value="Invite friends" data-toggle="modal" data-target="#inviteModal"></input>
+        <button class="btn btn-primary create-meetup-btn" data-toggle="modal" data-target="#inviteModal"><i class="fa fa-user-plus"></i></button>
       </div>
     </div>
   </div>
@@ -88,7 +87,22 @@
   </fieldset>
 
   <!--google map-->
-  <div id="map"></div>
+  <div class="row col-lg-12">
+    <div class="col-lg-9">
+      <div id="map"></div>
+    </div>
+    <div class="col-lg-3" id="meetupers-container">
+      <legend>Meetupers</legend><hr/>
+      <table class="meetupers-table table table-hover table-striped">
+        <tr ng-repeat="meetuper in meetupers" ng-mouseover="focusOnMeetuper(meetuper)">
+          <td><img ng-src="favicon.ico" width="18"></td>
+          <td>{{meetuper.firstName + ' ' + meetuper.lastName}}</td>
+        </tr>
+      </table>
+      <h6 ng-show="meetup.meetupers.length ==0">hit &nbsp;<i class="fa fa-user-plus"></i>&nbsp; to invite friends!</h6>
+
+    </div>
+  </div>
 
   <script type="text/ng-template" id="customTemplate.html">
     <a>
@@ -126,20 +140,24 @@
                 <div class="col-lg-8">
                   <h5>Friends</h5>
                   <hr/>
-                  <table class="friends-table table table-striped table-hover" ng-show="friends.length > 0">
-                    <tr ng-repeat="friend in friends">
-                      <td><img ng-src="favicon.ico" width="18">&nbsp;</td>
+                  <table class="friends-table table table-hover" ng-show="friends.length > 0">
+                    <tr ng-repeat="friend in friends" ng-click="onFriendSelected(friend)">
+                      <td>
+                          <img ng-src="favicon.ico" width="18" ng-show="!isFriendSelected(friend)">
+                          <i class="fa fa-check" ng-show="isFriendSelected(friend)"></i>
+                          &nbsp;
+                      </td>
                       <td>{{friend.userId}}</td>
                       <td>{{friend.firstName + ' ' + friend.lastName}}</td>
                     </tr>
                   </table>
                 </div>
                 <div class="col-lg-4">
-                  <h5>Selected Friends ({{selectedFriends.length}})</h5>
+                  <h5>Selected Friends ({{getNumberOfSelectedFriends()}})</h5>
                   <hr/>
-                  <table class="selected-friends-table table table-striped table-hover" ng-show="selectedFriends.length > 0">
-                    <tr ng-repeat="friend in selectedFriends">
-                      <td><img ng-src="favicon.ico" width="18">&nbsp;</td>
+                  <table class="selected-friends-table table table-hover" >
+                    <tr ng-repeat="(id, friend) in selectedFriends">
+                      <td><i class="fa fa-remove"></i>&nbsp;</td>
                       <td>{{friend.firstName + ' ' + friend.lastName}}</td>
                     </tr>
                   </table>
@@ -150,47 +168,9 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-primary" ng-click="addMeetupers()">Save changes</button>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-
-
-<!--
-    <h5 class="meetuper-header">Meetupers</h5>
-    <table class="table table-striped">
-      <thead>
-        <th>
-          name
-        </th>
-        <th>
-          lastKnownLatitude
-        </th>
-        <th>
-          lastKnownLongitude
-        </th>
-        <th>
-          status
-        </th>
-      </thead>
-      <tbody>
-        <tr ng-repeat="meetuper in meetup.meetupers">
-          <td>
-            {{meetuper.name}}
-          </td>
-          <td>
-            {{meetuper.lastKnownLatitude}}
-          </td>
-          <td>
-            {{meetuper.lastKnownLongitude}}
-          </td>
-          <td>
-            {{meetuper.status}}
-          </td>
-        </tr>
-      </tbody>
-    </table>
--->

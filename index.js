@@ -30,7 +30,8 @@ app.post("/api/meetup", meetupCtrl.createMeetup);
 app.get("/api/meetup/:meetupId", meetupCtrl.getMeetup);
 app.get("/api/meetups/:userId", meetupCtrl.getMeetups);
 app.get("/api/meetup/:meetupId/meetupers", meetupCtrl.getMeetupers);
-app.put("/api/meetup/:meetupId/meetupers", meetupCtrl.addMeetupers);
+app.put("/api/meetup/:meetupId", meetupCtrl.updateMeetup);
+app.put("/api/meetup/:meetupId/meetuper/:meetuperId", meetupCtrl.addMeetuper);
 
 /**api for geting coordinates from address**/
 app.get('/api/geolocation', function(req, res){

@@ -4,10 +4,15 @@ myApp.factory('meetupApiService', function($resource){
   var getMeetupResource = $resource("/api/meetup/:meetupId", {meetupId:"@meetupId"});
   var getMeetupsResource = $resource("/api/meetups/:userId", {userId:"@userId"});
   var createMeetupResource = $resource("/api/meetup");
+  var updateMeetupResource = $resource("/api/meetup/:meetupId", null, {'update':{method:'PUT'}});
+  var getMeetupersResource = $resource("/api/meetup/:meetupId/meetupers");
+  var addMeetuperResource = $resource("/api/meetup/:meetupId/meetuper/:meetuperId", null, {'update':{method:'PUT'}});
+
   var getUserResource = $resource("/api/user/:userId", {userId:"@userId"});
   var searchUsersResource = $resource("/api/users/:searchString", {searchString:"@searchString"});
   var createUserResource = $resource("/api/user");
   var authenicateUserResource = $resource("/api/user/:userId/:password", {userId:"@userId", password:"@password"});
+
   var addFriendResource = $resource("/api/friend/add/:source/:target", null, {'update':{method:'PUT'}});
   var getFriendsResource = $resource("/api/friends/:userId", {userId:"@userId"});
   var getFriendRequestsResource = $resource("/api/friend-requests/:userId", {userId:"@userId"});
@@ -16,17 +21,31 @@ myApp.factory('meetupApiService', function($resource){
   var updateLocationResource = $resource("/api/user/location/:userId", null, {'update':{method:'PUT'}});
 
   return{
-    getMeetup: function(targetMeetupId){
-      return getMeetupResource.get({meetupId:targetMeetupId});
+    getMeetup: function(meetupId){
+      return getMeetupResource.get({'meetupId':meetupId});
     },
 
-    getMeetups: function(targetUserId){
-      return getMeetupsResource.get({userId:targetUserId});
+    getMeetups: function(userId){
+      return getMeetupsResource.get({'userId':userId});
     },
 
     saveMeetup: function(meetup){
       console.log("[INFO] - saving meetup:" + JSON.stringify(meetup));
       return createMeetupResource.save(meetup);
+    },
+
+    updateMeetup: function(meetup){
+      console.log("[INFO] - updating meetup:" + JSON.stringify(meetup));
+      return updateMeetupResource.update({'meetupId':meetup._id}, meetup);
+    },
+
+    getMeetupers: function(meetupId){
+      return getMeetupersResource.get({'meetupId':meetupId});
+    },
+
+    addMeetuper: function(meetupId, meetuperId){
+      console.log('[INFO] - meetup::' + meetupId + ', meetuper::'+ meetuperId);
+      return addMeetuperResource.update({'meetupId':meetupId, 'meetuperId':meetuperId}, null);
     },
 
     getUser: function(user){
@@ -52,25 +71,25 @@ myApp.factory('meetupApiService', function($resource){
       return addFriendResource.update({source:sourceUserId, target:targetUserId}, null);
     },
 
-    getFriends: function(targetUserId, lastUserId, limit){
-      return getFriendsResource.get({userId:targetUserId}, {'lastUserId':lastUserId, 'limit':limit});
+    getFriends: function(userId, lastUserId, limit){
+      return getFriendsResource.get({'userId':userId}, {'lastUserId':lastUserId, 'limit':limit});
     },
 
-    getFriendRequests: function(targetUserId){
-      return getFriendRequestsResource.get({userId:targetUserId});
+    getFriendRequests: function(userId){
+      return getFriendRequestsResource.get({'userId':userId});
     },
 
-    getFriendInvitations: function(targetUserId){
-      return getFriendInvitationsResource.get({userId:targetUserId});
+    getFriendInvitations: function(userId){
+      return getFriendInvitationsResource.get({'userId':userId});
     },
 
-    searchFriends: function(targetUserId, searchString){
-      return searchFriendsResource.get({userId:targetUserId, searchString:searchString});
+    searchFriends: function(userId, searchString){
+      return searchFriendsResource.get({'userId':userId, 'searchString':searchString});
     },
 
-    updateLocation: function(targetUserId, location){
-      console.log("[INFO] - latitude::"+ location.latitude + ", longitude::"+ location.longitude + " for user::" + targetUserId);
-      return updateLocationResource.update({userId:targetUserId}, {'latitude':location.latitude, 'longitude':location.longitude});
+    updateLocation: function(userId, location){
+      console.log("[INFO] - latitude::"+ location.latitude + ", longitude::"+ location.longitude + " for user::" + userId);
+      return updateLocationResource.update({'userId':userId}, {'latitude':location.latitude, 'longitude':location.longitude});
     }
   }
 });

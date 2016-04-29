@@ -158,6 +158,29 @@ body{
   float:right;
 }
 
+#meetup-container .fa{
+  font-size:20px;
+}
+
+#meetup-container .fa-check{
+  color:#28B62C;
+}
+
+#meetup-container .fa-remove{
+  color:#FF4136;
+}
+
+#meetup-container #meetupers-container{
+  margin-top:10px;
+  height:45%;
+  overflow-y:auto;
+}
+
+#meetup-container #meetupers-container legend{
+  font-size:16px;
+  margin-bottom:10px;
+}
+
 /**add friend container**/
 #add-friend-container{
   margin-top: 120px;

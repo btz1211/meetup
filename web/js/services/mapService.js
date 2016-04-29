@@ -36,12 +36,24 @@ myApp.factory('mapService', function($log){
         callback();
       });
     },
-    addMarker : function(map, lat, lng, title, content){
+    addMarker : function(map, lat, lng, title, content, imageUrl){
+      var markerImage = null;
+      if(imageUrl){
+        markerImage = new google.maps.MarkerImage(
+          imageUrl,
+          new google.maps.Size(35,35),
+          new google.maps.Point(0, 0),
+          new google.maps.Point(17, 17),
+          new google.maps.Size(35,35)
+        );
+      }
+
       var marker = new google.maps.Marker({
         map: map,
         position: new google.maps.LatLng(lat, lng),
         title: title,
         content: content,
+        icon: markerImage
       });
 
       return marker;
@@ -53,6 +65,9 @@ myApp.factory('mapService', function($log){
 
     zoomIn: function(map, lat, lng, zoom){
       google.maps.event.trigger(map, 'resize');
+      if(!zoom){
+        zoom = map.getZoom();
+      }
       var center = new google.maps.LatLng(lat, lng);
       map.setZoom(zoom);
       map.panTo(center);

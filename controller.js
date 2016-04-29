@@ -29,6 +29,7 @@ module.exports.getMeetup = function(req, res){
 
   if(mongoose.connection.readyState){
     Meetup.findOne({_id:meetupId})
+    .select('_id name address owner startTime endTime latitude longitude status')
     .exec(function(error, meetup){
       if(error){
         buildResponseWithError(res, error);return;
@@ -65,6 +66,34 @@ module.exports.createMeetup = function(req, res){
   }
 };
 
+module.exports.updateMeetup = function(req, res){
+  var meetup = req.body;
+  var meetupId = req.params.meetupId;
+  console.log('[INFO] - updating meetup::' + JSON.stringify(meetup));
+
+  if(mongoose.connection.readyState){
+    Meetup.findById(meetupId).select('_id').exec()
+    //meetup found
+    .then(function(meetupInDb){
+      if(! meetupInDb){ throw 'invalid meetup id::' + meetupId; }
+      return Meetup.update({_id:meetupId}, {$set:{name:meetup.name, latitude:meetup.latitude, longitude:meetup.longitude,
+        address:meetup.address, startTime:meetup.startTime, endTime:meetup.endTime, status:meetup.status}}).exec();
+    })
+    //meetup updated
+    .then(function(result){
+      console.log('[INFO] - meetup updated::'+JSON.stringify(result));
+      buildResponse(res, 200, {success:true});
+    })
+    //process error
+    .catch(function(error){
+      console.log('[ERROR] - error found::' + JSON.stringify(error));
+      buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:error}]});
+    });
+  }else{
+    buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+  }
+}
+
 module.exports.getMeetupers = function(req, res){
   var meetupId = req.params.meetupId;
   if(isStringObjectId(meetupId)){
@@ -83,68 +112,46 @@ module.exports.getMeetupers = function(req, res){
     	{$unwind:"$user"},
     	{$project:{_id:"$user._id", userId:"$user.userId", firstName:"$user.firstName", lastName:"$user.lastName",
     		lastKnownLatitude:"$user.lastKnownLatitude", lastKnownLongitude:"$user.lastKnownLongitude", status:1}}
-    ]).exec(function(error, meetups){
+    ]).exec(function(error, meetupers){
       if(error){
         buildResponseWithError(res, error); return;
       }
 
-      console.log('[INFO] - meetups found::' + JSON.stringify(meetups));
-      buildResponse(res, 200, {data:meetups});
+      //console.log('[INFO] - meetupers found::' + JSON.stringify(meetupers));
+      buildResponse(res, 200, {data:meetupers});
     })
   }else{
     buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
-
 }
 
 /*add meetupers*/
-module.exports.addMeetupers = function(req, res){
-  var meetupId = req.params.meetupId;
-
+module.exports.addMeetuper = function(req, res){
+  var meetupId = mongoose.Types.ObjectId(req.params.meetupId);
+  var meetuperId = mongoose.Types.ObjectId(req.params.meetuperId);
   if(mongoose.connection.readyState){
-    Meetup.findOne({_id: meetupId}, '_id')
-    .exec(function(error, meetup){
-      if(error){
-        buildResponseWithError(res, error); return;
-      }
+      console.log('[INFO] - adding meetuper::' + meetuperId + ' to meetup::' + meetupId);
 
-      //validate meetup
-      if(!meetup){
-        buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"invalid meetup: " + meetupId}]});
-        return;
-      }
-
-      meetuperIds = [].concat(req.body.meetuper);
-      User.find({_id:{$in:meetuperIds}})
-      .select('_id')
-      .exec(function(error, users){
-        if(error){
-          buildResponseWithError(res, error); return;
-        }
-
-        //make sure all the users are valid
-        if(!users || (users.length != meetuperIds.length)){
-          buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:"request contains invalid user(s)"}]});
-          return;
-        }
-
-        //map meetuper to proper object for persistence
-        var meetupers = users.map(function(user){
-          return new Meetuper({user:user._id});
-        });
-        console.log('[INFO] creating meetupers'+JSON.stringify(meetupers));
-
-        Meetup.update({_id: meetupId, 'meetupers.user':{$nin: meetuperIds} }, {$push: {meetupers: {$each: meetupers}}})
-        .exec(function(error, updatedObjects){
-          if(error){
-            buildResponseWithError(res, error); return;
-          }
-
-          console.log('[INFO] - updated::' + JSON.stringify(updatedObjects));
-          buildResponse(res, 200, {success:true});
-        });
+      Meetup.findById(meetupId).select('_id').exec()
+      //meetup found
+      .then(function(meetup){
+        if(! meetup){ throw 'invalid meetup id::' + meetupId; }
+        return User.findById(meetuperId).select('_id').exec();
+      })
+      //user found
+      .then(function(user){
+        if(!user){ throw 'invalid meetuper id::' + meetuperId; }
+        var meetuper = new Meetuper({user:user._id});
+        return Meetup.update({$and:[{_id: meetupId},{'meetupers.user':{$ne:meetuperId}}]} , {$push: {meetupers:meetuper}}).exec();
+      })
+      //update meetup
+      .then(function(meetup){
+        buildResponse(res, 200, {success:true});
+      })
+      //process error
+      .catch(function(error){
+        buildResponse(res, 400, {success:false, errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:error}]});
       });
-    });
   }else{
     buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }
