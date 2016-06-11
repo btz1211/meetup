@@ -1,31 +1,8 @@
-<nav class="navbar navbar-default navbar-fixed-top">
-  <div class="container">
-    <!--collpased header-->
-    <div class="navbar-header">
-      <a href="#" class="navbar-brand"><strong>Meetup</strong> Now!</a>
-      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-    </div>
+<navbar active-item="meetups" on-dropdown-select="onUserSelect(item)"/>
 
-    <!--expanded header-->
-    <div class="collapse navbar-collapse" id="navbar-main">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Meetups</a></li>
-        <li><a href="#">Friends</a></li>
-        <li><a href="#">Me</a></li>
-        <li>{{loggedInUser.userId}}, {{loggedInUser._id}}</li>
-      </ul>
-    </div>
-  </div>
-</nav>
+<edit-meetup-modal meetup="meetup"></edit-meetup-modal>
 
-<div class="container" id="meetups-container">
-
-  <div class="container meetup-container">
-
+<<<<<<< HEAD
     <div class="row">
       <div class="page-header col-md-12">
         <!--<span class="label label-primary group-title  ">Meetups</span>-->
@@ -35,63 +12,77 @@
         <div class="col-md-2">
           <button class="btn btn-success plus-btn" ng-click="newMeetup()">+</button>
         </div>
+=======
+<!--Meetups container-->
+<div class="container content-container" id="meetups-container">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="col-md-3">
+        <h2 class="group-title">My Meetups</h2>
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-success plus-btn" ng-click="newMeetup()">+</button>
+>>>>>>> home
       </div>
     </div>
+  </div>
 
-    <table class="meetup-table table table-striped table-hover" ng-show="meetups.length>0">
-      <thead>
-        <tr>
-          <th>
-            name
-          </th>
-          <th>
-            address
-          </th>
-          <th>
-            latitude
-          </th>
-          <th>
-            longitude
-          </th>
-          <th>
-            start time
-          </th>
-          <th>
-            end time
-          </th>
-          <th>
-            status
-          </th>
-        </tr>
-      </thead>
-      <tbody ng-repeat="meetup in meetups | orderBy:'meetupers' | filter:query" ng-click="showMeetupInfo(meetup)">
-        <tr >
-          <td>
-            {{meetup.name}}
-          </td>
-          <td>
-            {{meetup.address}}
-          </td>
-          <td>
-            {{meetup.latitude | coordinateFilter}}
-          </td>
-          <td>
-            {{meetup.longitude | coordinateFilter}}
-          </td>
-          <td>
-            {{meetup.startTime}}
-          </td>
-          <td>
-            {{meetup.endTime}}
-          </td>
-          <td>
-            {{meetup.status}}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="empty-message" ng-show="meetups==null || meetups.length ==0">
-      <p>You current do not have any meet ups</p>
+  <table class="meetup-table table table-hover" ng-show="meetups.length>0">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Address</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody >
+      <tr ng-repeat="meetup in meetups | orderBy:'meetupers' | filter:query track by meetup._id">
+        <td ng-click="showMeetupInfo(meetup)">{{meetup.name}}</td>
+        <td ng-click="showMeetupInfo(meetup)">{{meetup.address}}</td>
+        <td ng-click="showMeetupInfo(meetup)">{{meetup.startTime |  date:'medium'}}</td>
+        <td ng-click="showMeetupInfo(meetup)">{{meetup.endTime | date:'medium'}}</td>
+        <td ng-click="showMeetupInfo(meetup)">
+          <p ng-class="['meetup-status',{'text-primary':meetup.status==='INPROGRESS'}, {'text-success':meetup.status==='COMPLETED'},
+          {'text-danger':meetup.status==='CANCELLED'}]">
+          {{meetup.status | statusFilter }}
+          </p>
+        </td>
+        <td>
+          <input type="button" class="btn btn-primary" value="edit"  data-toggle="modal" data-target="#editMeetupModal" ng-click="editMeetup()"></input>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="empty-message" ng-show="meetups==null || meetups.length ==0">
+    <p>You current do not have any meet ups</p>
+  </div>
+</div>
+
+<!--pending friend requests container-->
+<div class="container content-container" id="pending-relationship-container">
+  <div class="row">
+    <div class="col-md-8">
+      <h2 class="group-title">Friend Requests</h2>
     </div>
   </div>
+  <table class="friend-invitations-table table table-hover" ng-show="friendInvitations.length > 0">
+    <tr>
+      <th>username</th>
+      <th>first name</th>
+      <th>last name</th>
+      <th>action</th>
+    </tr>
+    <tr ng-repeat="invitation in friendInvitations">
+      <td>{{invitation.userId}}
+      <td>{{invitation.firstName}}</td>
+      <td>{{invitation.lastName}}</td>
+      <td>
+        <button type="button" class="btn btn-success" ng-click="accept(invitation)">accept</button>
+        <button type="button" class="btn btn-danger" ng-click="accept(invitation)">reject</button>
+      </td>
+    </tr>
+  </table>
 </div>

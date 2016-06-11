@@ -1,7 +1,8 @@
 var mongoose = require('mongoose');
 var userValidation = require('./user').validation;
 var relationshipSchema = mongoose.Schema({
-  type: {type: String, required: '{PATH} is required'},
+  type: {type: String, enum:{values:["FRIENDS", "FOLLOWING"], message:'valid relationship types are {FRIENDS} or {FOLLOWING}'},
+          required: '{PATH} is required'},
   source: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required:'{PATH} is required'},
   target: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required:'{PATH} is required'},
   status: {type: String, enum:["PENDING", "VERIFIED", "ONHOLD"], default: "PENDING"},

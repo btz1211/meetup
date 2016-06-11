@@ -1,0 +1,13 @@
+//full version of meetupers
+db.meetups.aggregate(
+	{$match:{_id:ObjectId("56e77924445ba8cc3631d84e")}},
+	{$unwind:"$meetupers"},
+	{$project:{user:"$meetupers.user", status:"$meetupers.status", _id:0}},
+	{$lookup:{from:"users", localField:"user", foreignField:"_id", as:"user"}},
+	{$unwind:"$user"},
+	{$project:{_id:"$user._id", userId:"$user.userId", firstName:"$user.firstName", lastName:"$user.lastName",
+		lastKnownLatitude:"$user.lastKnownLatitude", lastKnownLongitude:"$user.lastKnownLongitude", status:1}}
+)
+
+//simplified with only ids
+db.meetups.aggregate( {$unwind:"$meetupers"},  {$project:{user:"$meetupers.user", status:"$meetupers.status", _id:0}})

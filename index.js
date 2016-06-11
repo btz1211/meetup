@@ -14,26 +14,35 @@ app.use(express.static(root));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
-//restful api
-app.get("/api/user/:userId", meetupCtrl.getUser);
-app.get("/api/user/:userId/:password", meetupCtrl.authenticateUser);
-app.get("/api/meetups/:userId", meetupCtrl.getMeetups);
-app.get("/api/meetup/:meetupId", meetupCtrl.getMeetup);
-//app.get("/api/relationships/:userId", meetupCtrl.getRelationships);
-app.get("/api/friends/:userId", meetupCtrl.getFriends);
-
+//user api
 app.post("/api/user", meetupCtrl.createUser);
-app.post("/api/meetup", meetupCtrl.createMeetup);
-app.post("/api/meetuper", meetupCtrl.createMeetupers);
-app.post("/api/relationship", meetupCtrl.createRelationship);
-
-app.put("/api/relationship/:relationshipId", meetupCtrl.verifyFriendship);
+app.get("/api/user/:userId", meetupCtrl.getUser);
+app.get("/api/users/:searchString", meetupCtrl.getUsers);
+app.get("/api/user/:userId/:password", meetupCtrl.authenticateUser);
+app.get("/api/friends/:userId", meetupCtrl.getFriends);
+app.get("/api/friend-requests/:userId", meetupCtrl.getFriendRequests);
+app.get("/api/friend-invitations/:userId", meetupCtrl.getFriendInvitations);
 app.put("/api/user/location/:userId", meetupCtrl.updateLocation);
+app.put("/api/friend/add/:source/:target", meetupCtrl.addFriend);
+app.get("/api/friends/:userId/search/:searchString", meetupCtrl.searchFriends);
+//meetup api
+app.post("/api/meetup", meetupCtrl.createMeetup);
+app.get("/api/meetup/:meetupId", meetupCtrl.getMeetup);
+app.get("/api/meetups/:userId", meetupCtrl.getMeetups);
+app.get("/api/meetup/:meetupId/meetupers", meetupCtrl.getMeetupers);
+app.put("/api/meetup/:meetupId", meetupCtrl.updateMeetup);
+app.put("/api/meetup/:meetupId/meetuper/:meetuperId", meetupCtrl.addMeetuper);
 
+<<<<<<< HEAD
 
 app.get('/api/geolocation', function(req, res){
   var address = req.query.address;
   console.log('[INFO] - received address request::' + JSON.stringify(req.query));
+=======
+/**api for geting coordinates from address**/
+app.get('/api/geolocation', function(req, res){
+  var address = req.query.address;
+>>>>>>> home
 
   if(!address){
     res.status(400);
