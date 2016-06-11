@@ -32,28 +32,6 @@ myApp.controller('friendsCtrl', function($scope, $cookies, $window, meetupApiSer
     });
   }
 
-  $scope.getInvitations = function(){
-    meetupApiService.getFriendInvitations($scope.loggedInUser._id).
-    $promise.then(
-      function(response){
-        $scope.friendInvitations = response.data;
-        console.log("friend invitations::"+JSON.stringify(response.data));
-    }).catch(
-      function(error){
-        $log.warn(error);
-    });
-  }
-
-  $scope.accept = function(user){
-    meetupApiService.addFriend($scope.loggedInUser._id, user._id)
-    .$promise.then(function(response){
-      $scope.getFriends();
-      $scope.getInvitations();
-    }).catch(function(error){
-      $log.error(error);
-    })
-  }
-
   $scope.getFriends();
   $scope.getRequests();
   $scope.getInvitations();

@@ -11,7 +11,7 @@ module.exports.getMeetups = function(req, res){
   var userId = mongoose.Types.ObjectId(req.params.userId);
   console.log('[INFO] - received request for user id::' + userId);
 
-  Meetup.find({$or:[{meetupers:userId}, {owner:userId}]})
+  Meetup.find({$or:[{'meetupers.user':userId}, {owner:userId}]})
   .select('name address status owner startTime endTime latitude longitude')
   .exec(function(error, meetups){
     if(meetups && meetups.length > 0){
@@ -177,23 +177,23 @@ module.exports.createUser = function(req, res){
 
 /*get users by search string*/
 module.exports.getUsers = function(req, res){
-  var searchString = req.params.searchString;
+  var searchString = new RegExp(req.params.searchString, 'i');
   console.log('[INFO] - search keywords'+ searchString);
 
   if(mongoose.connection.readyState){
-    User.find({$text: {$search: searchString, $caseSensitive:false}})
-    .select('id userId firstName lastName')
-    .exec(function(error, users){
-      if(error){
-        buildResponseWithError(res, error); return;
-      }
-
-      if(!users){
-        buildResponse(res, 204, {success:false});
-      }else{
-        buildResponse(res, 200, {success:true, data:users});
-      }
+    User.find({})
+    .where({$or:[{firstName:{$regex:searchString}}, {lastName:{$regex:searchString}}]})
+    .select('userId firstName lastName')
+    .limit(10)
+    .exec()
+    .then(function(users){
+      console.log('[INFO] - found users::' + JSON.stringify(users));
+      buildResponse(res, 200, {data:users});
     })
+    .catch(function(error){
+      buildResponseWithError(res, error); return;
+    });
+
   }else{
     buildResponse(res, 500, {sucess:false, errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
   }

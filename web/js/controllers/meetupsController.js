@@ -1,12 +1,19 @@
 'use strict';
 
-myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, mapService, meetupApiService){
-  $scope.selectedMeetup = "";
+myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route, mapService, meetupApiService){
   $scope.loggedInUser = $cookies.getObject('loggedInUser');
-  $scope.meetup = {};
-  $scope.currentLocation = {};
-  $scope.mapModal = $("#createMeetupModal");
+  $scope.mapModal = $("#editMeetupModal");
 
+  //meetup vars
+  $scope.meetup = {};
+  $scope.selectedMeetup = "";
+  $scope.currentLocation = {};
+
+  //friends/user vars
+  $scope.friendInvitations = [];
+
+/*
+  //map vars
   $scope.marker;
   $scope.currentLocation= {};
   $scope.defaultLatitude = 40;
@@ -14,18 +21,19 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, mapSer
   $scope.defaultZoom = 4;
   $scope.mapElement = document.getElementById('modal-map');
   $scope.map = mapService.getMap($scope.mapElement, $scope.defaultLatitude, $scope.defaultLongitude, $scope.defaultZoom);
+*/
 
   $scope.getMeetups = function(){
     meetupApiService.getMeetups($scope.loggedInUser._id).
     $promise.then(
       function(response){
-        $scope.meetups = response.data.map(function(meetup){
-          meetup.startTime = new Date( Date.parse(meetup.startTime));
-          meetup.endTime = new Date( Date.parse(meetup.endTime));
-          return meetup;
-        });
-
-        console.log($scope.meetups);
+        if(response.data){
+          $scope.meetups = response.data.map(function(meetup){
+            meetup.startTime = new Date( Date.parse(meetup.startTime));
+            meetup.endTime = new Date( Date.parse(meetup.endTime));
+            return meetup;
+          });
+        }
       }).catch(
         function(error){
           $log.warn(error);
@@ -35,7 +43,7 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, mapSer
   $scope.editMeetup = function(meetup){
     //clone meetup, don't want the original be changed
     $scope.meetup = jQuery.extend(true, {}, meetup);
-
+/*
     //update meetup
     $scope.showModal(function(){
       if($scope.marker){
@@ -45,6 +53,7 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, mapSer
       }
       mapService.zoomIn($scope.map,$scope.meetup.latitude, $scope.meetup.longitude, 14);
     });
+    */
   }
 
   $scope.newMeetup = function(){
@@ -59,71 +68,6 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, mapSer
     });
   }
 
-  $scope.showMeetupInfo = function(meetup){
-    console.log('meetup::' + meetup._id);
-    $window.location.href = '#/meetup/' + meetup._id;
-  }
-
-  $scope.saveMeetup = function(){
-    //update/save meetup
-    var saveMeetupPromise;
-    if($scope.meetup._id){
-      saveMeetupPromise = meetupApiService.updateMeetup($scope.meetup).$promise;
-    }else{
-      $scope.meetup.owner = $scope.loggedInUser._id;
-      saveMeetupPromise = meetupApiService.saveMeetup($scope.meetup).$promise;
-    }
-
-    saveMeetupPromise.then(function(response){
-      console.log(JSON.stringify(response));
-      $scope.getMeetups();
-    }).catch(function(error){
-      $log.warn(error);
-    });
-  }
-
-  $scope.useCurrentAddress = function(){
-     navigator.geolocation.getCurrentPosition(function(position, error){
-
-       console.log('position received::' + position.coords);
-       $scope.meetup.latitude = position.coords.latitude;
-       $scope.meetup.longitude = position.coords.longitude;
-
-       //get location address
-       mapService.getAddress({lat: $scope.meetup.latitude, lng:$scope.meetup.longitude}, function(address){
-         if(address){
-           $scope.meetup.address = address;
-           $scope.$apply();
-
-           if($scope.marker){
-             mapService.moveMarker($scope.marker, $scope.meetup.latitude, $scope.meetup.longitude);
-           }else{
-             $scope.marker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.meetup.name);
-           }
-           mapService.zoomIn($scope.map,$scope.meetup.latitude, $scope.meetup.longitude, 14);
-         }
-       });
-     });
-   }
-
-   $scope.updatePosition = function(){
-     $scope.meetup.latitude = null;
-     $scope.meetup.longitude = null;
-
-     mapService.getLocation($scope.meetup.address, function(position){
-       $scope.meetup.latitude = position.lat();
-       $scope.meetup.longitude = position.lng();
-
-       if($scope.marker){
-         mapService.moveMarker($scope.marker, $scope.meetup.latitude, $scope.meetup.longitude);
-       }else{
-         $scope.marker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.currentLocation.address);
-       }
-       mapService.zoomIn($scope.map,$scope.meetup.latitude, $scope.meetup.longitude, 14);
-
-     });
-   }
-
   $scope.updateLocation = function(){
     navigator.geolocation.getCurrentPosition(function(position, error){
       console.log('position received::' + JSON.stringify(position.coords));
@@ -131,16 +75,74 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, mapSer
     });
   }
 
+  $scope.showMeetupInfo = function(meetup){
+    console.log('meetup::' + meetup._id);
+    $window.location.href = '#/meetup/' + meetup._id;
+  }
+
+  $scope.searchUsers = function(searchString){
+    return meetupApiService.searchUsers(searchString)
+    .$promise.then(function(response){
+      return response.data.map(function(user){
+        user.fullName = user.firstName + ' ' + user.lastName;
+        return user;
+      })
+    }).catch(function(error){
+      $log.warn(error);
+    });
+  }
+
+  $scope.onUserSelect = function(item){
+    $log.info("in meetups controller:"+JSON.stringify(item));
+  }
+
+  $scope.getInvitations = function(){
+    meetupApiService.getFriendInvitations($scope.loggedInUser._id)
+    .$promise.then(
+      function(response){
+        $scope.friendInvitations = response.data;
+        console.log("friend invitations::"+JSON.stringify(response.data));
+      }).catch(
+        function(error){
+          $log.warn(error);
+        });
+      }
+
+  $scope.accept = function(user){
+    meetupApiService.addFriend($scope.loggedInUser._id, user._id)
+    .$promise.then(function(response){
+      $scope.getFriends();
+      $scope.getInvitations();
+    }).catch(function(error){
+      $log.error(error);
+    })
+  }
+
+  $scope.onModalShow = function(){
+    if(jQuery.isEmptyObject($scope.meetup)){
+      if($scope.marker){
+        mapService.moveMarker($scope.marker, $scope.meetup.latitude, $scope.meetup.longitude);
+      }else{
+        $scope.marker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.currentLocation.address);
+      }
+    }
+    mapService.zoomIn($scope.map,$scope.meetup.latitude, $scope.meetup.longitude, 14);
+  }
+
+
+
   $scope.showModal = function(callback){
     //the reason for the callback is due to a race condition between map
     //rendering and modal generation. In order for map to calculate the size
     //modal needs to appear first
     $scope.mapModal.modal('show');
-    $scope.mapModal.on('shown.bs.modal', callback);
+    $scope.mapModal.on('shown.bs.modal', $scope.onModalShow);
     $scope.mapModal.on('hidden.bs.modal', function(){
       $scope.mapModal.unbind();
     });
   }
+
+
 
   $scope.parseDate = function(date){
     return new Date( Date.parse( date ) );
@@ -148,4 +150,5 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, mapSer
 
   $scope.getMeetups();
   $scope.updateLocation();
+  $scope.getInvitations()
 });

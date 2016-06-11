@@ -1,29 +1,9 @@
-<nav class="navbar navbar-default navbar-fixed-top">
-  <div class="container">
-    <!--collpased header-->
-    <div class="navbar-header">
-      <a href="#" class="navbar-brand"><strong>Meetup</strong> Now!</a>
-      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-    </div>
+<navbar active-item="meetups" on-dropdown-select="onUserSelect(item)"/>
 
-    <!--expanded header-->
-    <div class="collapse navbar-collapse" id="navbar-main">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Meetups</a></li>
-        <li><a href="#/friends">Friends</a></li>
-        <li><a href="#">Me</a></li>
-        <li>{{loggedInUser.userId}}, {{loggedInUser._id}}</li>
-      </ul>
-    </div>
-  </div>
-</nav>
+<edit-meetup-modal meetup="meetup"></edit-meetup-modal>
 
-<div class="container content-container" id="meetups-container" ng-init="initialize()">
-
+<!--Meetups container-->
+<div class="container content-container" id="meetups-container">
   <div class="row">
     <div class="col-md-6">
       <div class="col-md-3">
@@ -38,16 +18,16 @@
   <table class="meetup-table table table-hover" ng-show="meetups.length>0">
     <thead>
       <tr>
-        <th>name</th>
-        <th>address</th>
-        <th>start time</th>
-        <th>end time</th>
-        <th>status</th>
-        <th>action</th>
+        <th>Name</th>
+        <th>Address</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th>Status</th>
+        <th>Action</th>
       </tr>
     </thead>
-    <tbody  >
-      <tr ng-repeat="meetup in meetups | orderBy:'meetupers' | filter:query">
+    <tbody >
+      <tr ng-repeat="meetup in meetups | orderBy:'meetupers' | filter:query track by meetup._id">
         <td ng-click="showMeetupInfo(meetup)">{{meetup.name}}</td>
         <td ng-click="showMeetupInfo(meetup)">{{meetup.address}}</td>
         <td ng-click="showMeetupInfo(meetup)">{{meetup.startTime |  date:'medium'}}</td>
@@ -59,7 +39,7 @@
           </p>
         </td>
         <td>
-          <input type="button" class="btn btn-primary" value="edit"  ng-click="editMeetup(meetup)"></input>
+          <input type="button" class="btn btn-primary" value="edit"  data-toggle="modal" data-target="#editMeetupModal" ng-click="editMeetup()"></input>
         </td>
       </tr>
     </tbody>
@@ -67,75 +47,30 @@
   <div class="empty-message" ng-show="meetups==null || meetups.length ==0">
     <p>You current do not have any meet ups</p>
   </div>
+</div>
 
-  <!--invite meetupers modal-->
-  <div class="modal fade" role="dialog" id="createMeetupModal">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title">{{meetup.name}}</h4>
-        </div>
-        <div class="modal-body" style="padding:0">
-          <!--meetup info-->
-          <form  name="meetupForm">
-            <fieldset>
-              <div class="col-lg-12 row">
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label for="name" class="col-lg-3 control-label">Name:</label>
-                    <div class="col-lg-8">
-                      <input type="text" class="form-control" required ng-model="meetup.name"></input>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label for="address" class="col-lg-3 control-label">Address:</label>
-                    <div class="col-lg-8">
-                      <div class="input-group">
-                        <input type="text" class="form-control" required ng-model="meetup.address" ng-model-options="{debounce:2000}" ng-change="updatePosition()"></input>
-                        <span class="input-group-addon">
-                          <a ng-click="useCurrentAddress()"><i class="fa fa-map-marker"></i></a>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-12 row">
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label for="startTime" class="col-lg-3 control-label">Start Time:</label>
-                    <div class="col-lg-8">
-                      <input type="datetime-local" class="form-control" required ng-model="meetup.startTime"</input>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label for="endTime" class="col-lg-3 control-label">End Time:</label>
-                    <div class="col-lg-8">
-                      <input type="datetime-local" class="form-control" required ng-model="meetup.endTime"></input>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </fieldset>
-          </form>
-
-          <!--google map-->
-          <div class="row">
-            <div id="modal-map"></div>
-          </div>
-
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" ng-disabled="meetupForm.$invalid" ng-click="saveMeetup()" data-dismiss="modal">Save changes</button>
-        </div>
-      </div>
+<!--pending friend requests container-->
+<div class="container content-container" id="pending-relationship-container">
+  <div class="row">
+    <div class="col-md-8">
+      <h2 class="group-title">Friend Requests</h2>
     </div>
   </div>
+  <table class="friend-invitations-table table table-hover" ng-show="friendInvitations.length > 0">
+    <tr>
+      <th>username</th>
+      <th>first name</th>
+      <th>last name</th>
+      <th>action</th>
+    </tr>
+    <tr ng-repeat="invitation in friendInvitations">
+      <td>{{invitation.userId}}
+      <td>{{invitation.firstName}}</td>
+      <td>{{invitation.lastName}}</td>
+      <td>
+        <button type="button" class="btn btn-success" ng-click="accept(invitation)">accept</button>
+        <button type="button" class="btn btn-danger" ng-click="accept(invitation)">reject</button>
+      </td>
+    </tr>
+  </table>
 </div>

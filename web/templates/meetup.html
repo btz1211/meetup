@@ -1,176 +1,30 @@
-<nav class="navbar navbar-default navbar-fixed-top">
-  <div class="container">
-    <!--collpased header-->
-    <div class="navbar-header">
-      <a href="#" class="navbar-brand"><strong>Meetup</strong> Now!</a>
-      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-    </div>
-
-    <!--expanded header-->
-    <div class="collapse navbar-collapse" id="navbar-main">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="#/meetups">Meetups</a></li>
-        <li><a href="#">Friends</a></li>
-        <li><a href="#">Me</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+<navbar active-item="meetups"/>
 
 <div class="container" id="meetup-container">
-  <div class="row">
-    <div class="col-lg-12">
-      <div class="col-lg-3">
-        <legend>{{meetup.name}}</legend>
-      </div>
-      <div class="col-lg-9">
-        <button class="btn btn-primary create-meetup-btn" data-toggle="modal" data-target="#inviteModal"><i class="fa fa-user-plus"></i></button>
-      </div>
-    </div>
-  </div>
-  <hr></hr>
 
-  <!--meetup info-->
-  <fieldset>
-    <div class="col-lg-12 row">
-      <div class="col-lg-6">
-        <div class="form-group">
-          <label for="name" class="col-lg-3 control-label">Name:</label>
-          <div class="col-lg-8">
-            <p class="text-info">{{meetup.name}}</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6">
-        <div class="form-group">
-          <label for="address" class="col-lg-3 control-label">Address:</label>
-          <div class="col-lg-8">
-             <p class="text-info">{{meetup.address}}</p>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!--modal that allows user to invite friends-->
+  <invite-friends-modal user="loggedInUser" meetup="meetup" get-meetupers="getMeetupers()"></invite-friends-modal>
 
-    <div class="col-lg-12 row">
-      <div class="col-lg-6">
-        <div class="form-group">
-          <label for="startTime" class="col-lg-3 control-label">Start Time:</label>
-          <div class="col-lg-8">
-            <p class="text-info">{{meetup.startTime| date:'medium'}}</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6">
-        <div class="form-group">
-          <label for="endTime" class="col-lg-3 control-label">End Time:</label>
-          <div class="col-lg-8">
-            <p class="text-info">{{meetup.endTime | date:'medium'}}</p>
-          </div>
-        </div>
-      </div>
-    </div>
+  <meetup-view meetup="meetup"></meetup-view>
 
-    <div class="col-lg-12 row">
-      <div class="col-lg-6">
-        <div class="form-group">
-          <label for="meetupName" class="col-lg-3 control-label">Status:</label>
-          <div class="col-lg-8">
-            <p class="text-info">{{meetup.status | statusFilter}}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </fieldset>
-
-  <!--google map-->
   <div class="row col-lg-12">
+    <!--google map-->
     <div class="col-lg-9">
       <div id="map"></div>
     </div>
+
+    <!--meetupers-->
     <div class="col-lg-3" id="meetupers-container">
       <legend>Meetupers</legend><hr/>
       <table class="meetupers-table table table-hover table-striped">
-        <tr ng-repeat="meetuper in meetupers" ng-mouseover="focusOnMeetuper(meetuper)">
+        <tr ng-repeat="meetuper in meetupers track by meetuper._id" ng-mouseover="focusOnMeetuper(meetuper)">
           <td><img ng-src="favicon.ico" width="18"></td>
           <td>{{meetuper.firstName + ' ' + meetuper.lastName}}</td>
         </tr>
       </table>
       <h6 ng-show="meetup.meetupers.length ==0">hit &nbsp;<i class="fa fa-user-plus"></i>&nbsp; to invite friends!</h6>
-
     </div>
   </div>
 
-  <script type="text/ng-template" id="customTemplate.html">
-    <a>
-      <img ng-src="favicon.ico" width="18">&nbsp;
-      <span ng-bind-html="match.model.fullName | uibTypeaheadHighlight:query"></span>
-    </a>
-  </script>
 
-  <!--invite meetupers modal-->
-  <div class="modal fade" role="dialog" id="inviteModal">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title">Invite Friends</h4>
-        </div>
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-lg-12">
-              <!-- auto-complete friend search-->
-              <input type="text" ng-model="searchString" placeholder="start typing to search for friends"
-                uib-typeahead="friend for friend in searchFriends($viewValue)"
-                typeahead-loading="loadingFriends"
-                typeahead-no-results="noFriendsFound"
-                typeahead-template-url="customTemplate.html"
-                typeahead-on-select='onFriendSelected($item, $model, $label)'
-                class="form-control">
-              <i ng-show="loadingFriends" class="glyphicon glyphicon-refresh"></i>
-              <div ng-show="noFriendsFound">
-                <i class="fa fa-user"></i> No Results Found
-              </div>
-
-              <!--friends and selected friends-->
-              <div class="row">
-                <div class="col-lg-8">
-                  <h5>Friends</h5>
-                  <hr/>
-                  <table class="friends-table table table-hover" ng-show="friends.length > 0">
-                    <tr ng-repeat="friend in friends" ng-click="onFriendSelected(friend)">
-                      <td>
-                          <img ng-src="favicon.ico" width="18" ng-show="!isFriendSelected(friend)">
-                          <i class="fa fa-check" ng-show="isFriendSelected(friend)"></i>
-                          &nbsp;
-                      </td>
-                      <td>{{friend.userId}}</td>
-                      <td>{{friend.firstName + ' ' + friend.lastName}}</td>
-                    </tr>
-                  </table>
-                </div>
-                <div class="col-lg-4">
-                  <h5>Selected Friends ({{getNumberOfSelectedFriends()}})</h5>
-                  <hr/>
-                  <table class="selected-friends-table table table-hover" >
-                    <tr ng-repeat="(id, friend) in selectedFriends">
-                      <td><i class="fa fa-remove"></i>&nbsp;</td>
-                      <td>{{friend.firstName + ' ' + friend.lastName}}</td>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" ng-click="addMeetupers()">Save changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>

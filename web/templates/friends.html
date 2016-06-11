@@ -10,6 +10,32 @@
       </button>
     </div>
 
+    <script type="text/ng-template" id="customTemplate.html">
+      <a>
+        <img ng-src="favicon.ico" width="18">&nbsp;
+        <span ng-bind-html="match.model.fullName | uibTypeaheadHighlight:query"></span>
+      </a>
+    </script>
+
+    <form class="navbar-form navbar-right" role="search">
+      <div class="form-group">
+        <div class="input-group">
+          <input type="text" ng-model="searchString" placeholder="search users"
+            uib-typeahead="user for user in searchUsers($viewValue)"
+            typeahead-loading="loadingUsers"
+            typeahead-template-url="customTemplate.html"
+            typeahead-on-select='onFriendSelected($item, $model, $label)'
+            class="form-control">
+
+          <span class="input-group-btn">
+            <button type="submit" class="btn btn-success">Submit</button>
+          </span>
+      </div>
+        <i ng-show="loadingUsers" class="glyphicon glyphicon-refresh"></i>
+      </div>
+
+    </form>
+
     <!--expanded header-->
     <div class="collapse navbar-collapse" id="navbar-main">
       <ul class="nav navbar-nav">
@@ -22,6 +48,7 @@
 </nav>
 
 <div class="container content-container" id="friends-container">
+
   <div class="row">
       <div class="col-md-6">
         <div class="col-md-3">
@@ -50,7 +77,6 @@
   <div class="empty-message" ng-show="friends==null || friends.length ==0">
     <p>No friends? It's okay, you add friends by click +</p>
   </div>
-
 </div>
 
 
