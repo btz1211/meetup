@@ -1,0 +1,74 @@
+<div>
+
+  <!-- logic for dropdown display in the auto-complete input-->
+  <script type="text/ng-template" id="customTemplate.html">
+    <a>
+      <img ng-src="favicon.ico" width="18">&nbsp;
+      <span ng-bind-html="match.model.fullName | uibTypeaheadHighlight:query"></span>
+    </a>
+  </script>
+
+  <!--invite meetupers modal-->
+  <div class="modal fade" role="dialog" id="inviteFriendsModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Invite Friends</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-lg-12">
+
+              <!-- auto-complete friend search-->
+              <input type="text" ng-model="searchString" placeholder="start typing to search for friends"
+                uib-typeahead="friend for friend in searchFriends($viewValue)"
+                typeahead-loading="loadingFriends"
+                typeahead-no-results="noFriendsFound"
+                typeahead-template-url="customTemplate.html"
+                typeahead-on-select='onFriendSelect($item, $model, $label)'
+                class="form-control">
+              <i ng-show="loadingFriends" class="glyphicon glyphicon-refresh"></i>
+              <div ng-show="noFriendsFound">
+                <i class="fa fa-user"></i> No Results Found
+              </div>
+
+              <!--friends and selected friends-->
+              <div class="row">
+                <div class="col-lg-8">
+                  <h5>Friends</h5>
+                  <hr/>
+                  <table class="friends-table table table-hover" ng-show="friends.length > 0">
+                    <tr ng-repeat="friend in friends" ng-click="onFriendSelect(friend)">
+                      <td>
+                          <img ng-src="favicon.ico" width="18" ng-show="!isFriendSelected(friend)">
+                          <i class="fa fa-check" ng-show="isFriendSelected(friend)"></i>
+                          &nbsp;
+                      </td>
+                      <td>{{friend.userId}}</td>
+                      <td>{{friend.firstName + ' ' + friend.lastName}}</td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="col-lg-4">
+                  <h5>Selected Friends ({{getNumberOfSelectedFriends()}})</h5>
+                  <hr/>
+                  <table class="selected-friends-table table table-hover" >
+                    <tr ng-repeat="(id, friend) in selectedFriends">
+                      <td><i class="fa fa-remove"></i>&nbsp;</td>
+                      <td>{{friend.firstName + ' ' + friend.lastName}}</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="addMeetupers()">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
