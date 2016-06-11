@@ -33,9 +33,16 @@ app.get("/api/meetup/:meetupId/meetupers", meetupCtrl.getMeetupers);
 app.put("/api/meetup/:meetupId", meetupCtrl.updateMeetup);
 app.put("/api/meetup/:meetupId/meetuper/:meetuperId", meetupCtrl.addMeetuper);
 
+<<<<<<< HEAD
+
+app.get('/api/geolocation', function(req, res){
+  var address = req.query.address;
+  console.log('[INFO] - received address request::' + JSON.stringify(req.query));
+=======
 /**api for geting coordinates from address**/
 app.get('/api/geolocation', function(req, res){
   var address = req.query.address;
+>>>>>>> home
 
   if(!address){
     res.status(400);

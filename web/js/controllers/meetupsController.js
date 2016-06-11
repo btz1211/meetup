@@ -92,8 +92,18 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route
     });
   }
 
+<<<<<<< HEAD
+  $scope.newMeetup = function(){
+    $window.location.href = '#/meetup/new';
+  }
+
+/*
+  $scope.isSelectedMeetup = function(meetup){
+    return $scope.selectedMeetup === meetup;
+=======
   $scope.onUserSelect = function(item){
     $log.info("in meetups controller:"+JSON.stringify(item));
+>>>>>>> home
   }
 
   $scope.getInvitations = function(){

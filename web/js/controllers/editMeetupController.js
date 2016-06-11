@@ -1,5 +1,9 @@
 'use strict';
 
+<<<<<<< HEAD
+myApp.controller('editMeetupCtrl', function($scope, $log, $window, $cookies, meetupApiService){
+  $scope.meetup = {};
+=======
 myApp.controller('editMeetupCtrl', function($scope, $log, $http, $window, $cookies, meetupApiService, mapService){
   $scope.loggedInUser = $cookies.getObject('loggedInUser');
   $scope.selectedFriends = [];
@@ -36,4 +40,5 @@ myApp.controller('editMeetupCtrl', function($scope, $log, $http, $window, $cooki
   }
 
   $scope.getFriends();
+>>>>>>> home
 });

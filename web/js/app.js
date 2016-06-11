@@ -7,6 +7,15 @@ var myApp = angular.module('myApp', ['ngResource', 'ngRoute', 'ngCookies', 'ngAn
     }).when('/meetups', {
       templateUrl: 'templates/meetups.html',
       controller: 'meetupsCtrl'
+<<<<<<< HEAD
+    }).when('/meetup/new', {
+        templateUrl: 'templates/editMeetup.html',
+        controller: 'editMeetupCtrl'
+    }).when('/meetup/:meetupId',{
+      templateUrl: 'templates/meetup.html',
+      controller: 'meetupCtrl'
+
+=======
     }).when('/meetup/new',{
       templateUrl: 'templates/editMeetup.html',
       controller: 'editMeetupCtrl'
@@ -19,5 +28,6 @@ var myApp = angular.module('myApp', ['ngResource', 'ngRoute', 'ngCookies', 'ngAn
     }).when('/friends/add',{
       templateUrl: 'templates/addFriend.html',
       controller: 'addFriendCtrl'
+>>>>>>> home
     }).otherwise({redirectTo:'/login'});
 });
