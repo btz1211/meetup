@@ -2,17 +2,6 @@
 
 <edit-meetup-modal meetup="meetup"></edit-meetup-modal>
 
-<<<<<<< HEAD
-    <div class="row">
-      <div class="page-header col-md-12">
-        <!--<span class="label label-primary group-title  ">Meetups</span>-->
-        <div class="col-md-2">
-          <h2 class="group-title">Meetups</h2>
-        </div>
-        <div class="col-md-2">
-          <button class="btn btn-success plus-btn" ng-click="newMeetup()">+</button>
-        </div>
-=======
 <!--Meetups container-->
 <div class="container content-container" id="meetups-container">
   <div class="row">
@@ -21,8 +10,7 @@
         <h2 class="group-title">My Meetups</h2>
       </div>
       <div class="col-md-3">
-        <button class="btn btn-success plus-btn" ng-click="newMeetup()">+</button>
->>>>>>> home
+        <button class="btn btn-success plus-btn"  ng-click="newMeetup()">+</button>
       </div>
     </div>
   </div>
@@ -51,7 +39,7 @@
           </p>
         </td>
         <td>
-          <input type="button" class="btn btn-primary" value="edit"  data-toggle="modal" data-target="#editMeetupModal" ng-click="editMeetup()"></input>
+          <input type="button" class="btn btn-primary" value="edit" ng-click="editMeetup(meetup)"></input>
         </td>
       </tr>
     </tbody>

@@ -25,17 +25,6 @@ myApp.factory('mapService', function($log){
       });
     },
 
-<<<<<<< HEAD
-      /*mark meetupers on the map
-      for(var i = 0; i < meetup.meetupers.length; ++i){
-        var meetuper = meetup.meetupers[i];
-        if(meetuper.lastKnownLatitude && meetuper.lastKnownLongitude){}
-          var marker = new google.maps.Marker({
-            map: map,
-            position: new google.maps.LatLng(meetuper.lastKnownLatitude, meetuper.lastKnownLongitude),
-            title: meetuper.user.lastName + ', ' + meetuper.user.firstName
-          });
-=======
     getLocation:function(address, callback){
       geocoder.geocode({"address":address}, function(results, status){
         if (status === google.maps.GeocoderStatus.OK) {
@@ -43,7 +32,7 @@ myApp.factory('mapService', function($log){
             callback(results[0].geometry.location);
             return;
           }
->>>>>>> home
+
         }
         callback();
       });

@@ -81,16 +81,18 @@ myApp.directive('editMeetupModal', function(){
        }
 
        $scope.onModalShow = function(){
-         if(jQuery.isEmptyObject($scope.meetup)){
+         if(! jQuery.isEmptyObject($scope.meetup)){
            if($scope.marker){
              mapService.moveMarker($scope.marker, $scope.meetup.latitude, $scope.meetup.longitude);
            }else{
              $scope.marker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.currentLocation.address);
            }
+           mapService.zoomIn($scope.map,$scope.meetup.latitude, $scope.meetup.longitude, 14);
          }
-         mapService.zoomIn($scope.map,$scope.meetup.latitude, $scope.meetup.longitude, 14);
+
+         mapService.zoomIn($scope.map, $scope.defaultLatitude, $scope.defaultLongitude, $scope.defaultZoom);
        }
-       
+
        $scope.mapModal.on('shown.bs.modal', $scope.onModalShow);
        $scope.mapModal.on('hidden.bs.modal', function(){
          $scope.mapModal.unbind();
