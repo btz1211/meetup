@@ -64,6 +64,10 @@ myApp.factory('mapService', function($log){
       marker.setPosition(new google.maps.LatLng(lat, lng));
     },
 
+    removeMarkerFromMap : function(marker){
+      marker.setMap(null);
+    },
+
     zoomIn: function(map, lat, lng, zoom){
       google.maps.event.trigger(map, 'resize');
       if(!zoom){

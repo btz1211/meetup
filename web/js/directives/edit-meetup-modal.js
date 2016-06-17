@@ -8,7 +8,7 @@ myApp.directive('editMeetupModal', function(){
       meetup:"="
     },
     templateUrl: 'templates/directive-templates/edit-meetup-modal.html',
-    controller: function($scope, mapService, meetupApiService){
+    controller: function($scope, $cookies, mapService, meetupApiService){
       $scope.marker;
       $scope.currentLocation= {};
       $scope.defaultLatitude = 40;
@@ -16,8 +16,7 @@ myApp.directive('editMeetupModal', function(){
       $scope.defaultZoom = 4;
       $scope.mapElement = document.getElementById('modal-map');
       $scope.map = mapService.getMap($scope.mapElement, $scope.defaultLatitude, $scope.defaultLongitude, $scope.defaultZoom);
-
-      $scope.mapModal = $("#editMeetupModal");
+      $scope.loggedInUser = $cookies.getObject('loggedInUser');
 
       $scope.saveMeetup = function(){
         //update/save meetup
@@ -82,22 +81,30 @@ myApp.directive('editMeetupModal', function(){
 
        $scope.onModalShow = function(){
          if(! jQuery.isEmptyObject($scope.meetup)){
+           //existing meetup, move marker to meetup location and zoom in
            if($scope.marker){
              mapService.moveMarker($scope.marker, $scope.meetup.latitude, $scope.meetup.longitude);
            }else{
              $scope.marker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.currentLocation.address);
            }
            mapService.zoomIn($scope.map,$scope.meetup.latitude, $scope.meetup.longitude, 14);
+         }else{
+           //new meetup, remove marker and reset map zoom
+           if($scope.marker){
+             mapService.removeMarkerFromMap($scope.marker);
+             $scope.marker = null;
+           }
+
+           mapService.zoomIn($scope.map, $scope.defaultLatitude, $scope.defaultLongitude, $scope.defaultZoom);
          }
 
-         mapService.zoomIn($scope.map, $scope.defaultLatitude, $scope.defaultLongitude, $scope.defaultZoom);
        }
 
-       $scope.mapModal.on('shown.bs.modal', $scope.onModalShow);
-       $scope.mapModal.on('hidden.bs.modal', function(){
-         $scope.mapModal.unbind();
-       });
+       $scope.setupModal = function(){
+         $("#editMeetupModal").on('shown', $scope.onModalShow);
+       }
 
+       $scope.setupModal();
     }
   }
 });

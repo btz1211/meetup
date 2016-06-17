@@ -103,11 +103,11 @@ body{
   font-weight: bold;
 }
 
-#createMeetupModal .form-group{
+#editMeetupModal .form-group{
   padding-top:25px;
 }
 
-#createMeetupModal a:hover {
+#editMeetupModal a:hover {
  cursor:pointer;
 }
 

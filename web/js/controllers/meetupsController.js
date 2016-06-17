@@ -1,8 +1,7 @@
 'use strict';
 
-myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route, mapService, meetupApiService){
+myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route, $interval, mapService, meetupApiService){
   $scope.loggedInUser = $cookies.getObject('loggedInUser');
-  $scope.mapModal = $("#editMeetupModal");
 
   //meetup vars
   $scope.meetup = {};
@@ -11,17 +10,6 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route
 
   //friends/user vars
   $scope.friendInvitations = [];
-
-/*
-  //map vars
-  $scope.marker;
-  $scope.currentLocation= {};
-  $scope.defaultLatitude = 40;
-  $scope.defaultLongitude = -95;
-  $scope.defaultZoom = 4;
-  $scope.mapElement = document.getElementById('modal-map');
-  $scope.map = mapService.getMap($scope.mapElement, $scope.defaultLatitude, $scope.defaultLongitude, $scope.defaultZoom);
-*/
 
   $scope.getMeetups = function(){
     meetupApiService.getMeetups($scope.loggedInUser._id).
@@ -44,32 +32,11 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route
     //clone meetup, don't want the original be changed
     $scope.meetup = jQuery.extend(true, {}, meetup);
     $scope.showModal();
-    /*
-    //update meetup
-    $scope.showModal(function(){
-      if($scope.marker){
-        mapService.moveMarker($scope.marker, $scope.meetup.latitude, $scope.meetup.longitude);
-      }else{
-        $scope.marker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.currentLocation.address);
-      }
-      mapService.zoomIn($scope.map,$scope.meetup.latitude, $scope.meetup.longitude, 14);
-    });
-    */
   }
 
   $scope.newMeetup = function(){
     $scope.meetup = {};
     $scope.showModal();
-    /*
-    //reset marker
-    if($scope.marker){
-      $scope.marker.setMap(null);
-      $scope.marker = null;
-    }
-    $scope.showModal(function(){
-      mapService.zoomIn($scope.map, $scope.defaultLatitude, $scope.defaultLongitude, $scope.defaultZoom);
-    });
-    */
   }
 
   $scope.updateLocation = function(){
@@ -94,10 +61,6 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route
     }).catch(function(error){
       $log.warn(error);
     });
-  }
-
-  $scope.isSelectedMeetup = function(meetup){
-    return $scope.selectedMeetup === meetup;
   }
 
   $scope.onUserSelect = function(item){
@@ -127,20 +90,16 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route
   }
 
   $scope.showModal = function(){
-    //the reason for the callback is due to a race condition between map
-    //rendering and modal generation. In order for map to calculate the size
-    //modal needs to appear first
-    $scope.mapModal.on('shown.bs.modal', function(){
-      console.log('modal showed')
-    });
-    $scope.mapModal.modal('show');
-
-
+    $("#editMeetupModal").modal('show');
   }
 
   $scope.parseDate = function(date){
     return new Date( Date.parse( date ) );
   }
+
+  $interval(function(){
+    $scope.getMeetups();
+  }, 5000);
 
   $scope.getMeetups();
   $scope.updateLocation();
