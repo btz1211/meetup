@@ -10,7 +10,7 @@ myApp.directive('navbar', function($log, meetupApiService){
       },
       templateUrl: 'templates/directive-templates/navbar.html',
       link:function(scope, element, attr){
-        scope.searchFriends = function(searchString){
+        scope.searchUsers = function(searchString){
           return meetupApiService.searchUsers(searchString)
           .$promise.then(function(response){
             return response.data.map(function(user){

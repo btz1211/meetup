@@ -189,3 +189,8 @@ body{
 #add-friend-container a{
   cursor: pointer;
 }
+
+/**navbar**/
+#nav-search-form .form-control{
+  min-width:250px
+}
