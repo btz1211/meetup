@@ -6,7 +6,6 @@ myApp.directive('navbar', function($log, meetupApiService){
       replace: true,
       scope:{
         activeItem:"@",
-        onDropdownSelect:"&"
       },
       templateUrl: 'templates/directive-templates/navbar.html',
       link:function(scope, element, attr){

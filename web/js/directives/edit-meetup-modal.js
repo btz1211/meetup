@@ -97,7 +97,6 @@ myApp.directive('editMeetupModal', function(){
 
            mapService.zoomIn($scope.map, $scope.defaultLatitude, $scope.defaultLongitude, $scope.defaultZoom);
          }
-
        }
 
        $scope.setupModal = function(){

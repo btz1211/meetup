@@ -111,6 +111,10 @@ body{
  cursor:pointer;
 }
 
+#editMeetupModal .input-group-addon{
+  font-size:20px;
+}
+
 /**friends-container**/
 #friends-container .col-md-3{
   width:20%;
