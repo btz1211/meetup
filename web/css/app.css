@@ -194,7 +194,16 @@ body{
   cursor: pointer;
 }
 
+#user-container{
+  margin-top: 120px;
+
+
+}
 /**navbar**/
 #nav-search-form .form-control{
   min-width:250px
+}
+
+#navbar-main a:hover {
+ cursor:pointer;
 }

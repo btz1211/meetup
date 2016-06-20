@@ -26,7 +26,7 @@
             uib-typeahead="item for item in searchUsers($viewValue)"
             typeahead-loading="loading"
             typeahead-template-url="customTemplate.html"
-            typeahead-on-select='onSelect($item, $model, $label)'
+            typeahead-on-select='onUserSelect($item, $model, $label)'
             class="form-control">
       </div>
         <i ng-show="loading" class="glyphicon glyphicon-refresh"></i>
@@ -37,7 +37,7 @@
     <div class="collapse navbar-collapse" id="navbar-main">
       <ul class="nav navbar-nav">
         <li ng-class="{active:activeItem=='meetups'}"><a href="#/meetups" >Meetups</a></li>
-        <li><a href="#">Me</a></li>
+        <li ng-class="{active:activeItem=='user'}"><a ng-href="#" ng-click="$event.preventDefault(); onUserSelect(loggedInUser)">{{loggedInUser.firstName}}</a></li>
       </ul>
     </div>
   </div>

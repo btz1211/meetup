@@ -204,13 +204,14 @@ module.exports.getUser = function(req, res){
   var userId = req.params.userId;
   console.log('[INFO] - received get user for id::' + userId);
   if(mongoose.connection.readyState){
-    User.findOne({userId:userId})
+    User.findOne({_id:userId})
     .select('userId firstName lastName createDate')
     .exec(function(error, user){
       if(error){
         buildResponseWithError(res, error);return;
       }else{
         if(user){
+          console.log('returning user::' + JSON.stringify(user))
           buildResponse(res, 200, {success:true, data:user});
         }else{
           buildResponse(res, 204, {success:false});

@@ -48,8 +48,8 @@ myApp.factory('meetupApiService', function($resource){
       return addMeetuperResource.update({'meetupId':meetupId, 'meetuperId':meetuperId}, null);
     },
 
-    getUser: function(user){
-      return getUserResource.get({userId:user.userId});
+    getUser: function(userId){
+      return getUserResource.get({userId:userId});
     },
 
     createUser: function(user){

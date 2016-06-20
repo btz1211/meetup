@@ -9,4 +9,4 @@ repository for meetup that contains:
   - show user full name instead of 'Me' on the navbar
   - add validation in the editMeetupModal
   - Make user profile page (currently is the 'Me' link) work
-  - add a link to re-focus on meetup when map is moved
+  - add a link to re-focus on meetup when map is moved on the 'Meetup' page
