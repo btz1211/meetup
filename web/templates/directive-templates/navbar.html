@@ -11,27 +11,7 @@
       </button>
     </div>
 
-    <!--search form-->
-    <script type="text/ng-template" id="customTemplate.html">
-      <a>
-        <img ng-src="favicon.ico" width="18">&nbsp;
-        <span ng-bind-html="match.model.fullName | uibTypeaheadHighlight:query"></span>
-      </a>
-    </script>
 
-    <form class="navbar-form navbar-right" role="search" id="nav-search-form">
-      <div class="form-group">
-        <div class="input-group">
-          <input type="text" ng-model="searchString" placeholder="search users to add friends"
-            uib-typeahead="item for item in searchUsers($viewValue)"
-            typeahead-loading="loading"
-            typeahead-template-url="customTemplate.html"
-            typeahead-on-select='onUserSelect($item, $model, $label)'
-            class="form-control">
-      </div>
-        <i ng-show="loading" class="glyphicon glyphicon-refresh"></i>
-      </div>
-    </form>
 
     <!--expanded header-->
     <div class="collapse navbar-collapse" id="navbar-main">
@@ -39,6 +19,27 @@
         <li ng-class="{active:activeItem=='meetups'}"><a href="#/meetups" >Meetups</a></li>
         <li ng-class="{active:activeItem=='user'}"><a ng-href="#" ng-click="$event.preventDefault(); onUserSelect(loggedInUser)">{{loggedInUser.firstName}}</a></li>
       </ul>
+
+      <!--search form-->
+      <script type="text/ng-template" id="customTemplate.html">
+        <a>
+          <img ng-src="favicon.ico" width="18">&nbsp;
+          <span ng-bind-html="match.model.fullName | uibTypeaheadHighlight:query"></span>
+        </a>
+      </script>
+      <form class="navbar-form navbar-right" role="search" id="nav-search-form">
+        <div class="form-group">
+          <div class="input-group">
+            <input type="text" ng-model="searchString" placeholder="search users to add friends"
+              uib-typeahead="item for item in searchUsers($viewValue)"
+              typeahead-loading="loading"
+              typeahead-template-url="customTemplate.html"
+              typeahead-on-select='onUserSelect($item, $model, $label)'
+              class="form-control">
+        </div>
+          <i ng-show="loading" class="glyphicon glyphicon-refresh"></i>
+        </div>
+      </form>
     </div>
   </div>
 

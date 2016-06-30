@@ -18,6 +18,12 @@ myApp.controller('userCtrl', function($scope, $cookies, $routeParams, $log, meet
       });
     }
 
+    $scope.addable = function(){
+      if($scope.user._id != $scope.loggedInUser){
+        
+      }
+    }
+
 
     $scope.getUser();
 })

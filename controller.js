@@ -411,6 +411,21 @@ module.exports.searchFriends = function(req, res){
   });
 }
 
+module.exports.checkFriend = function(){
+  var source = mongoose.Types.ObjectId(req.params.source);
+  var target = mongoose.Types.ObjectId(req.params.target);
+
+  User.find({$and:[{_id:source}, {friends:target}]})
+  .select('userId')
+  .exec(function(error, user){
+    if(user){
+      buildResponse(res, 200, {data: true})
+    }else{
+      buildResponse(res, 200, {data: false})
+    }
+  });
+}
+
 /*-------------------utilties function (move later)--------------------*/
 var buildResponseWithError = function(res, error){
   console.log("error::"+ JSON.stringify(error));
