@@ -4,6 +4,7 @@
   "dependencies":{
     "express":">=1.2.0",
     "body-parser":">=1.9.2",
-    "mongoose":">=4.4.3"
+    "mongoose":">=4.4.3",
+    "winston":">=2.2.0"
   }
 }
