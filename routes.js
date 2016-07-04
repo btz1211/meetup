@@ -4,6 +4,7 @@ var UserService = require('./services/UserService.js')
 var userService = new UserService();
 var meetupService = new MeetupService();
 var setup = function(app){
+
   //user api
   app.post("/api/user", userService.createUser);
   app.get("/api/user/:userId", userService.getUser);

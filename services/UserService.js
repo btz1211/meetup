@@ -11,7 +11,7 @@ var responseBuilder = new ResponseBuilder();
 UserService.prototype.createUser = function(req, res){
   var user = req.body;
   var newUser = new User(user);
-  console.log('[INFO] - received create user request::' + newUser );
+  logger.info('[INFO] - received create user request::' + newUser );
   if(mongoose.connection.readyState){
     newUser.save(function(error){
       if(error){
@@ -29,7 +29,7 @@ UserService.prototype.createUser = function(req, res){
 //get users by first name or last name
 UserService.prototype.getUsers = function(req, res){
   var searchString = new RegExp(req.params.searchString, 'i');
-  console.log('[INFO] - search keywords'+ searchString);
+  logger.info('[INFO] - search keywords'+ searchString);
 
   if(mongoose.connection.readyState){
     User.find({})
@@ -40,7 +40,7 @@ UserService.prototype.getUsers = function(req, res){
     .limit(10)
     .exec()
     .then(function(users){
-      console.log('[INFO] - found users::' + JSON.stringify(users));
+      logger.info('[INFO] - found users::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     })
     .catch(function(error){
@@ -56,7 +56,7 @@ UserService.prototype.getUsers = function(req, res){
 //get user by _id
 UserService.prototype.getUser = function(req, res){
   var userId = req.params.userId;
-  console.log('[INFO] - received get user for id::' + userId);
+  logger.info('[INFO] - received get user for id::' + userId);
 
   if(mongoose.connection.readyState){
     User.findOne({_id:userId})
@@ -66,7 +66,7 @@ UserService.prototype.getUser = function(req, res){
         responseBuilder.buildResponseWithError(res, error);return;
       }else{
         if(user){
-          console.log('returning user::' + JSON.stringify(user))
+          logger.info('returning user::' + JSON.stringify(user))
           responseBuilder.buildResponse(res, 200, {success:true, data:user});
         }else{
           responseBuilder.buildResponse(res, 204, {success:false});
@@ -84,7 +84,7 @@ UserService.prototype.authenticateUser = function(req, res){
   var userId = req.params.userId;
   var password = req.params.password;
 
-  console.log('[INFO] - received authenticate user for id::' + userId);
+  logger.info('[INFO] - received authenticate user for id::' + userId);
   if(mongoose.connection.readyState){
     User.findOne({userId: userId, password: password})
     .select('userId firstName lastName createDate')
@@ -111,7 +111,7 @@ UserService.prototype.authenticateUser = function(req, res){
 //update user location
 UserService.prototype.updateLocation = function(req, res){
   var userId = req.params.userId;
-  console.log('[INFO] - received update location request for user::'
+  logger.info('[INFO] - received update location request for user::'
               + userId +" with location::" + JSON.stringify(req.body));
 
   if(! req.body.latitude || ! req.body.longitude){
@@ -140,7 +140,7 @@ UserService.prototype.updateLocation = function(req, res){
 }
 
 /*add friend*/
-UserService.addFriend = function(req, res){
+UserService.prototype.addFriend = function(req, res){
   var source = mongoose.Types.ObjectId(req.params.source);
   var target = mongoose.Types.ObjectId(req.params.target);
 
@@ -151,14 +151,14 @@ UserService.addFriend = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res,error); return;
       }
-      console.log('[INFO] - added friend to ::' + JSON.stringify(user));
+      logger.info('[INFO] - added friend to ::' + JSON.stringify(user));
       responseBuilder.buildResponse(res, 200, {success:true});
     });
 }
 
 
 /*get friends*/
-UserService.getFriends = function(req, res){
+UserService.prototype.getFriends = function(req, res){
   var userId = mongoose.Types.ObjectId(req.params.userId);
   var lastUserId = objectUtil.isStringObjectId(req.query.lastUserId)
                    ? mongoose.Types.ObjectId(req.query.lastUserId)
@@ -166,8 +166,8 @@ UserService.getFriends = function(req, res){
 
   var limit = objectUtil.isNumberInt(+req.query.limit) ? +req.query.limit : 20;
 
-  console.log('[INFO] - limiting response to:' + limit);
-  console.log('[INFO] - last user id:' + JSON.stringify(lastUserId));
+  logger.info('[INFO] - limiting response to:' + limit);
+  logger.info('[INFO] - last user id:' + JSON.stringify(lastUserId));
 
   User.findOne({_id:userId})
   .select('friends')
@@ -197,13 +197,13 @@ UserService.getFriends = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }
-      console.log('[INFO] - found pending relationships::' + JSON.stringify(users));
+      logger.info('[INFO] - found pending relationships::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     });
   });
 }
 
-UserService.getFriendRequests = function(req, res){
+UserService.prototype.getFriendRequests = function(req, res){
   var userId = mongoose.Types.ObjectId(req.params.userId);
 
   User.findOne({_id:userId})
@@ -229,13 +229,13 @@ UserService.getFriendRequests = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }
-      console.log('[INFO] - found friend requests::' + JSON.stringify(users));
+      logger.info('[INFO] - found friend requests::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     });
   });
 }
 
-UserService.getFriendInvitations = function(req, res){
+UserService.prototype.getFriendInvitations = function(req, res){
   var userId = mongoose.Types.ObjectId(req.params.userId);
 
   User.findOne({_id:userId})
@@ -260,16 +260,16 @@ UserService.getFriendInvitations = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }
-      console.log('[INFO] - found pending friend invitations::' + JSON.stringify(users));
+      logger.info('[INFO] - found pending friend invitations::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     });
   });
 }
 
-UserService.searchFriends = function(req, res){
+UserService.prototype.searchFriends = function(req, res){
   var userId = mongoose.Types.ObjectId(req.params.userId);
   var searchString = new RegExp(req.params.searchString, 'i');
-  console.log('[INFO] - search string:' + searchString);
+  logger.info('[INFO] - search string:' + searchString);
 
   User.findOne({_id:userId})
   .select('friends')
@@ -297,13 +297,13 @@ UserService.searchFriends = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }
-      console.log('[INFO] - found pending relationships::' + JSON.stringify(users));
+      logger.info('[INFO] - found pending relationships::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     });
   });
 }
 
-UserService.checkFriend = function(){
+UserService.prototype.checkFriend = function(){
   var source = mongoose.Types.ObjectId(req.params.source);
   var target = mongoose.Types.ObjectId(req.params.target);
 
