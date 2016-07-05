@@ -1,18 +1,14 @@
 var winston = require('winston');
-
-// Bring Mongoose into the app
+var config = require('./config');
 var mongoose = require( 'mongoose' );
 
-// Build the connection string
-var dbURI = 'mongodb://localhost/local';
-
 // Create the database connection
-mongoose.connect(dbURI);
+mongoose.connect(config.db.mongodb);
 
 // CONNECTION EVENTS
 // When successfully connected
 mongoose.connection.on('connected', function () {
-  winston.info('Mongoose default connection open to ' + dbURI);
+  winston.info('Mongoose default connection open to ' + config.db.mongodb);
 });
 
 // If the connection throws an error

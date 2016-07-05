@@ -11,13 +11,11 @@ var responseBuilder = new ResponseBuilder();
 /*get user's meetups*/
 MeetupService.prototype.getMeetups = function(req, res){
   var userId = mongoose.Types.ObjectId(req.params.userId);
-  logger.info('received request for user id::' + userId);
 
   Meetup.find({$or:[{'meetupers.user':userId}, {owner:userId}]})
   .select('name address status owner startTime endTime latitude longitude')
   .exec(function(error, meetups){
     if(meetups && meetups.length > 0){
-      logger.info("meetups::" + JSON.stringify(meetups));
       responseBuilder.buildResponse(res, 200, {success:true, data:meetups});
     }else{
       responseBuilder.buildResponse(res, 204, {success:false});
@@ -55,7 +53,7 @@ MeetupService.prototype.createMeetup = function(req, res){
   if(mongoose.connection.readyState){
     meetup.status="INPROGRESS";
     var newMeetup = new Meetup(meetup);
-    logger.info('[INFO] - creating meetup::'+ JSON.stringify(meetup));
+    logger.info('creating meetup::'+ JSON.stringify(meetup));
 
     //save meetup
     newMeetup.save(function(error, meetup){
@@ -73,7 +71,7 @@ MeetupService.prototype.createMeetup = function(req, res){
 MeetupService.prototype.updateMeetup = function(req, res){
   var meetup = req.body;
   var meetupId = req.params.meetupId;
-  logger.info('[INFO] - updating meetup::' + JSON.stringify(meetup));
+  logger.info('updating meetup::' + JSON.stringify(meetup));
 
   if(mongoose.connection.readyState){
     Meetup.findById(meetupId)
@@ -97,7 +95,7 @@ MeetupService.prototype.updateMeetup = function(req, res){
 
     //meetup updated
     .then(function(result){
-      logger.info('[INFO] - meetup updated::'+JSON.stringify(result));
+      logger.info('meetup updated::'+JSON.stringify(result));
       responseBuilder.buildResponse(res, 200, {success:true});
     })
 
@@ -143,7 +141,7 @@ MeetupService.prototype.getMeetupers = function(req, res){
         responseBuilder.buildResponseWithError(res, error); return;
       }
 
-      //logger.info('[INFO] - meetupers found::' + JSON.stringify(meetupers));
+      //logger.info('meetupers found::' + JSON.stringify(meetupers));
       responseBuilder.buildResponse(res, 200, {data:meetupers});
     })
   }else{
@@ -157,7 +155,7 @@ MeetupService.prototype.addMeetuper = function(req, res){
   var meetupId = mongoose.Types.ObjectId(req.params.meetupId);
   var meetuperId = mongoose.Types.ObjectId(req.params.meetuperId);
   if(mongoose.connection.readyState){
-      logger.info('[INFO] - adding meetuper::' + meetuperId + ' to meetup::' + meetupId);
+      logger.info('adding meetuper::' + meetuperId + ' to meetup::' + meetupId);
 
       Meetup.findById(meetupId).select('_id').exec()
       //meetup found

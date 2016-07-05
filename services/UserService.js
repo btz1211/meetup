@@ -1,17 +1,18 @@
 var mongoose = require('mongoose');
-var User = mongoose.model('User');
 var ResponseBuilder = require('../util/ResponseBuilder.js')
 var ObjectUtil = require('../util/ObjectUtil.js')
+var logger = require('../logger')
 
 var UserService = function(){}
 var objectUtil = new ObjectUtil();
 var responseBuilder = new ResponseBuilder();
+var User = mongoose.model('User');
 
 //create user
 UserService.prototype.createUser = function(req, res){
   var user = req.body;
   var newUser = new User(user);
-  logger.info('[INFO] - received create user request::' + newUser );
+  logger.info('received create user request::' + newUser );
   if(mongoose.connection.readyState){
     newUser.save(function(error){
       if(error){
@@ -29,7 +30,7 @@ UserService.prototype.createUser = function(req, res){
 //get users by first name or last name
 UserService.prototype.getUsers = function(req, res){
   var searchString = new RegExp(req.params.searchString, 'i');
-  logger.info('[INFO] - search keywords'+ searchString);
+  logger.info('search keywords'+ searchString);
 
   if(mongoose.connection.readyState){
     User.find({})
@@ -40,7 +41,7 @@ UserService.prototype.getUsers = function(req, res){
     .limit(10)
     .exec()
     .then(function(users){
-      logger.info('[INFO] - found users::' + JSON.stringify(users));
+      logger.info('found users::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     })
     .catch(function(error){
@@ -56,7 +57,7 @@ UserService.prototype.getUsers = function(req, res){
 //get user by _id
 UserService.prototype.getUser = function(req, res){
   var userId = req.params.userId;
-  logger.info('[INFO] - received get user for id::' + userId);
+  logger.info('received get user for id::' + userId);
 
   if(mongoose.connection.readyState){
     User.findOne({_id:userId})
@@ -84,7 +85,7 @@ UserService.prototype.authenticateUser = function(req, res){
   var userId = req.params.userId;
   var password = req.params.password;
 
-  logger.info('[INFO] - received authenticate user for id::' + userId);
+  logger.info('received authenticate user for id::' + userId);
   if(mongoose.connection.readyState){
     User.findOne({userId: userId, password: password})
     .select('userId firstName lastName createDate')
@@ -111,7 +112,7 @@ UserService.prototype.authenticateUser = function(req, res){
 //update user location
 UserService.prototype.updateLocation = function(req, res){
   var userId = req.params.userId;
-  logger.info('[INFO] - received update location request for user::'
+  logger.info('received update location request for user::'
               + userId +" with location::" + JSON.stringify(req.body));
 
   if(! req.body.latitude || ! req.body.longitude){
@@ -151,7 +152,7 @@ UserService.prototype.addFriend = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res,error); return;
       }
-      logger.info('[INFO] - added friend to ::' + JSON.stringify(user));
+      logger.info('added friend to ::' + JSON.stringify(user));
       responseBuilder.buildResponse(res, 200, {success:true});
     });
 }
@@ -166,8 +167,8 @@ UserService.prototype.getFriends = function(req, res){
 
   var limit = objectUtil.isNumberInt(+req.query.limit) ? +req.query.limit : 20;
 
-  logger.info('[INFO] - limiting response to:' + limit);
-  logger.info('[INFO] - last user id:' + JSON.stringify(lastUserId));
+  logger.info('limiting response to:' + limit);
+  logger.info('last user id:' + JSON.stringify(lastUserId));
 
   User.findOne({_id:userId})
   .select('friends')
@@ -197,7 +198,7 @@ UserService.prototype.getFriends = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }
-      logger.info('[INFO] - found pending relationships::' + JSON.stringify(users));
+      logger.info('found pending relationships::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     });
   });
@@ -229,7 +230,7 @@ UserService.prototype.getFriendRequests = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }
-      logger.info('[INFO] - found friend requests::' + JSON.stringify(users));
+      logger.info('found friend requests::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     });
   });
@@ -260,7 +261,7 @@ UserService.prototype.getFriendInvitations = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }
-      logger.info('[INFO] - found pending friend invitations::' + JSON.stringify(users));
+      logger.info('found pending friend invitations::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     });
   });
@@ -269,7 +270,7 @@ UserService.prototype.getFriendInvitations = function(req, res){
 UserService.prototype.searchFriends = function(req, res){
   var userId = mongoose.Types.ObjectId(req.params.userId);
   var searchString = new RegExp(req.params.searchString, 'i');
-  logger.info('[INFO] - search string:' + searchString);
+  logger.info('search string:' + searchString);
 
   User.findOne({_id:userId})
   .select('friends')
@@ -297,7 +298,7 @@ UserService.prototype.searchFriends = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }
-      logger.info('[INFO] - found pending relationships::' + JSON.stringify(users));
+      logger.info('found pending relationships::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     });
   });
