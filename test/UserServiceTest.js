@@ -12,7 +12,7 @@ require('../models/meetup')
 var User = mongoose.model('User');
 var Meetup = mongoose.model('Meetup');
 
-describe('api', function(){
+describe('user service api', function(){
   var url = 'http://localhost:8002'
 
   before(function(done){
@@ -40,37 +40,35 @@ describe('api', function(){
     });
   });
 
-  describe('user service api', function(){
-    describe('get user api', function(){
-      var testUserInfo = {
-        firstName: 'john',
-        lastName: 'doe',
-        userId: 'johnd123',
-        password: 'testPassword',
-      };
+  describe('get user api', function(){
+    var testUserInfo = {
+      firstName: 'john',
+      lastName: 'doe',
+      userId: 'johnd123',
+      password: 'testPassword',
+    };
 
-      var testUser =  new User(testUserInfo);
+    var testUser =  new User(testUserInfo);
 
-      before(function(done){
-        testUser.save(function(error, user){
-          if(error){ throw error; }
-          done();
-        })
+    before(function(done){
+      testUser.save(function(error, user){
+        if(error){ throw error; }
+        done();
+      })
+    });
+
+    it('should return user with given id', function(done){
+      request(url)
+      .get('/api/user/' + testUser._id)
+      .end(function(error, response){
+        if(error){ throw error; }
+        expect(response.status).to.equal(200);
+        expect(response.body.data._id).to.equal(testUser._id + '');
+        expect(response.body.data.userId).to.equal(testUserInfo.userId);
+        expect(response.body.data.firstName).to.equal(testUserInfo.firstName);
+        expect(response.body.data.lastName).to.equal(testUserInfo.lastName);
+        done();
       });
-
-      it('should return user with given id', function(done){
-        request(url)
-          .get('/api/user/' + testUser._id)
-          .end(function(error, response){
-            if(error){ throw error; }
-            expect(response.status).to.equal(200);
-            expect(response.body.data._id).to.equal(testUser._id + '');
-            expect(response.body.data.userId).to.equal(testUserInfo.userId);
-            expect(response.body.data.firstName).to.equal(testUserInfo.firstName);
-            expect(response.body.data.lastName).to.equal(testUserInfo.lastName);
-            done();
-          });
-        });
-      });
+    });
   });
 });
