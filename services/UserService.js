@@ -14,11 +14,13 @@ UserService.prototype.createUser = function(req, res){
   var newUser = new User(user);
   logger.info('received create user request::' + newUser );
   if(mongoose.connection.readyState){
-    newUser.save(function(error){
+    newUser.save(function(error, user){
       if(error){
         responseBuilder.buildResponseWithError(res, error);
       }else{
-        responseBuilder.buildResponse(res, 200);
+        userJson = user.toObject();
+        delete userJson.password;
+        responseBuilder.buildResponse(res, 200, {data: userJson});
       }
     });
   }else{
@@ -126,8 +128,10 @@ UserService.prototype.updateLocation = function(req, res){
   if(mongoose.connection.readyState){
     User.update({_id:userId},
                 {$set:{lastKnownLatitude: req.body.latitude,
-                       lastKnownLongitude: req.body.longitude}})
-    .exec(function(error){
+                       lastKnownLongitude: req.body.longitude}},
+                {runValidators: true})
+    .exec(function(error, result){
+      console.log('response:' + JSON.stringify(result));
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }else{

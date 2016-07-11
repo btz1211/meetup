@@ -10,7 +10,7 @@ var setup = function(app){
   app.get("/api/user/:userId", userService.getUser);
   app.get("/api/users/:searchString", userService.getUsers);
   app.get("/api/user/:userId/:password", userService.authenticateUser);
-  app.put("/api/user/location/:userId", userService.updateLocation);
+  app.put("/api/user/:userId/location", userService.updateLocation);
 
   //friend api
   app.get("/api/friends/:userId", userService.getFriends);
