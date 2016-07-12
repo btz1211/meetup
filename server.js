@@ -11,7 +11,6 @@ winston.info('root path::' + root);
 
 var app = express();
 var expressLogFile = fs.createWriteStream('./logs/express.log', {flags: 'a'});
-var node_env = process.env.NODE_ENV
 
 //app configuration
 app.use(express.static(root));

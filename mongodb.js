@@ -3,12 +3,12 @@ var config = require('./config');
 var mongoose = require( 'mongoose' );
 
 // Create the database connection
-mongoose.connect(config.db.mongodb);
+mongoose.connect(config.db.uri, config.db.options);
 
 // CONNECTION EVENTS
 // When successfully connected
 mongoose.connection.on('connected', function () {
-  winston.info('Mongoose default connection open to ' + config.db.mongodb);
+  winston.info('Mongoose default connection open to ' + config.db.uri);
 });
 
 // If the connection throws an error

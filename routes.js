@@ -1,7 +1,9 @@
-var MeetupService = require('./services/MeetupService.js')
-var UserService = require('./services/UserService.js')
+var UserService = require('./services/UserService');
+var FriendService = require('./services/FriendService');
+var MeetupService = require('./services/MeetupService');
 
 var userService = new UserService();
+var friendService = new FriendService();
 var meetupService = new MeetupService();
 var setup = function(app){
 
@@ -13,12 +15,11 @@ var setup = function(app){
   app.put("/api/user/:userId/location", userService.updateLocation);
 
   //friend api
-  app.get("/api/friends/:userId", userService.getFriends);
-  app.get("/api/friend-requests/:userId", userService.getFriendRequests);
-  app.get("/api/friend-invitations/:userId", userService.getFriendInvitations);
-  app.put("/api/friend/add/:source/:target", userService.addFriend);
-  app.put("/api/friend/check/:source/:target", userService.checkFriend);
-  app.get("/api/friends/:userId/search/:searchString", userService.searchFriends);
+  app.get("/api/friends/:userId", friendService.getFriends);
+  app.put("/api/friend/add/:source/:target", friendService.addFriend);
+  app.get("/api/friend-requests/:userId", friendService.getFriendRequests);
+  app.get("/api/friend-invitations/:userId", friendService.getFriendInvitations);
+  app.get("/api/friends/:userId/search/:searchString", friendService.searchFriends);
 
   //meetup api
   app.post("/api/meetup", meetupService.createMeetup);

@@ -1,16 +1,17 @@
 var config = {
   "test":{
     "db":{
-      "mongodb": "mongodb://localhost/test"
+      "uri": "mongodb://localhost/test"
     },
     "logger":{
       "api": "logs/test_api.log",
       "exception": "logs/test_exceptions.log"
     }
   },
+
   "development":{
     "db":{
-      "mongodb": "mongodb://localhost/local"
+      "uri": "mongodb://localhost/meetup"
     },
     "logger":{
       "api": "logs/api.log",
@@ -20,7 +21,11 @@ var config = {
 
   "production":{
     "db":{
-      "mongodb": "mongodb://localhost/local"
+      "uri": "ds049854.mlab.com:49854/meetup",
+      "options":  {
+          "user": 'dodo',
+          "pass": 'baote1211'
+      }
     },
     "logger":{
       "api": "logs/api.log",

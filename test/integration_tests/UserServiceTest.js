@@ -5,12 +5,12 @@ var assert = require('assert');
 var expect = require('chai').expect;
 var request = require('supertest');
 var mongoose = require('mongoose');
-var logger = require('../logger');
-var config = require('../config');
-var helper = require('./helpers/testHelper');
+var logger = require.main.require('logger');
+var config = require.main.require('config');
+var helper = require.main.require('test/helpers/testHelper');
+require.main.require('models/user')
+require.main.require('models/meetup')
 
-require('../models/user')
-require('../models/meetup')
 var User = mongoose.model('User');
 var Meetup = mongoose.model('Meetup');
 mongoose.Promise = global.Promise;
@@ -20,7 +20,7 @@ describe('user service api', function(){
   var conn;
 
   before(function(done){
-    conn = mongoose.connect(config.db.mongodb);
+    conn = mongoose.connect(config.db.uri);
     done();
   });
 
@@ -30,7 +30,7 @@ describe('user service api', function(){
     done();
   });
 
-  describe('GET /api/user/:userId', function(){
+  describe('GET /api/user/:userId - get user', function(){
     var testUserInfo = {
       firstName: 'john',
       lastName: 'doe',
@@ -62,7 +62,7 @@ describe('user service api', function(){
     });
   });
 
-  describe('GET /api/users/:searchString', function(){
+  describe('GET /api/users/:searchString - search users', function(){
     var testUserInfo = {
       user1:{
         firstName: 'john',
@@ -114,7 +114,7 @@ describe('user service api', function(){
     });
   });
 
-  describe('GET /api/user/:userId/:password', function(){
+  describe('GET /api/user/:userId/:password - authenticate user', function(){
     var testUserInfo = {
       firstName: 'john',
       lastName: 'doe',
@@ -122,9 +122,9 @@ describe('user service api', function(){
       password: 'testPassword',
     };
 
-    var testUser =  new User(testUserInfo);
+    beforeEach(function(done){
+      var testUser =  new User(testUserInfo);
 
-    before(function(done){
       testUser.save(function(error, user){
         if(error){ throw error; }
         done();
@@ -162,8 +162,7 @@ describe('user service api', function(){
     });
   });
 
-
-  describe('POST /api/user', function(){
+  describe('POST /api/user, create user', function(){
     var testUserInfo = {
       firstName: 'john',
       lastName: 'doe',
@@ -186,7 +185,7 @@ describe('user service api', function(){
     });
   });
 
-  describe('GET /api/user/:userId/location', function(){
+  describe('GET /api/user/:userId/location - update user location', function(){
     var testUserInfo = {
       firstName: 'john',
       lastName: 'doe',

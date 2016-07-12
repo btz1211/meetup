@@ -7,7 +7,6 @@ ObjectUtil.prototype.isNumberInt = function(number){
 ObjectUtil.prototype.isStringObjectId = function(string){
     if(mongoose.Types.ObjectId.isValid(string)){
       var convertedObjectId = new mongoose.Types.ObjectId(string);
-      console.log("[INFO] - converted object id:" + convertedObjectId.toString());
       return string === convertedObjectId.toString();
     }else{
       return false;
