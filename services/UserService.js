@@ -2,8 +2,11 @@ var mongoose = require('mongoose');
 var ResponseBuilder = require('../util/ResponseBuilder.js')
 var ObjectUtil = require('../util/ObjectUtil.js')
 var logger = require('../logger')
+require('../models/user');
+require('../models/meetup');
 
 var UserService = function(){}
+
 var objectUtil = new ObjectUtil();
 var responseBuilder = new ResponseBuilder();
 var User = mongoose.model('User');
@@ -131,7 +134,6 @@ UserService.prototype.updateLocation = function(req, res){
                        lastKnownLongitude: req.body.longitude}},
                 {runValidators: true})
     .exec(function(error, result){
-      console.log('response:' + JSON.stringify(result));
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }else{

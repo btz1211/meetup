@@ -1,3 +1,5 @@
+var logger = require('../logger')
+
 var ResponseBuilder = function(){}
 
 ResponseBuilder.prototype.buildResponse = function(res, statusCode, statusMessage){
@@ -8,7 +10,7 @@ ResponseBuilder.prototype.buildResponse = function(res, statusCode, statusMessag
 
 ResponseBuilder.prototype.buildResponseWithError = function(res, error){
   var responseBuilder = this;
-  console.log("error::"+ JSON.stringify(error));
+  logger.info("error::"+JSON.stringify(error));
 
   var errors = [];
   if(error.name){

@@ -28,9 +28,3 @@ process.on('SIGINT', function() {
     process.exit(0);
   });
 });
-
-// BRING IN YOUR SCHEMAS & MODELS // For example
-require('./models/user');
-require('./models/meetup');
-require('./models/meetuper');
-require('./models/relationship');

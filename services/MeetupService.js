@@ -3,10 +3,14 @@ var logger = require('../logger')
 var Meetup = mongoose.model('Meetup');
 var ResponseBuilder = require('../util/ResponseBuilder.js')
 var ObjectUtil = require('../util/ObjectUtil.js')
+require('../models/user');
+require('../models/meetup');
 
 var MeetupService = function(){}
+
 var objectUtil = new ObjectUtil();
 var responseBuilder = new ResponseBuilder();
+var Meetup = mongoose.model('Meetup');
 
 /*get user's meetups*/
 MeetupService.prototype.getMeetups = function(req, res){

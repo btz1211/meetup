@@ -2,8 +2,11 @@ var mongoose = require('mongoose');
 var ResponseBuilder = require('../util/ResponseBuilder.js')
 var ObjectUtil = require('../util/ObjectUtil.js')
 var logger = require('../logger')
+require('../models/user');
+require('../models/meetup');
 
 var FriendService = function(){}
+
 var objectUtil = new ObjectUtil();
 var responseBuilder = new ResponseBuilder();
 var User = mongoose.model('User');
@@ -16,12 +19,11 @@ FriendService.prototype.addFriend = function(req, res){
   User.update({$and:[{_id:source},
               {_id:{$ne:target}}]},
               {$addToSet:{friends:target}})
-  .exec(function(error, user){
-      if(error){
+  .exec(function(error, response){
+      if(error && ! response.result.nModified){
         responseBuilder.buildResponseWithError(res,error); return;
       }
-      logger.info('added friend to ::' + JSON.stringify(user));
-      responseBuilder.buildResponse(res, 200, {success:true});
+      responseBuilder.buildResponse(res, 200, {success: true});
     });
 }
 
@@ -29,6 +31,7 @@ FriendService.prototype.addFriend = function(req, res){
 /*get friends*/
 FriendService.prototype.getFriends = function(req, res){
   var userId = mongoose.Types.ObjectId(req.params.userId);
+
   var lastUserId = objectUtil.isStringObjectId(req.query.lastUserId)
                    ? mongoose.Types.ObjectId(req.query.lastUserId)
                    : null;
@@ -56,6 +59,7 @@ FriendService.prototype.getFriends = function(req, res){
     var friends = user.friends;
     var query = User.find({$and:[{_id:{$in:friends}}, {friends:userId}]});
 
+    logger.info('friend::' + JSON.stringify(friends));
     if(lastUserId){
       query = query.where({_id:{$gt:lastUserId}});
     }

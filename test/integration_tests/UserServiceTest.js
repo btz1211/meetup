@@ -2,21 +2,17 @@ process.env.NODE_ENV = 'test';
 
 var should = require('should');
 var assert = require('assert');
-var expect = require('chai').expect;
 var request = require('supertest');
 var mongoose = require('mongoose');
+var server = require.main.require('server');
 var logger = require.main.require('logger');
 var config = require.main.require('config');
 var helper = require.main.require('test/helpers/testHelper');
-require.main.require('models/user')
-require.main.require('models/meetup')
-
 var User = mongoose.model('User');
-var Meetup = mongoose.model('Meetup');
+
 mongoose.Promise = global.Promise;
 
 describe('user service api', function(){
-  var url = 'http://localhost:8002'
   var conn;
 
   before(function(done){
@@ -25,8 +21,18 @@ describe('user service api', function(){
   });
 
   afterEach(function(done){
+    User.remove({}, function(err) {
+       done();
+    });
+  });
+
+  after(function(done){
     //clear test database
     conn.connection.db.dropDatabase();
+    conn.connection.close();
+
+    //close server
+    server.close();
     done();
   });
 
@@ -48,7 +54,7 @@ describe('user service api', function(){
     });
 
     it('should return user with given id', function(done){
-      request(url)
+      request(server)
       .get('/api/user/' + testUser._id)
       .end(function(error, response){
         if(error){ throw error; }
@@ -102,7 +108,7 @@ describe('user service api', function(){
     });
 
     it('should get users based on search string', function(done){
-      request(url)
+      request(server)
       .get('/api/users/doe')
       .end(function(error, response){
         if(error){ throw error; }
@@ -132,7 +138,7 @@ describe('user service api', function(){
     });
 
     it('should return ok', function(done){
-      request(url)
+      request(server)
       .get('/api/user/' + testUserInfo.userId + '/' + testUserInfo.password)
       .end(function(error, response){
         if(error){ throw error; }
@@ -142,7 +148,7 @@ describe('user service api', function(){
     });
 
     it('should return with unauthorized error due to bad user id', function(done){
-      request(url)
+      request(server)
       .get('/api/user/badUser/' + testUserInfo.password)
       .end(function(error, response){
         if(error){ throw error; }
@@ -152,7 +158,7 @@ describe('user service api', function(){
     });
 
     it('should return with unauthorized error due to bad password', function(done){
-      request(url)
+      request(server)
       .get('/api/user/' + testUserInfo.userId + '/badPassword')
       .end(function(error, response){
         if(error){ throw error; }
@@ -171,7 +177,7 @@ describe('user service api', function(){
     };
 
     it('should create user', function(done){
-      request(url)
+      request(server)
       .post('/api/user')
       .send(testUserInfo)
       .end(function(error, response){
@@ -203,7 +209,7 @@ describe('user service api', function(){
     });
 
     it('should return with validation error for latitude', function(done){
-      request(url)
+      request(server)
       .put('/api/user/' + testUser._id + '/location')
       .send({latitude: 91, longitude: 1})
       .end(function(error, response){
@@ -216,7 +222,7 @@ describe('user service api', function(){
     });
 
     it('should return with validation error for longitude', function(done){
-      request(url)
+      request(server)
       .put('/api/user/' + testUser._id + '/location')
       .send({latitude: 90, longitude: 201})
       .end(function(error, response){
@@ -229,7 +235,7 @@ describe('user service api', function(){
     });
 
     it('should update user location', function(done){
-      request(url)
+      request(server)
       .put('/api/user/' + testUser._id + '/location')
       .send({latitude: 90, longitude: 180})
       .end(function(error, response){
