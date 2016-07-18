@@ -96,8 +96,69 @@ describe('friend service api', function(){
   });
 
   describe('GET /api/friend-requests/:userId - get friend requests', function(){
+    var testUserInfo = {
+      user1:{
+        firstName: 'john',
+        lastName: 'doe',
+        userId: 'johnd123',
+        password: 'testPassword'
+      },
+      user2:{
+        firstName: 'jane',
+        lastName: 'doe',
+        userId: 'janed123',
+        password: 'testPassword'
+      },
+      user3:{
+        firstName: 'test',
+        lastName: 'user',
+        userId: 'testUser',
+        password: 'testPassword'
+      }
+    };
+
+    var testUser1 =  new User(testUserInfo.user1);
+    var testUser2 = new User(testUserInfo.user2);
+    var testUser3 = new User(testUserInfo.user3);
+    testUser1.friends.push(testUser2._id);
+    testUser1.friends.push(testUser3._id);
+
+    before(function(done){
+      testUser1.save(function(error, user){
+        if(error){ throw error; }
+        return testUser2.save();
+      })
+      .then(function(user){
+        if(user){
+          return testUser3.save();
+        }
+      })
+      .then(function(user){
+        if(user){ done(); }
+      });
+    });
+
     it('should get friend requests', function(done){
-      done();
+      request(server)
+      .get('/api/friend-requests/' + testUser1._id)
+      .end(function(error, response){
+        if(error){ throw error; }
+        response.status.should.equal(200);
+        response.body.data.length.should.equal(2);
+
+        //convert data to json for better comparison
+        var friendRequestJson = helper.covertArrayToObjectWithId(response.body.data, '_id');
+
+        testUser2.firstName.should.equal(friendRequestJson[testUser2._id].firstName);
+        testUser2.lastName.should.equal(friendRequestJson[testUser2._id].lastName);
+        testUser2.userId.should.equal(friendRequestJson[testUser2._id].userId);
+
+        testUser3.firstName.should.equal(friendRequestJson[testUser3._id].firstName);
+        testUser3.lastName.should.equal(friendRequestJson[testUser3._id].lastName);
+        testUser3.userId.should.equal(friendRequestJson[testUser3._id].userId);
+        
+        done();
+      });
     })
   });
 

@@ -7,4 +7,12 @@ exports.stringify = function(json){
     });
 
   return jsonString;
+};
+
+exports.covertArrayToObjectWithId = function(array, id){
+  var json = {};
+  array.map(function(item){
+    json[item[id]] = item;
+  });
+  return json;
 }
