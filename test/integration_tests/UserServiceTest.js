@@ -13,27 +13,11 @@ var User = mongoose.model('User');
 mongoose.Promise = global.Promise;
 
 describe('user service api', function(){
-  var conn;
-
-  before(function(done){
-    conn = mongoose.connect(config.db.uri);
-    done();
-  });
 
   afterEach(function(done){
     User.remove({}, function(err) {
        done();
     });
-  });
-
-  after(function(done){
-    //clear test database
-    conn.connection.db.dropDatabase();
-    conn.connection.close();
-
-    //close server
-    server.close();
-    done();
   });
 
   describe('GET /api/user/:userId - get user', function(){

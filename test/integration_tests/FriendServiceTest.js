@@ -13,27 +13,11 @@ var User = mongoose.model('User');
 mongoose.Promise = global.Promise;
 
 describe('friend service api', function(){
-  var conn;
-
-  before(function(done){
-    conn = mongoose.connect(config.db.uri);
-    done();
-  });
 
   afterEach(function(done){
     User.remove({}, function(err) {
        done();
     });
-  });
-
-  after(function(done){
-    //clear test database
-    conn.connection.db.dropDatabase();
-    conn.connection.close();
-
-    //close server
-    server.close();
-    done();
   });
 
   describe('GET /api/friends/:userId - get friends', function(){
@@ -156,7 +140,7 @@ describe('friend service api', function(){
         testUser3.firstName.should.equal(friendRequestJson[testUser3._id].firstName);
         testUser3.lastName.should.equal(friendRequestJson[testUser3._id].lastName);
         testUser3.userId.should.equal(friendRequestJson[testUser3._id].userId);
-        
+
         done();
       });
     })

@@ -20,7 +20,6 @@ app.use(bodyParser.json());
 routes.setup(app);
 
 var port = process.env.PORT || 8002;
-var server = app.listen(port);
-winston.info("Server listening on port %d in %s mode", port, app.settings.env);
+app.set('port', port);
 
-module.exports = server;
+module.exports = app;
