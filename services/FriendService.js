@@ -38,8 +38,8 @@ FriendService.prototype.getFriends = function(req, res){
 
   var limit = objectUtil.isNumberInt(+req.query.limit) ? +req.query.limit : 20;
 
-  logger.info('limiting response to:' + limit);
-  logger.info('last user id:' + JSON.stringify(lastUserId));
+  logger.debug('limiting response to:' + limit);
+  logger.debug('last user id:' + JSON.stringify(lastUserId));
 
   User.findOne({_id:userId})
   .select('friends')
@@ -59,7 +59,7 @@ FriendService.prototype.getFriends = function(req, res){
     var friends = user.friends;
     var query = User.find({$and:[{_id:{$in:friends}}, {friends:userId}]});
 
-    logger.info('friend::' + JSON.stringify(friends));
+    logger.debug('friend::' + JSON.stringify(friends));
     if(lastUserId){
       query = query.where({_id:{$gt:lastUserId}});
     }
@@ -70,7 +70,7 @@ FriendService.prototype.getFriends = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }
-      logger.info('found pending relationships::' + JSON.stringify(users));
+      logger.debug('found pending relationships::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     });
   });
@@ -104,7 +104,7 @@ FriendService.prototype.getFriendRequests = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }
-      logger.info('found friend requests::' + JSON.stringify(users));
+      logger.debug('found friend requests::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     });
   });
@@ -135,7 +135,7 @@ FriendService.prototype.getFriendInvitations = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }
-      logger.info('found pending friend invitations::' + JSON.stringify(users));
+      logger.debug('found pending friend invitations::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     });
   });
@@ -144,7 +144,7 @@ FriendService.prototype.getFriendInvitations = function(req, res){
 FriendService.prototype.searchFriends = function(req, res){
   var userId = mongoose.Types.ObjectId(req.params.userId);
   var searchString = new RegExp(req.params.searchString, 'i');
-  logger.info('search string:' + searchString);
+  logger.debug('search string:' + searchString);
 
   User.findOne({_id:userId})
   .select('friends')
@@ -172,7 +172,7 @@ FriendService.prototype.searchFriends = function(req, res){
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }
-      logger.info('found pending relationships::' + JSON.stringify(users));
+      logger.debug('found friends::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     });
   });

@@ -6,7 +6,7 @@ winston.emitErrs = true;
 var logger = new winston.Logger({
     transports: [
         new winston.transports.File({
-            level: 'info',
+            level: 'debug',
             filename: config.logger.api,
             handleExceptions: true,
             json: true,

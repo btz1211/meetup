@@ -15,7 +15,7 @@ var User = mongoose.model('User');
 UserService.prototype.createUser = function(req, res){
   var user = req.body;
   var newUser = new User(user);
-  logger.info('received create user request::' + newUser );
+  logger.debug('received create user request::' + newUser );
   if(mongoose.connection.readyState){
     newUser.save(function(error, user){
       if(error){
@@ -35,7 +35,7 @@ UserService.prototype.createUser = function(req, res){
 //get users by first name or last name
 UserService.prototype.getUsers = function(req, res){
   var searchString = new RegExp(req.params.searchString, 'i');
-  logger.info('search keywords'+ searchString);
+  logger.debug('search keywords'+ searchString);
 
   if(mongoose.connection.readyState){
     User.find({})
@@ -46,7 +46,7 @@ UserService.prototype.getUsers = function(req, res){
     .limit(10)
     .exec()
     .then(function(users){
-      logger.info('found users::' + JSON.stringify(users));
+      logger.debug('found users::' + JSON.stringify(users));
       responseBuilder.buildResponse(res, 200, {data:users});
     })
     .catch(function(error){
@@ -62,7 +62,7 @@ UserService.prototype.getUsers = function(req, res){
 //get user by _id
 UserService.prototype.getUser = function(req, res){
   var userId = req.params.userId;
-  logger.info('received get user for id::' + userId);
+  logger.debug('received get user for id::' + userId);
 
   if(mongoose.connection.readyState){
     User.findOne({_id:userId})
@@ -72,7 +72,7 @@ UserService.prototype.getUser = function(req, res){
         responseBuilder.buildResponseWithError(res, error);return;
       }else{
         if(user){
-          logger.info('returning user::' + JSON.stringify(user))
+          logger.debug('returning user::' + JSON.stringify(user))
           responseBuilder.buildResponse(res, 200, {success:true, data:user});
         }else{
           responseBuilder.buildResponse(res, 204, {success:false});
@@ -90,7 +90,7 @@ UserService.prototype.authenticateUser = function(req, res){
   var userId = req.params.userId;
   var password = req.params.password;
 
-  logger.info('received authenticate user for id::' + userId);
+  logger.debug('received authenticate user for id::' + userId);
   if(mongoose.connection.readyState){
     User.findOne({userId: userId, password: password})
     .select('userId firstName lastName createDate')
@@ -117,7 +117,7 @@ UserService.prototype.authenticateUser = function(req, res){
 //update user location
 UserService.prototype.updateLocation = function(req, res){
   var userId = req.params.userId;
-  logger.info('received update location request for user::'
+  logger.debug('received update location request for user::'
               + userId +" with location::" + JSON.stringify(req.body));
 
   if(! req.body.latitude || ! req.body.longitude){

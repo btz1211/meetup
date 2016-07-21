@@ -57,7 +57,7 @@ MeetupService.prototype.createMeetup = function(req, res){
   if(mongoose.connection.readyState){
     meetup.status="INPROGRESS";
     var newMeetup = new Meetup(meetup);
-    logger.info('creating meetup::'+ JSON.stringify(meetup));
+    logger.debug('creating meetup::'+ JSON.stringify(meetup));
 
     //save meetup
     newMeetup.save(function(error, meetup){
@@ -75,7 +75,7 @@ MeetupService.prototype.createMeetup = function(req, res){
 MeetupService.prototype.updateMeetup = function(req, res){
   var meetup = req.body;
   var meetupId = req.params.meetupId;
-  logger.info('updating meetup::' + JSON.stringify(meetup));
+  logger.debug('updating meetup::' + JSON.stringify(meetup));
 
   if(mongoose.connection.readyState){
     Meetup.findById(meetupId)
@@ -99,13 +99,13 @@ MeetupService.prototype.updateMeetup = function(req, res){
 
     //meetup updated
     .then(function(result){
-      logger.info('meetup updated::'+JSON.stringify(result));
+      logger.debug('meetup updated::'+JSON.stringify(result));
       responseBuilder.buildResponse(res, 200, {success:true});
     })
 
     //process error
     .catch(function(error){
-      logger.info('[ERROR] - error found::' + JSON.stringify(error));
+      logger.debug('[ERROR] - error found::' + JSON.stringify(error));
       responseBuilder.buildResponse(res, 400, {success:false,
         errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:error}]});
     });
@@ -145,7 +145,7 @@ MeetupService.prototype.getMeetupers = function(req, res){
         responseBuilder.buildResponseWithError(res, error); return;
       }
 
-      //logger.info('meetupers found::' + JSON.stringify(meetupers));
+      //logger.debug('meetupers found::' + JSON.stringify(meetupers));
       responseBuilder.buildResponse(res, 200, {data:meetupers});
     })
   }else{
@@ -159,7 +159,7 @@ MeetupService.prototype.addMeetuper = function(req, res){
   var meetupId = mongoose.Types.ObjectId(req.params.meetupId);
   var meetuperId = mongoose.Types.ObjectId(req.params.meetuperId);
   if(mongoose.connection.readyState){
-      logger.info('adding meetuper::' + meetuperId + ' to meetup::' + meetupId);
+      logger.debug('adding meetuper::' + meetuperId + ' to meetup::' + meetupId);
 
       Meetup.findById(meetupId).select('_id').exec()
       //meetup found

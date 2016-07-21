@@ -4,13 +4,14 @@ var should = require('should');
 var assert = require('assert');
 var request = require('supertest');
 var mongoose = require('mongoose');
+var promise = require('bluebird');
 var server = require.main.require('server');
 var logger = require.main.require('logger');
 var config = require.main.require('config');
 var helper = require.main.require('test/helpers/testHelper');
 var User = mongoose.model('User');
 
-mongoose.Promise = global.Promise;
+mongoose.Promise = promise;
 
 describe('user service api', function(){
 

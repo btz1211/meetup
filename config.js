@@ -5,6 +5,7 @@ var config = {
     },
     "logger":{
       "api": "logs/test_api.log",
+      "debug": "logs/test_debug.log",
       "exception": "logs/test_exceptions.log"
     }
   },
@@ -15,6 +16,7 @@ var config = {
     },
     "logger":{
       "api": "logs/api.log",
+      "debug": "logs/debug.log",
       "exception": "logs/exceptions.log"
     }
   },
@@ -29,6 +31,7 @@ var config = {
     },
     "logger":{
       "api": "logs/api.log",
+      "debug": "logs/debug.log",
       "exception": "logs/exceptions.log"
     }
   }
