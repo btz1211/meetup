@@ -1,11 +1,15 @@
 process.env.NODE_ENV = 'test';
 
+var should = require('should');
+var promise = require('bluebird');
 var mongoose = require('mongoose');
 var config = require.main.require('config');
 var app = require.main.require('server');
 
 var conn;
 var server;
+
+mongoose.promise = promise;
 
 before(function(done){
   conn = mongoose.connect(config.db.uri);
@@ -22,3 +26,5 @@ after(function(done){
   server.close();
   done();
 });
+
+exports.server = app;

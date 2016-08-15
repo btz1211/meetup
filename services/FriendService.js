@@ -75,7 +75,7 @@ FriendService.prototype.getFriends = function(req, res){
     });
   });
 }
-
+/*get friend requests*/
 FriendService.prototype.getFriendRequests = function(req, res){
   var userId = mongoose.Types.ObjectId(req.params.userId);
 
