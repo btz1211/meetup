@@ -12,7 +12,7 @@ var objectUtil = new ObjectUtil();
 var responseBuilder = new ResponseBuilder();
 var Meetup = mongoose.model('Meetup');
 
-/*get user's meetups*/
+/* get user's meetups */
 MeetupService.prototype.getMeetups = function(req, res){
   var userId = mongoose.Types.ObjectId(req.params.userId);
 
@@ -27,7 +27,7 @@ MeetupService.prototype.getMeetups = function(req, res){
   });
 };
 
-//get meetup
+/* get meetup */
 MeetupService.prototype.getMeetup = function(req, res){
   var meetupId = req.params.meetupId;
 
@@ -50,7 +50,7 @@ MeetupService.prototype.getMeetup = function(req, res){
   }
 }
 
-/*create meetup*/
+/* create meetup */
 MeetupService.prototype.createMeetup = function(req, res){
   var meetup = req.body;
 
@@ -72,6 +72,7 @@ MeetupService.prototype.createMeetup = function(req, res){
   }
 };
 
+/* update meetup */
 MeetupService.prototype.updateMeetup = function(req, res){
   var meetup = req.body;
   var meetupId = req.params.meetupId;
@@ -115,10 +116,12 @@ MeetupService.prototype.updateMeetup = function(req, res){
   }
 }
 
+/* get meetupers for meetup */
 MeetupService.prototype.getMeetupers = function(req, res){
   var meetupId = req.params.meetupId;
   if(objectUtil.isStringObjectId(meetupId)){
     meetupId = mongoose.Types.ObjectId(req.params.meetupId);
+    console.log('meetupId:' + meetupId);
   }else{
     responseBuilder.buildResponse(res, 400, {success:false,
       errors:[{errorCode:"INVALID_REQUEST_ERROR",
@@ -140,12 +143,13 @@ MeetupService.prototype.getMeetupers = function(req, res){
     		         lastKnownLatitude:"$user.lastKnownLatitude",
                  lastKnownLongitude:"$user.lastKnownLongitude",
                  status:1}}
-    ]).exec(function(error, meetupers){
+    ])
+    .exec(function(error, meetupers){
       if(error){
         responseBuilder.buildResponseWithError(res, error); return;
       }
 
-      //logger.debug('meetupers found::' + JSON.stringify(meetupers));
+      console.log('meetupers found::' + JSON.stringify(meetupers));
       responseBuilder.buildResponse(res, 200, {data:meetupers});
     })
   }else{
@@ -154,7 +158,7 @@ MeetupService.prototype.getMeetupers = function(req, res){
   }
 }
 
-/*add meetupers*/
+/* add meetupers */
 MeetupService.prototype.addMeetuper = function(req, res){
   var meetupId = mongoose.Types.ObjectId(req.params.meetupId);
   var meetuperId = mongoose.Types.ObjectId(req.params.meetuperId);

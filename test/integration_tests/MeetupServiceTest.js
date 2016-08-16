@@ -5,6 +5,7 @@ var logger = require.main.require('logger');
 var helper = require.main.require('test/helpers/testHelper');
 var User = mongoose.model('User');
 var Meetup = mongoose.model('Meetup');
+var Meetuper = mongoose.model('Meetuper');
 
 describe('meetup service api', function(){
   //create test user for the meetup
@@ -28,6 +29,12 @@ describe('meetup service api', function(){
        done();
     });
   });
+
+  after(function(done){
+    User.remove({}, function(err){
+      done();
+    })
+  })
 
   describe('GET /api/meetup/:meetupId', function(){
     var meetupInfo = {
@@ -115,10 +122,84 @@ describe('meetup service api', function(){
         userMeetups['Meetup 2'].address.should.equal(meetupInfo.meetup2.address);
         userMeetups['Meetup 2'].latitude.should.equal(meetupInfo.meetup2.latitude);
         userMeetups['Meetup 2'].longitude.should.equal(meetupInfo.meetup2.longitude);
-        userMeetups['Meetup 2'].status.should.equal("INPROGRESS");
+        userMeetups['Meetup 2'].status.should.equal("INPROGRESS"); //default status should be INPROGRESS
         done();
       });
     })
+  });
+
+  describe('GET /api/meetup/:meetupId/meetupers', function(){
+    var meetupInfo = {
+      name: 'Test Meetup',
+      address: '123 Test Address',
+      longitude: 1,
+      latitude: 1,
+      startTime: '1',
+      endTime: '1',
+      owner: testUser._id
+    };
+
+    var meetuperInfo = {
+      meetuper1:{
+        firstName: 'meetuper',
+        lastName: 'one',
+        userId: 'testUser1',
+        password: 'testPassword'
+      },
+      meetuper2:{
+        firstName: 'meetuper',
+        lastName: 'two',
+        userId: 'testUser2',
+        password: 'testPassword'
+      }
+    };
+
+    var meetup = new Meetup(meetupInfo);
+    var meetuper1 = new User(meetuperInfo.meetuper1);
+    var meetuper2 = new User(meetuperInfo.meetuper2);
+    meetup.meetupers.push(new Meetuper({ user: meetuper1._id }));
+    meetup.meetupers.push(new Meetuper({ user: meetuper2._id }));
+
+    before(function(done){
+      meetuper1.save(function(error, user){
+        if(error){ throw error; }
+        if(user){ return meetuper2.save(); }
+      }).then(function(user){
+        if(user){ return meetup.save(); }
+      }).then(function(meetup){
+        if(meetup){ done(); }
+      })
+    });
+
+    after(function(done){
+      User.remove({firstName: 'meetuper'}, function(err) {
+         done();
+      });
+    })
+
+    it('should get meetupers for the meetup', function(done){
+      request(server)
+      .get('/api/meetup/' + meetup._id + '/meetupers')
+      .end(function(error, response){
+        if(error){ throw error; }
+
+        console.log('response::' + JSON.stringify(response));
+        response.status.should.equal(200);
+        response.body.data.length.should.equal(2);
+
+        var meetupers = helper.covertArrayToObjectWithId(response.body.data, 'userId');
+        meetupers['testUser1'].firstName.should.equal('meetuper');
+        meetupers['testUser1'].lastName.should.equal('one');
+        meetupers['testUser1']._id.should.equal(meetuper1._id + '');
+        meetupers['testUser1'].status.should.equal('PENDING'); //default status
+
+        meetupers['testUser2'].firstName.should.equal('meetuper');
+        meetupers['testUser2'].lastName.should.equal('two');
+        meetupers['testUser2']._id.should.equal(meetuper2._id + '');
+        meetupers['testUser2'].status.should.equal('PENDING'); //default status
+        done();
+      });
+    });
   });
 
   describe('POST /api/meetup - create meetup', function(){

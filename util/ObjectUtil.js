@@ -1,3 +1,5 @@
+var mongoose = require('mongoose');
+
 var ObjectUtil = function(){}
 
 ObjectUtil.prototype.isNumberInt = function(number){
