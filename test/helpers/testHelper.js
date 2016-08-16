@@ -9,10 +9,10 @@ exports.stringify = function(json){
   return jsonString;
 };
 
-exports.covertArrayToObjectWithId = function(array, id){
+exports.covertArrayToObjectWithId = function(array, key){
   var json = {};
   array.map(function(item){
-    json[item[id]] = item;
+    json[item[key]] = item;
   });
   return json;
 }

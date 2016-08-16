@@ -7,23 +7,122 @@ var User = mongoose.model('User');
 var Meetup = mongoose.model('Meetup');
 
 describe('meetup service api', function(){
+  //create test user for the meetup
+  var testUserInfo = {
+    firstName: 'john',
+    lastName: 'doe',
+    userId: 'johnd123',
+    password: 'testPassword'
+  };
+
+  var testUser =  new User(testUserInfo);
+  before(function(done){
+    testUser.save(function(error, user){
+      if(error){ throw error; }
+      done();
+    });
+  });
+
   afterEach(function(done){
     Meetup.remove({}, function(err) {
        done();
     });
   });
 
-  describe('GET /api/meetups/:userId - get meetups for user', function(){
-    var testUserInfo = {
-      user1:{
-        firstName: 'john',
-        lastName: 'doe',
-        userId: 'johnd123',
-        password: 'testPassword'
-      }
-    };
+  describe('GET /api/meetup/:meetupId', function(){
+    var meetupInfo = {
+      name: 'Test Meetup',
+      address: '123 Test Address',
+      longitude: 1,
+      latitude: 1,
+      startTime: '1',
+      endTime: '1',
+      owner: testUser._id
+    }
 
-    var meetups = {
+    var meetup = new Meetup(meetupInfo);
+    before(function(done){
+      meetup.save(function(error, meetup){
+        if(error){ throw error; }
+        if(meetup){ done(); }
+      });
+    });
+
+    it('should get meetup', function(done){
+      request(server)
+      .get('/api/meetup/' + meetup._id)
+      .end(function(error, response){
+        response.status.should.equal(200);
+        var returnedMeetup = response.body.data;
+        logger.info('meetup::' + JSON.stringify(returnedMeetup));
+
+        returnedMeetup._id.should.equal(meetup._id + '');
+        returnedMeetup.name.should.equal(meetup.name);
+        returnedMeetup.latitude.should.equal(meetup.latitude);
+        returnedMeetup.longitude.should.equal(meetup.longitude);
+        returnedMeetup.status.should.equal('INPROGRESS');
+        done();
+      });
+    });
+  });
+
+  describe('GET /api/meetups/:userId', function(){
+    var meetupInfo = {
+      meetup1:{
+        name: 'Meetup 1',
+        address: '123 Test Address',
+        longitude: 1,
+        latitude: 1,
+        startTime: '1',
+        endTime: '1',
+        owner: testUser._id
+      },
+      meetup2:{
+        name: 'Meetup 2',
+        address: '456 Test Address',
+        longitude: 2,
+        latitude: 2,
+        startTime: '1',
+        endTime: '1',
+        owner: testUser._id
+      }
+    }
+
+    var meetup1 = new Meetup(meetupInfo.meetup1);
+    var meetup2 = new Meetup(meetupInfo.meetup2);
+    before(function(done){
+      meetup1.save(function(error, meetup){
+        if(error){ throw error; }
+        return meetup2.save();
+      }).then(function(meetup){
+        if(meetup){ done(); }
+      });
+    });
+
+    it('should get meetups for user', function(done){
+      request(server)
+      .get('/api/meetups/' + testUser._id)
+      .end(function(error, response){
+        response.status.should.equal(200);
+        var userMeetups = helper.covertArrayToObjectWithId(response.body.data, 'name');
+        logger.info('meetups for user::' + JSON.stringify(userMeetups));
+
+        userMeetups['Meetup 1'].address.should.equal(meetupInfo.meetup1.address);
+        userMeetups['Meetup 1'].latitude.should.equal(meetupInfo.meetup1.latitude);
+        userMeetups['Meetup 1'].longitude.should.equal(meetupInfo.meetup1.longitude);
+        userMeetups['Meetup 1'].status.should.equal("INPROGRESS"); //default status should be INPROGRESS
+
+        userMeetups['Meetup 2'].address.should.equal(meetupInfo.meetup2.address);
+        userMeetups['Meetup 2'].latitude.should.equal(meetupInfo.meetup2.latitude);
+        userMeetups['Meetup 2'].longitude.should.equal(meetupInfo.meetup2.longitude);
+        userMeetups['Meetup 2'].status.should.equal("INPROGRESS");
+        done();
+      });
+    })
+  });
+
+  describe('POST /api/meetup - create meetup', function(){
+    var meetupInfo = {
       badLocationMeetup:{
         name: 'Bad Owner and Location Meetup',
         address: '123 Test Address',
@@ -34,8 +133,7 @@ describe('meetup service api', function(){
         status: '2',
         owner:'FFFFFFFFFFFFFFFFFFFFFFFF'
       },
-      missingInfoMeetup:{
-      },
+      missingInfoMeetup:{},
       goodMeetup:{
         name: 'Good Meetup',
         address: '123 Test Address',
@@ -43,29 +141,19 @@ describe('meetup service api', function(){
         latitude: 1,
         startTime: '5',
         endTime: '1',
+        owner: testUser._id
       }
     };
-
-    var testUser1 =  new User(testUserInfo.user1);
-    before(function(done){
-      testUser1.save(function(error, user){
-        if(error){ throw error; }
-        if(user){
-          meetups.goodMeetup.owner = user._id;
-          done();
-        }
-      });
-    });
 
     it('should return with errors for owner and location', function(done){
       request(server)
       .post('/api/meetup')
-      .send(meetups.badLocationMeetup)
+      .send(meetupInfo.badLocationMeetup)
       .end(function(error, response){
         if(error){ throw error; }
         response.status.should.equal(400);
         var errorJson = helper.covertArrayToObjectWithId(response.body.errors, 'field');
-        logger.info('[INFO] - errors::' + JSON.stringify(errorJson));
+        logger.info('errors::' + JSON.stringify(errorJson));
 
         errorJson['owner'].errorCode.should.equal('VALIDATION_ERROR');
         errorJson['owner'].errorMessage.should.equal('owner[ffffffffffffffffffffffff] is an invalid user');
@@ -80,13 +168,13 @@ describe('meetup service api', function(){
     it('should return with errors complaining missing information', function(done){
       request(server)
       .post('/api/meetup')
-      .send(meetups.missingInfoMeetup)
+      .send(meetupInfo.missingInfoMeetup)
       .end(function(error, response){
         if(error){ throw error; }
         response.status.should.equal(400);
         response.body.errors.length.should.equal(7);
         var errorJson = helper.covertArrayToObjectWithId(response.body.errors, 'field');
-        logger.info('[INFO] - missing params::' + JSON.stringify(errorJson));
+        logger.info('missing params::' + JSON.stringify(errorJson));
         errorJson['name'].errorMessage.should.equal('name is required');
         errorJson['address'].errorMessage.should.equal('address is required');
         errorJson['latitude'].errorMessage.should.equal('latitude is required');
@@ -94,6 +182,19 @@ describe('meetup service api', function(){
         errorJson['startTime'].errorMessage.should.equal('startTime is required');
         errorJson['endTime'].errorMessage.should.equal('endTime is required');
         errorJson['owner'].errorMessage.should.equal('owner is required');
+        done();
+      });
+    });
+
+    it('should create meetup', function(done){
+      request(server)
+      .post('/api/meetup')
+      .send(meetupInfo.goodMeetup)
+      .end(function(error, response){
+        if(error){ throw error; }
+        response.status.should.equal(200);
+        logger.info('created meetup::' + JSON.stringify(response.body.data));
+        response.body.data['name'] = 'Good Meetup';
         done();
       });
     });
