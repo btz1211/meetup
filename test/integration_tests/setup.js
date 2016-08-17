@@ -1,5 +1,3 @@
-process.env.NODE_ENV = 'test';
-
 var should = require('should');
 var promise = require('bluebird');
 var mongoose = require('mongoose');
@@ -12,7 +10,7 @@ var server;
 mongoose.promise = promise;
 
 before(function(done){
-  conn = mongoose.connect(config.db.uri);
+  conn = mongoose.connect(config.db.uri + '/meetup-test', config.db.options);
   server = app.listen(app.get('port'));
   done();
 });

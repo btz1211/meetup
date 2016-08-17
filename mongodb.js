@@ -3,7 +3,7 @@ var config = require('./config');
 var mongoose = require( 'mongoose' );
 
 // Create the database connection
-mongoose.connect(config.db.uri, config.db.options);
+mongoose.connect(config.db.uri + '/' + config.db.name, config.db.options);
 
 // CONNECTION EVENTS
 // When successfully connected
