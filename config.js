@@ -1,12 +1,8 @@
 var config = {
   "test":{
     "db":{
-      "uri": "ds161225.mlab.com:61225",
+      "uri": "mongodb://localhost",
       "name": "meetup-test",
-      "options":  {
-          "user": 'test-user',
-          "pass": 'meetup'
-      }
     },
     "logger":{
       "api": "logs/test_api.log",
