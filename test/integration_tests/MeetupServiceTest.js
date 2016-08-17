@@ -8,19 +8,39 @@ var Meetup = mongoose.model('Meetup');
 var Meetuper = mongoose.model('Meetuper');
 
 describe('meetup service api', function(){
-  //create test user for the meetup
+  //create test users
   var testUserInfo = {
-    firstName: 'john',
-    lastName: 'doe',
-    userId: 'johnd123',
-    password: 'testPassword'
+    user1:{
+      firstName: 'john',
+      lastName: 'doe',
+      userId: 'johnd123',
+      password: 'testPassword'
+    },
+    user2:{
+      firstName: 'meetuper',
+      lastName: 'one',
+      userId: 'testUser1',
+      password: 'testPassword'
+    },
+    user3:{
+      firstName: 'meetuper',
+      lastName: 'two',
+      userId: 'testUser2',
+      password: 'testPassword'
+    }
   };
 
-  var testUser =  new User(testUserInfo);
+  var testUser1 = new User(testUserInfo.user1);
+  var testUser2 = new User(testUserInfo.user2);
+  var testUser3 = new User(testUserInfo.user3);
   before(function(done){
-    testUser.save(function(error, user){
+    testUser1.save(function(error, user){
       if(error){ throw error; }
-      done();
+      if(user){ return testUser2.save(); }
+    }).then(function(user){
+      if(user){ return testUser3.save(); }
+    }).then(function(user){
+      if(user){ done(); }
     });
   });
 
@@ -33,10 +53,10 @@ describe('meetup service api', function(){
   after(function(done){
     User.remove({}, function(err){
       done();
-    })
-  })
+    });
+  });
 
-  describe('GET /api/meetup/:meetupId', function(){
+  describe('GET /api/meetup/:meetupId - get meetup', function(){
     var meetupInfo = {
       name: 'Test Meetup',
       address: '123 Test Address',
@@ -44,7 +64,7 @@ describe('meetup service api', function(){
       latitude: 1,
       startTime: '1',
       endTime: '1',
-      owner: testUser._id
+      owner: testUser1._id
     }
 
     var meetup = new Meetup(meetupInfo);
@@ -73,7 +93,7 @@ describe('meetup service api', function(){
     });
   });
 
-  describe('GET /api/meetups/:userId', function(){
+  describe('GET /api/meetups/:userId - get meetups for user', function(){
     var meetupInfo = {
       meetup1:{
         name: 'Meetup 1',
@@ -82,7 +102,7 @@ describe('meetup service api', function(){
         latitude: 1,
         startTime: '1',
         endTime: '1',
-        owner: testUser._id
+        owner: testUser1._id
       },
       meetup2:{
         name: 'Meetup 2',
@@ -91,7 +111,7 @@ describe('meetup service api', function(){
         latitude: 2,
         startTime: '1',
         endTime: '1',
-        owner: testUser._id
+        owner: testUser1._id
       }
     }
 
@@ -108,7 +128,7 @@ describe('meetup service api', function(){
 
     it('should get meetups for user', function(done){
       request(server)
-      .get('/api/meetups/' + testUser._id)
+      .get('/api/meetups/' + testUser1._id)
       .end(function(error, response){
         response.status.should.equal(200);
         var userMeetups = helper.covertArrayToObjectWithId(response.body.data, 'name');
@@ -128,7 +148,7 @@ describe('meetup service api', function(){
     })
   });
 
-  describe('GET /api/meetup/:meetupId/meetupers', function(){
+  describe('GET /api/meetup/:meetupId/meetupers - get meetupers for meetup', function(){
     var meetupInfo = {
       name: 'Test Meetup',
       address: '123 Test Address',
@@ -136,46 +156,19 @@ describe('meetup service api', function(){
       latitude: 1,
       startTime: '1',
       endTime: '1',
-      owner: testUser._id
-    };
-
-    var meetuperInfo = {
-      meetuper1:{
-        firstName: 'meetuper',
-        lastName: 'one',
-        userId: 'testUser1',
-        password: 'testPassword'
-      },
-      meetuper2:{
-        firstName: 'meetuper',
-        lastName: 'two',
-        userId: 'testUser2',
-        password: 'testPassword'
-      }
+      owner: testUser1._id
     };
 
     var meetup = new Meetup(meetupInfo);
-    var meetuper1 = new User(meetuperInfo.meetuper1);
-    var meetuper2 = new User(meetuperInfo.meetuper2);
-    meetup.meetupers.push(new Meetuper({ user: meetuper1._id }));
-    meetup.meetupers.push(new Meetuper({ user: meetuper2._id }));
+    meetup.meetupers.push({ user: testUser2._id });
+    meetup.meetupers.push({ user: testUser3._id });
 
     before(function(done){
-      meetuper1.save(function(error, user){
+      meetup.save(function(error, meetup){
         if(error){ throw error; }
-        if(user){ return meetuper2.save(); }
-      }).then(function(user){
-        if(user){ return meetup.save(); }
-      }).then(function(meetup){
         if(meetup){ done(); }
-      })
-    });
-
-    after(function(done){
-      User.remove({firstName: 'meetuper'}, function(err) {
-         done();
       });
-    })
+    });
 
     it('should get meetupers for the meetup', function(done){
       request(server)
@@ -183,21 +176,127 @@ describe('meetup service api', function(){
       .end(function(error, response){
         if(error){ throw error; }
 
-        console.log('response::' + JSON.stringify(response));
         response.status.should.equal(200);
         response.body.data.length.should.equal(2);
 
         var meetupers = helper.covertArrayToObjectWithId(response.body.data, 'userId');
+        logger.info('meetupers::' + JSON.stringify(meetupers));
         meetupers['testUser1'].firstName.should.equal('meetuper');
         meetupers['testUser1'].lastName.should.equal('one');
-        meetupers['testUser1']._id.should.equal(meetuper1._id + '');
+        meetupers['testUser1']._id.should.equal(testUser2._id + '');
         meetupers['testUser1'].status.should.equal('PENDING'); //default status
 
         meetupers['testUser2'].firstName.should.equal('meetuper');
         meetupers['testUser2'].lastName.should.equal('two');
-        meetupers['testUser2']._id.should.equal(meetuper2._id + '');
+        meetupers['testUser2']._id.should.equal(testUser3._id + '');
         meetupers['testUser2'].status.should.equal('PENDING'); //default status
         done();
+      });
+    });
+  });
+
+  describe('PUT /api/meetup/:meetupId - update meetup', function(){
+    var meetupInfo = {
+      name: 'Test Meetup',
+      address: '123 Test Address',
+      longitude: 1,
+      latitude: 1,
+      startTime: '1',
+      endTime: '1',
+      owner: testUser1._id
+    }
+
+    var newMeetupInfo = {
+      name: 'Updated Meetup',
+      address: '456 Test Address',
+      longitude: 2,
+      latitude: 2,
+      status: 'CANCELLED'
+    }
+
+    var meetup = new Meetup(meetupInfo);
+    before(function(done){
+      meetup.save(function(error, meetup){
+        if(error){ throw error; }
+        if(meetup){ done(); }
+      });
+    });
+
+    it('should update meetup with new info', function(done){
+      request(server)
+      .put('/api/meetup/' + meetup._id)
+      .send(newMeetupInfo)
+      .end(function(error, response){
+        if(error){ throw error; }
+        response.status.should.equal(200);
+
+        Meetup.findOne({_id: meetup._id}, function(error, updatedMeetup){
+          logger.info('updated meetup::' + JSON.stringify(updatedMeetup));
+          updatedMeetup.name.should.equal(newMeetupInfo.name);
+          updatedMeetup.address.should.equal(newMeetupInfo.address);
+          updatedMeetup.latitude.should.equal(newMeetupInfo.latitude);
+          updatedMeetup.longitude.should.equal(newMeetupInfo.longitude);
+          updatedMeetup.status.should.equal(newMeetupInfo.status);
+          done();
+        })
+      });
+    });
+  });
+
+  describe('PUT /api/meetup/:meetupId - add meetupers', function(){
+    var meetupInfo = {
+      name: 'Test Meetup',
+      address: '123 Test Address',
+      longitude: 1,
+      latitude: 1,
+      startTime: '1',
+      endTime: '1',
+      owner: testUser1._id
+    }
+
+    var meetup = new Meetup(meetupInfo);
+    before(function(done){
+      meetup.save(function(error, meetup){
+        if(error){ throw error; }
+        if(meetup){ done(); }
+      });
+    });
+
+    it('should add meetupers to meetup', function(done){
+      request(server)
+      .put('/api/meetup/' + meetup._id + '/meetuper/' + testUser2._id)
+      .end(function(error, response){
+        if(error){ throw error; }
+        response.status.should.equal(200);
+
+        Meetup.findOne({_id: meetup._id}, function(error, meetup){
+          meetup.meetupers.length.should.equal(1);
+          meetup.meetupers[0].user.toString().should.equal(testUser2._id.toString());
+          done();
+        })
+      });
+    });
+
+    context('meetuper already exists', function(){
+      var meetup = new Meetup(meetupInfo);
+      meetup.meetupers.push({ user: testUser2._id });
+
+      before(function(done){
+        meetup.save(function(error, meetup){
+          if(error){ throw error; }
+          if(meetup){ done(); }
+        });
+      });
+
+      it('should failed to add meetuper to meetup', function(done){
+        request(server)
+        .put('/api/meetup/' + meetup._id + '/meetuper/' + testUser2._id)
+        .end(function(error, response){
+          if(error){ throw error; }
+          response.status.should.equal(400);
+          response.body.errors[0].errorMessage.should.equal("unable to add meetuper, it already exists");
+          done();
+        });
       });
     });
   });
@@ -222,7 +321,7 @@ describe('meetup service api', function(){
         latitude: 1,
         startTime: '5',
         endTime: '1',
-        owner: testUser._id
+        owner: testUser1._id
       }
     };
 

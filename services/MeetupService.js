@@ -1,16 +1,17 @@
 var mongoose = require('mongoose');
 var logger = require('../logger')
-var Meetup = mongoose.model('Meetup');
 var ResponseBuilder = require('../util/ResponseBuilder.js')
 var ObjectUtil = require('../util/ObjectUtil.js')
-require('../models/user');
-require('../models/meetup');
+// require('../models/user');
+// require('../models/meetup');
 
 var MeetupService = function(){}
 
 var objectUtil = new ObjectUtil();
 var responseBuilder = new ResponseBuilder();
+var User = mongoose.model('User');
 var Meetup = mongoose.model('Meetup');
+var Meetuper = mongoose.model('Meetuper');
 
 /* get user's meetups */
 MeetupService.prototype.getMeetups = function(req, res){
@@ -76,14 +77,11 @@ MeetupService.prototype.createMeetup = function(req, res){
 MeetupService.prototype.updateMeetup = function(req, res){
   var meetup = req.body;
   var meetupId = req.params.meetupId;
-  logger.debug('updating meetup::' + JSON.stringify(meetup));
 
   if(mongoose.connection.readyState){
     Meetup.findById(meetupId)
     .select('_id')
     .exec()
-
-    //meetup found
     .then(function(meetupInDb){
       if(! meetupInDb){ throw 'invalid meetup id::' + meetupId; }
 
@@ -121,7 +119,6 @@ MeetupService.prototype.getMeetupers = function(req, res){
   var meetupId = req.params.meetupId;
   if(objectUtil.isStringObjectId(meetupId)){
     meetupId = mongoose.Types.ObjectId(req.params.meetupId);
-    console.log('meetupId:' + meetupId);
   }else{
     responseBuilder.buildResponse(res, 400, {success:false,
       errors:[{errorCode:"INVALID_REQUEST_ERROR",
@@ -149,7 +146,6 @@ MeetupService.prototype.getMeetupers = function(req, res){
         responseBuilder.buildResponseWithError(res, error); return;
       }
 
-      console.log('meetupers found::' + JSON.stringify(meetupers));
       responseBuilder.buildResponse(res, 200, {data:meetupers});
     })
   }else{
@@ -181,13 +177,17 @@ MeetupService.prototype.addMeetuper = function(req, res){
                              {$push: {meetupers:meetuper}}).exec();
       })
       //update meetup
-      .then(function(meetup){
-        responseBuilder.buildResponse(res, 200, {success:true});
+      .then(function(result){
+        if(result['nModified'] > 0){
+          responseBuilder.buildResponse(res, 200, {success:true});
+        }else{
+            throw 'unable to add meetuper, it already exists';
+        }
       })
       //process error
       .catch(function(error){
         responseBuilder.buildResponse(res, 400, {success:false,
-          errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:error}]});
+          errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:(error + '')}]});
       });
   }else{
     responseBuilder.buildResponse(res, 500, {sucess:false,
