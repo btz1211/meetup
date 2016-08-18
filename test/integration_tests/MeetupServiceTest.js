@@ -38,7 +38,9 @@ describe('meetup service api', function(){
       if(error){ throw error; }
       if(user){ return testUser2.save(); }
     }).then(function(user){
-      return testUser3.save();
+      if(user){
+        return testUser3.save();
+      }
     }).then(function(user){
       if(user){ done(); }
     });

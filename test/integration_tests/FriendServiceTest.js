@@ -1,5 +1,4 @@
 var request = require('supertest');
-var promise = require('bluebird');
 var mongoose = require('mongoose');
 var server = require('./setup').server;
 var logger = require.main.require('logger');
