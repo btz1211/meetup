@@ -49,8 +49,8 @@ describe('friend service api', function(){
         if(error){ throw error; }
         return testUser2.save();
       })
-      .then(function(user){
-        if(user){
+      .then(function(user2){
+        if(user2){
           return testUser3.save();
         }
       })
