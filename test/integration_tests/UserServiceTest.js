@@ -77,9 +77,7 @@ describe('user service api', function(){
         return testUser2.save();
       })
       .then(function(user){
-        if(user){
-          return testUser3.save();
-        }
+        return testUser3.save();
       })
       .then(function(user){
         if(user){ done(); }

@@ -5,7 +5,6 @@ var server = require('./setup').server;
 var logger = require.main.require('logger');
 var helper = require.main.require('test/helpers/testHelper');
 var User = mongoose.model('User');
-mongoose.Promise = promise;
 
 describe('friend service api', function(){
 
@@ -58,6 +57,8 @@ describe('friend service api', function(){
       .then(function(user){
         console.log('user3::' + JSON.stringify(user));
         if(user){ done(); }
+      }).catch(function(error){
+        console.log('error::' + JSON.stringify(error));
       });
     });
 

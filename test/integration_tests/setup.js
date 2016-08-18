@@ -7,7 +7,7 @@ var app = require.main.require('server');
 var conn;
 var server;
 
-mongoose.promise = promise;
+mongoose.Promise = promise;
 
 before(function(done){
   conn = mongoose.connect(config.db.uri + '/meetup-test', config.db.options);
