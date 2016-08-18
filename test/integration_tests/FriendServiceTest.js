@@ -49,11 +49,7 @@ describe('friend service api', function(){
         return testUser2.save();
       })
       .then(function(user){
-        console.log('user2::' + JSON.stringify(user));
-
-        if(user){
           return testUser3.save();
-        }
       })
       .then(function(user){
         console.log('user3::' + JSON.stringify(user));
