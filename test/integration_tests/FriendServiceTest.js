@@ -1,9 +1,11 @@
 var request = require('supertest');
+var promise = require('bluebird');
 var mongoose = require('mongoose');
 var server = require('./setup').server;
 var logger = require.main.require('logger');
 var helper = require.main.require('test/helpers/testHelper');
 var User = mongoose.model('User');
+mongoose.promise = promise;
 
 describe('friend service api', function(){
 
