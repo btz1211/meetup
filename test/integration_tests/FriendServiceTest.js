@@ -38,23 +38,25 @@ describe('friend service api', function(){
     var testUser1 =  new User(testUserInfo.user1);
     var testUser2 = new User(testUserInfo.user2);
     var testUser3 = new User(testUserInfo.user3);
+
     testUser1.friends.push(testUser2._id);
     testUser1.friends.push(testUser3._id);
     testUser2.friends.push(testUser1._id);
 
     before(function(done){
-      testUser1.save(function(error, user){
-        console.log('user1::' + JSON.stringify(user));
-        if(error){ throw error; }
-        return testUser2.save();
-      })
-      .then(function(user){
-        return testUser3.save();
-      })
-      .then(function(user){
-        if(user){ done(); }
+      var savePromises = [];
+      savePromises.push(testUser1.save());
+      savePromises.push(testUser2.save());
+      savePromises.push(testUser3.save());
+
+      Promise.all(savePromises)
+      .then(function(){
+        done();
+      }).catch(function(error){
+        throw error;
       });
     });
+
 
     it('should get friends', function(done){
       request(server)
@@ -100,15 +102,16 @@ describe('friend service api', function(){
     testUser1.friends.push(testUser3._id);
 
     before(function(done){
-      testUser1.save(function(error, user){
-        if(error){ throw error; }
-        return testUser2.save();
-      })
-      .then(function(user){
-        return testUser3.save();
-      })
-      .then(function(user){
-        if(user){ done(); }
+      var savePromises = [];
+      savePromises.push(testUser1.save());
+      savePromises.push(testUser2.save());
+      savePromises.push(testUser3.save());
+
+      Promise.all(savePromises)
+      .then(function(){
+        done();
+      }).catch(function(error){
+        throw error;
       });
     });
 
@@ -166,15 +169,16 @@ describe('friend service api', function(){
     testUser2.friends.push(testUser3._id);
 
     before(function(done){
-      testUser1.save(function(error, user){
-        if(error){ throw error; }
-        return testUser2.save();
-      })
-      .then(function(user){
-        return testUser3.save();
-      })
-      .then(function(user){
-        if(user){ done(); }
+      var savePromises = [];
+      savePromises.push(testUser1.save());
+      savePromises.push(testUser2.save());
+      savePromises.push(testUser3.save());
+
+      Promise.all(savePromises)
+      .then(function(){
+        done();
+      }).catch(function(error){
+        throw error;
       });
     });
 
@@ -234,17 +238,19 @@ describe('friend service api', function(){
     testUser3.friends.push(testUser1._id);
 
     before(function(done){
-      testUser1.save(function(error, user){
-        if(error){ throw error; }
-        return testUser2.save();
-      })
-      .then(function(user){
-        return testUser3.save();
-      })
-      .then(function(user){
-        if(user){ done(); }
+      var savePromises = [];
+      savePromises.push(testUser1.save());
+      savePromises.push(testUser2.save());
+      savePromises.push(testUser3.save());
+
+      Promise.all(savePromises)
+      .then(function(){
+        done();
+      }).catch(function(error){
+        throw error;
       });
     });
+
     it('should get friends based on search string', function(done){
       request(server)
       .get('/api/friends/' +  testUser1._id + '/search/test')

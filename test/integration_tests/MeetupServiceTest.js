@@ -33,7 +33,7 @@ describe('meetup service api', function(){
   var testUser1 = new User(testUserInfo.user1);
   var testUser2 = new User(testUserInfo.user2);
   var testUser3 = new User(testUserInfo.user3);
-  
+
   before(function(done){
     var savePromises = [];
     savePromises.push(testUser1.save());
@@ -121,12 +121,17 @@ describe('meetup service api', function(){
 
     var meetup1 = new Meetup(meetupInfo.meetup1);
     var meetup2 = new Meetup(meetupInfo.meetup2);
+
     before(function(done){
-      meetup1.save(function(error, meetup){
-        if(error){ throw error; }
-        return meetup2.save();
-      }).then(function(meetup){
+      var savePromises = [];
+      savePromises.push(meetup1.save());
+      savePromises.push(meetup2.save());
+
+      Promise.all(savePromises)
+      .then(function(){
         done();
+      }).catch(function(error){
+        throw error;
       });
     });
 

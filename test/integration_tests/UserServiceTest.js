@@ -67,20 +67,21 @@ describe('user service api', function(){
       }
     };
 
-    var testUser1 =  new User(testUserInfo.user1);
+    var testUser1 = new User(testUserInfo.user1);
     var testUser2 = new User(testUserInfo.user2);
     var testUser3 = new User(testUserInfo.user3);
 
     before(function(done){
-      testUser1.save(function(error, user){
-        if(error){ throw error; }
-        return testUser2.save();
-      })
-      .then(function(user){
-        return testUser3.save();
-      })
-      .then(function(user){
-        if(user){ done(); }
+      var savePromises = [];
+      savePromises.push(testUser1.save());
+      savePromises.push(testUser2.save());
+      savePromises.push(testUser3.save());
+
+      Promise.all(savePromises)
+      .then(function(){
+        done();
+      }).catch(function(error){
+        throw error;
       });
     });
 
