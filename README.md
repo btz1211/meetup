@@ -4,6 +4,9 @@ repository for meetup that contains:
 2. web app for meetup
 
 #todo
-- add meetuper to meetup
-- add search user and meetup capability
-- filter for status for meetup
+- add friends
+- small fixes
+  - show user full name instead of 'Me' on the navbar
+  - add validation in the editMeetupModal
+  - Make user profile page (currently is the 'Me' link) work
+  - add a link to re-focus on meetup when map is moved on the 'Meetup' page

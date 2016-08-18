@@ -2,6 +2,24 @@ body{
   background-color: #F1F1F1;
 }
 
+fieldset label{
+  line-height:45px;
+  font-size:13px;
+}
+
+fieldset .text-info{
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: rgba(255,255,255,0.15);
+  color: #008EC5;
+  box-shadow: 0px 1px 0px 0px #D4D4D4;
+}
+
+fieldset .form-group{
+  padding:10px;
+}
+
 .top-half{
   padding-top:100px;
   padding-bottom:60px;
@@ -55,6 +73,7 @@ body{
 .content-container{
   margin-top: 120px;
   background-color:white;
+  padding:20px;
 }
 
 .content-container .container{
@@ -76,13 +95,14 @@ body{
   padding:3px 10px;
 }
 
-.content-container .group-title{
+.group-title{
   color:rgba(255, 119, 1, 0.74);
   font-weight: bold;
   padding-bottom: 5px;
-  padding-right:0;
-
+  padding-right:50px;
   font-size:28px;
+  position:relative;
+  float:left;
 }
 
 .content-container .empty-message{
@@ -141,22 +161,9 @@ body{
   padding:10px;
 }
 
-#meetup-container label{
-  line-height:45px;
-  font-size:13px;
-}
-#meetup-container p{
-  border: 1px solid lightgray;
-  border-radius: 5px;
-  padding: 10px;
-  background-color: rgba(255,255,255,0.15);
-  color: #008EC5;
-  box-shadow: 0px 1px 0px 0px #D4D4D4;
-}
-
-#meetup-container .create-meetup-btn{
+#meetup-container .edit-meetup-btn{
   float:right;
-  margin-right: 5px;
+  margin-top:15px;
 }
 #meetup-container .cancel-btn{
   float:right;
@@ -194,7 +201,21 @@ body{
   cursor: pointer;
 }
 
+#user-container{
+  margin-top: 8%;
+}
+
+#user-container .btn-add-friend{
+    float:right;
+    position: relative;
+    margin-top:20px;
+}
+
 /**navbar**/
 #nav-search-form .form-control{
   min-width:250px
+}
+
+#navbar-main a:hover {
+ cursor:pointer;
 }

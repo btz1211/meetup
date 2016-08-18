@@ -8,8 +8,10 @@ myApp.directive('navbar', function($log, meetupApiService){
         activeItem:"@",
       },
       templateUrl: 'templates/directive-templates/navbar.html',
-      link:function(scope, element, attr){
-        scope.searchUsers = function(searchString){
+      controller: function($scope, $cookies, $window, meetupApiService){
+        $scope.loggedInUser = $cookies.getObject('loggedInUser');
+
+        $scope.searchUsers = function(searchString){
           return meetupApiService.searchUsers(searchString)
           .$promise.then(function(response){
             return response.data.map(function(user){
@@ -20,11 +22,9 @@ myApp.directive('navbar', function($log, meetupApiService){
             $log.warn(error);
           });
         },
-        scope.onSelect = function(item){
-          if(scope.onDropDownSelect){
-            scope.onDropdownSelect({item: item});
-          }
-          scope.searchString = "";
+        $scope.onUserSelect = function(user){
+          console.log('user::' + user);
+          $window.location.href = '#/user/' + user._id;
         }
       }
     }

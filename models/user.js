@@ -13,7 +13,6 @@ var userSchema = mongoose.Schema({
 });
 var userModel = mongoose.model('User', userSchema);
 var userValidation  = function(value, respond){
-  console.log('user validation for::'+value);
   userModel.findOne({_id:value}, function(error, user){
     if(error || !user){
       respond(false);
