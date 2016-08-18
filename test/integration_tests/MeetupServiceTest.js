@@ -34,12 +34,12 @@ describe('meetup service api', function(){
   var testUser2 = new User(testUserInfo.user2);
   var testUser3 = new User(testUserInfo.user3);
   before(function(done){
-    testUser1.save(function(error, user){
+    testUser1.saveAsync(function(error, user){
       if(error){ throw error; }
-      if(user){ return testUser2.save(); }
+      if(user){ return testUser2.saveAsync(); }
     }).then(function(user){
       if(user){
-        return testUser3.save();
+        return testUser3.saveAsync();
       }
     }).then(function(user){
       if(user){ done(); }
