@@ -290,7 +290,7 @@ describe('friend service api', function(){
         return testUser2.save();
       })
       .then(function(user){
-        if(user){ done(); }
+        done();
       });
     });
 

@@ -122,7 +122,7 @@ describe('meetup service api', function(){
         if(error){ throw error; }
         return meetup2.save();
       }).then(function(meetup){
-        if(meetup){ done(); }
+        done();
       });
     });
 
