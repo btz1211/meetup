@@ -12,13 +12,13 @@ myApp.factory('meetupApiService', function($resource){
   var searchUsersResource = $resource("/api/users/:searchString", {searchString:"@searchString"});
   var createUserResource = $resource("/api/user");
   var authenicateUserResource = $resource("/api/user/:userId/:password", {userId:"@userId", password:"@password"});
+  var updateLocationResource = $resource("/api/user/:userId/location", null, {'update':{method:'PUT'}});
 
   var addFriendResource = $resource("/api/friend/add/:source/:target", null, {'update':{method:'PUT'}});
   var getFriendsResource = $resource("/api/friends/:userId", {userId:"@userId"});
   var getFriendRequestsResource = $resource("/api/friend-requests/:userId", {userId:"@userId"});
   var getFriendInvitationsResource = $resource("/api/friend-invitations/:userId", {userId:"@userId"});
   var searchFriendsResource = $resource("/api/friends/:userId/search/:searchString", {userId:"@userId", searchString:"@searchString"});
-  var updateLocationResource = $resource("/api/user/location/:userId", null, {'update':{method:'PUT'}});
 
   return{
     getMeetup: function(meetupId){
@@ -48,8 +48,8 @@ myApp.factory('meetupApiService', function($resource){
       return addMeetuperResource.update({'meetupId':meetupId, 'meetuperId':meetuperId}, null);
     },
 
-    getUser: function(user){
-      return getUserResource.get({userId:user.userId});
+    getUser: function(userId){
+      return getUserResource.get({userId:userId});
     },
 
     createUser: function(user){
