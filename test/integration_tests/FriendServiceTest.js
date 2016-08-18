@@ -50,13 +50,11 @@ describe('friend service api', function(){
         return testUser2.save();
       })
       .then(function(user2){
-        if(user2){
           return testUser3.save();
-        }
       })
-      .then(function(user){
-        console.log('user3::' + JSON.stringify(user));
-        if(user){ done(); }
+      .then(function(user3){
+        console.log('user3::' + JSON.stringify(user3));
+        if(user3){ done(); }
       }).catch(function(error){
         console.log('error::' + JSON.stringify(error));
       });
