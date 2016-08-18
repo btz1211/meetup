@@ -53,7 +53,7 @@ describe('friend service api', function(){
         return testUser3.save();
       })
       .then(function(user){
-        if(user3){ done(); }
+        if(user){ done(); }
       });
     });
 
