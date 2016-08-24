@@ -13,6 +13,77 @@ describe('friend service api', function(){
     });
   });
 
+  describe('GET /api/friend/:userId/:friendId - get friend', function(){
+    var testUserInfo = {
+      user1:{
+        firstName: 'john',
+        lastName: 'doe',
+        userId: 'johnd123',
+        password: 'testPassword'
+      },
+      user2:{
+        firstName: 'jane',
+        lastName: 'doe',
+        userId: 'janed123',
+        password: 'testPassword'
+      },
+      user3:{
+        firstName: 'test',
+        lastName: 'user',
+        userId: 'testUser',
+        password: 'testPassword'
+      }
+    };
+
+    var testUser1 =  new User(testUserInfo.user1);
+    var testUser2 = new User(testUserInfo.user2);
+    var testUser3 = new User(testUserInfo.user3);
+
+    testUser1.friends.push(testUser2._id);
+    testUser1.friends.push(testUser3._id);
+    testUser2.friends.push(testUser1._id);
+
+    before(function(done){
+      var savePromises = [];
+      savePromises.push(testUser1.save());
+      savePromises.push(testUser2.save());
+      savePromises.push(testUser3.save());
+
+      Promise.all(savePromises)
+      .then(function(){
+        done();
+      }).catch(function(error){
+        throw error;
+      });
+    });
+
+
+    it('should get a friend', function(done){
+      request(server)
+      .get('/api/friend/' + testUser1._id + '/' + testUser2._id)
+      .end(function(error, response){
+        if(error){ throw error; }
+        response.status.should.equal(200);
+        var friend = response.body.data;
+        response.friend._id.should.equal(testUser2._id + '');
+        response.friend.firstName.should.equal(testUser2.firstName);
+        response.friend.lastName.should.equal(testUser2.lastName);
+        done();
+      });
+    });
+
+    it('should not get a friend', function(done){
+      request(server)
+      .get('/api/friends/' + testUser1._id)
+      .end(function(error, response){
+        if(error){ throw error; }
+        response.status.should.equal(404);
+        response.body.errors[0].errorMessage.should.equal('cannot find friend with id:'+ testUser2._id);
+        done();
+      });
+    });
+  });
+
   describe('GET /api/friends/:userId - get friends', function(){
     var testUserInfo = {
       user1:{

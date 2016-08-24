@@ -16,6 +16,7 @@ var setup = function(app){
 
   //friend api
   app.get("/api/friends/:userId", friendService.getFriends);
+  app.get("/api/friend/:userId/:friendId", friendService.getFriend);
   app.put("/api/friend/add/:source/:target", friendService.addFriend);
   app.get("/api/friend-requests/:userId", friendService.getFriendRequests);
   app.get("/api/friend-invitations/:userId", friendService.getFriendInvitations);
