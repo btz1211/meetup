@@ -15,7 +15,8 @@ var User = mongoose.model('User');
 FriendService.prototype.addFriend = function(req, res){
   var source = mongoose.Types.ObjectId(req.params.source);
   var target = mongoose.Types.ObjectId(req.params.target);
-
+  logger.debug('received request, source:' + source + ', target:' + target);
+  
   User.update({$and:[{_id:source},
               {_id:{$ne:target}}]},
               {$addToSet:{friends:target}})

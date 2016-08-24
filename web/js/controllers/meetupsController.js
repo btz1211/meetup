@@ -63,7 +63,6 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route
   $scope.accept = function(user){
     meetupApiService.addFriend($scope.loggedInUser._id, user._id)
     .$promise.then(function(response){
-      $scope.getFriends();
       $scope.getInvitations();
     }).catch(function(error){
       $log.error(error);
