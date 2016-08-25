@@ -35,29 +35,29 @@ FriendService.prototype.getFriend = function(req, res){
     var friendId = mongoose.Types.ObjectId(req.params.friendId);
   }catch(error){
     responseBuilder.buildResponse(res, 400, {success:false,
-      errors:[{errorCdoe:"INVALID_REQUEST_ERROR", errorMessage:"Invalid object id(s) for users"}]});
+      errors:[{errorCdoe:"INVALID_REQUEST_ERROR", errorMessage:"invalid object id(s) for users"}]});
+
+    return;
   }
 
   User.findOne({ _id:userId })
   .select('friends')
   .exec()
   .then(function(user){
-    if(! user){
-      console.log('user not found');
-      throw 'invalid user:' + userId;
-    }
+    if(! user){ throw 'invalid user id:' + userId; }
+
     return User.findOne({$and:[{_id:friendId}, {friends:userId}]})
           .select('id firstName lastName lastKnownLatitude lastKnownLongitude')
           .exec();
   }).then(function(user){
-    if(! user){
-      throw 'cannot find friend with id:' + friendId;
-    }
+    if(! user){ throw 'cannot find friend with id:' + friendId; }
 
     responseBuilder.buildResponse(res, 200, {data: user});
+    return;
   }).catch(function(error){
     responseBuilder.buildResponse(res, 404, {success:false,
       errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:(error + '')}]});
+      return;
   });
 }
 
