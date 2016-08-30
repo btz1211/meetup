@@ -5,7 +5,7 @@ var ResponseBuilder = function(){}
 ResponseBuilder.prototype.buildResponse = function(res, statusCode, statusMessage){
   res.setHeader('Content-Type', 'application/json');
   res.status(statusCode);
-  res.send(statusMessage);
+  res.send(JSON.stringify(statusMessage));
 }
 
 ResponseBuilder.prototype.buildResponseWithError = function(res, error){

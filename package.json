@@ -10,7 +10,8 @@
     "supertest":">=1.2.0",
     "chai": ">=3.5.0",
     "bluebird":">=3.4.1",
-    "mocha": ">=2.5.3"
+    "mocha": ">=2.5.3",
+    "express-mocks-http": ">=0.0.11"
   },
   "scripts": {
     "test" : "node_modules/.bin/mocha test/**/*.js"
