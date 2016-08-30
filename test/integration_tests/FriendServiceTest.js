@@ -69,36 +69,9 @@ describe('friend service api', function(){
       });
     });
 
-    context('bad user id(s)', function(){
-      var testUser1 = new User(testUserInfo.user1);
-      var testUser2 = new User(testUserInfo.user2);
-
-      it('should get 404 error complaining invalid user', function(done){
-        request(server)
-        .get('/api/friend/' + testUser1._id + '/' + testUser2._id)
-        .end(function(error, response){
-          response.status.should.equal(404);
-          response.body.errors[0].errorMessage.should.equal('invalid user id:' + testUser1._id);
-          done();
-        });
-      });
-
-      it('should get 400 error with bad Object Id', function(done){
-        request(server)
-        .get('/api/friend/a/b')
-        .end(function(error, response){
-          console.log(JSON.stringify(response));
-          response.status.should.equal(400);
-          response.body.errors[0].errorMessage.should.equal('invalid object id(s) for users');
-          done();
-        });
-      });
-    });
-
     context('users are not friends', function(){
       var testUser1 = new User(testUserInfo.user1);
       var testUser2 = new User(testUserInfo.user2);
-      testUser1.friends.push(testUser2._id);
 
       before(function(done){
         var savePromises = [];
@@ -113,13 +86,22 @@ describe('friend service api', function(){
         });
       });
 
-      it('should get error complaining cannot find friend', function(done){
+      it('should get 204, not friends', function(done){
         request(server)
         .get('/api/friend/' + testUser1._id + '/' + testUser2._id)
         .end(function(error, response){
-          if(error){ throw error; }
-          response.status.should.equal(404);
-          response.body.errors[0].errorMessage.should.equal('cannot find friend with id:' + testUser2._id);
+          response.status.should.equal(204);
+          done();
+        });
+      });
+    });
+
+    context('bad user id(s)', function(){
+      it('should get 404 error, invalid user', function(done){
+        request(server)
+        .get('/api/friend/ffffffffffffffffffffffff/ffffffffffffffffffffffff')
+        .end(function(error, response){
+          response.status.should.equal(204);
           done();
         });
       });

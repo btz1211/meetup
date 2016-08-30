@@ -15,4 +15,10 @@ ObjectUtil.prototype.isStringObjectId = function(string){
     }
 }
 
+ObjectUtil.prototype.convertStringToObjectId = function(string){
+  return this.isStringObjectId(string)
+         ? mongoose.Types.ObjectId(string)
+         : string;
+}
+
 module.exports = ObjectUtil;

@@ -1,7 +1,8 @@
 var mongoose = require('mongoose');
-var ResponseBuilder = require('../util/ResponseBuilder.js')
-var ObjectUtil = require('../util/ObjectUtil.js')
-var logger = require('../logger')
+var ResponseBuilder = require('../util/ResponseBuilder.js');
+var ObjectUtil = require('../util/ObjectUtil.js');
+var logger = require('../logger');
+var RequestError = require('../errors/RequestError')
 require('../models/user');
 require('../models/meetup');
 
@@ -21,54 +22,36 @@ FriendService.prototype.addFriend = function(req, res){
               {_id:{$ne:target}}]},
               {$addToSet:{friends:target}})
   .exec(function(error, response){
-      if(error && ! response.result.nModified){
-        responseBuilder.buildResponseWithError(res,error); return;
-      }
+    if(error && ! response.result.nModified){
+      responseBuilder.buildResponseWithError(res,error);
+    }else{
       responseBuilder.buildResponse(res, 200, {success: true});
-    });
+    }
+  });
 }
 
 /* get a friend */
 FriendService.prototype.getFriend = function(req, res){
-  try{
-    var userId = mongoose.Types.ObjectId(req.params.userId);
-    var friendId = mongoose.Types.ObjectId(req.params.friendId);
-  }catch(error){
-    responseBuilder.buildResponse(res, 400, {success:false,
-      errors:[{errorCdoe:"INVALID_REQUEST_ERROR", errorMessage:"invalid object id(s) for users"}]});
+  var userId = objectUtil.convertStringToObjectId(req.params.userId);
+  var friendId = objectUtil.convertStringToObjectId(req.params.friendId);
 
-    return;
-  }
-
-  User.findOne({ _id:userId })
-  .select('friends')
+  User.findOne({$and:[{_id:userId}, {friends:friendId}]})
   .exec()
   .then(function(user){
-    if(! user){ throw 'invalid user id:' + userId; }
-
-    return User.findOne({$and:[{_id:friendId}, {friends:userId}]})
-          .select('id firstName lastName lastKnownLatitude lastKnownLongitude')
-          .exec();
+    if(! user){ throw new RequestError(204); }
+    return User.findOne({ $and:[{ _id:friendId },{ friends:userId }] }).exec();
   }).then(function(user){
-    if(! user){ throw 'cannot find friend with id:' + friendId; }
-
+    if(! user){ throw new RequestError(204); }
     responseBuilder.buildResponse(res, 200, {data: user});
-    return;
   }).catch(function(error){
-    responseBuilder.buildResponse(res, 404, {success:false,
-      errors:[{errorCode:"INVALID_REQUEST_ERROR", errorMessage:(error + '')}]});
-      return;
+    responseBuilder.buildResponseWithError(res, error);
   });
 }
 
 /*get friends*/
 FriendService.prototype.getFriends = function(req, res){
-  var userId = mongoose.Types.ObjectId(req.params.userId);
-
-  var lastUserId = objectUtil.isStringObjectId(req.query.lastUserId)
-                   ? mongoose.Types.ObjectId(req.query.lastUserId)
-                   : null;
-
+  var userId = objectUtil.convertStringToObjectId(req.params.userId);
+  var lastUserId = objectUtil.convertStringToObjectId(req.query.lastUserId);
   var limit = objectUtil.isNumberInt(+req.query.limit) ? +req.query.limit : 20;
 
   logger.debug('limiting response to:' + limit);
@@ -76,17 +59,14 @@ FriendService.prototype.getFriends = function(req, res){
 
   User.findOne({_id:userId})
   .select('friends')
-  .exec(function(error, user){
-    if(error){
-      responseBuilder.buildResponseWithError(res, error); return;
-    }
+  .exec()
+  .then(function(user){
 
     if(!user){
-      responseBuilder.buildResponse(res, 400, {success:false,
+      throw new RequestError(400, { success:false,
         errors:[{errorCode:"INVALID_REQUEST_ERROR",
-        errorMessage:"invalid user::"+ userId}]});
-
-      return;
+        errorMessage:"invalid user::"+ userId}] }
+      );
     }
 
     var friends = user.friends;
@@ -97,15 +77,14 @@ FriendService.prototype.getFriends = function(req, res){
       query = query.where({_id:{$gt:lastUserId}});
     }
 
-    query.select('userId firstName lastName')
-    .limit(limit)
-    .exec(function(error, users){
-      if(error){
-        responseBuilder.buildResponseWithError(res, error); return;
-      }
-      logger.debug('found pending relationships::' + JSON.stringify(users));
-      responseBuilder.buildResponse(res, 200, {data:users});
-    });
+    return query.select('userId firstName lastName').limit(limit).exec();
+
+  }).then(function( users){
+    logger.debug('found friends::' + JSON.stringify(users));
+    responseBuilder.buildResponse(res, 200, {data:users});
+
+  }).catch(function(error){
+    responseBuilder.buildResponseWithError(res, error);
   });
 }
 /*get friend requests*/
