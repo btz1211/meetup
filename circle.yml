@@ -3,6 +3,8 @@ test:
     - NODE_ENV=test npm test
 
 dependencies:
+  pre:
+    - npm install
   override:
     - sudo apt-get purge mongodb-org*
     - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
