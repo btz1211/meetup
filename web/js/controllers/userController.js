@@ -10,19 +10,21 @@ myApp.controller('userCtrl', function($scope, $cookies, $routeParams, $log, meet
       $promise.then(function(response){
         if(response.data){
           $scope.user = response.data;
-          $scope.isUserAddable($scope.user._id);
+          $scope.setUserAddableAttribute($scope.user._id);
         }
       }).catch(function(error){
         $log.warn(error);
       });
     }
 
-    $scope.isUserAddable = function(userId){
+    $scope.setUserAddableAttribute = function(userId){
       meetupApiService.getFriend($scope.loggedInUser._id, userId)
       .$promise.then(function(response){
+        console.log('response:' + JSON.stringify(response));
         $scope.addable = $.isEmptyObject(response.data) && userId != $scope.loggedInUser._id;
         return;
       }).catch(function(error){
+        $log.error(JSON.stringify(error));
         $log.warn('failed to verify if user is a friend');
       });
       $scope.addable = false;
@@ -32,7 +34,7 @@ myApp.controller('userCtrl', function($scope, $cookies, $routeParams, $log, meet
       meetupApiService.addFriend($scope.loggedInUser._id, $scope.user._id)
       .$promise.then(
         function(response){
-          //notify user
+          $scope.setUserAddableAttribute($scope.user._id);
         }
       ).catch(
         function(error){
