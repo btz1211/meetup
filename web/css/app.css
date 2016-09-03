@@ -20,6 +20,10 @@ fieldset .form-group{
   padding:10px;
 }
 
+.alert{
+  margin-top:55px;
+}
+
 .top-half{
   padding-top:100px;
   padding-bottom:60px;
