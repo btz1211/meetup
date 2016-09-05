@@ -1,7 +1,8 @@
 var mongoose = require('mongoose');
-var ResponseBuilder = require('../util/ResponseBuilder.js')
-var ObjectUtil = require('../util/ObjectUtil.js')
-var logger = require('../logger')
+var ResponseBuilder = require('../util/ResponseBuilder.js');
+var ObjectUtil = require('../util/ObjectUtil.js');
+var logger = require('../logger');
+var RequestError = require('../errors/RequestError')
 require('../models/user');
 require('../models/meetup');
 
@@ -15,27 +16,43 @@ var User = mongoose.model('User');
 FriendService.prototype.addFriend = function(req, res){
   var source = mongoose.Types.ObjectId(req.params.source);
   var target = mongoose.Types.ObjectId(req.params.target);
+  logger.debug('received request, source:' + source + ', target:' + target);
 
   User.update({$and:[{_id:source},
               {_id:{$ne:target}}]},
               {$addToSet:{friends:target}})
   .exec(function(error, response){
-      if(error && ! response.result.nModified){
-        responseBuilder.buildResponseWithError(res,error); return;
-      }
+    if(error && ! response.result.nModified){
+      responseBuilder.buildResponseWithError(res,error);
+    }else{
       responseBuilder.buildResponse(res, 200, {success: true});
-    });
+    }
+  });
 }
 
+/* get a friend */
+FriendService.prototype.getFriend = function(req, res){
+  var userId = objectUtil.convertStringToObjectId(req.params.userId);
+  var friendId = objectUtil.convertStringToObjectId(req.params.friendId);
+
+  User.findOne({$and:[{_id:userId}, {friends:friendId}]})
+  .exec()
+  .then(function(user){
+    console.log(JSON.stringify(user));
+    if(! user){ throw new RequestError(404, { errorCode:"INVALID_REQUEST_ERROR", errorMessage:"users are not friends" }); }
+    return User.findOne({ $and:[{ _id:friendId },{ friends:userId }] }).exec();
+  }).then(function(user){
+    if(! user){ throw new RequestError(404, { errorCode:"INVALID_REQUEST_ERROR", errorMessage:"users are not friends" }); }
+    responseBuilder.buildResponse(res, 200, {data: user});
+  }).catch(function(error){
+    responseBuilder.buildResponseWithError(res, error);
+  });
+}
 
 /*get friends*/
 FriendService.prototype.getFriends = function(req, res){
-  var userId = mongoose.Types.ObjectId(req.params.userId);
-
-  var lastUserId = objectUtil.isStringObjectId(req.query.lastUserId)
-                   ? mongoose.Types.ObjectId(req.query.lastUserId)
-                   : null;
-
+  var userId = objectUtil.convertStringToObjectId(req.params.userId);
+  var lastUserId = objectUtil.convertStringToObjectId(req.query.lastUserId);
   var limit = objectUtil.isNumberInt(+req.query.limit) ? +req.query.limit : 20;
 
   logger.debug('limiting response to:' + limit);
@@ -43,17 +60,13 @@ FriendService.prototype.getFriends = function(req, res){
 
   User.findOne({_id:userId})
   .select('friends')
-  .exec(function(error, user){
-    if(error){
-      responseBuilder.buildResponseWithError(res, error); return;
-    }
+  .exec()
+  .then(function(user){
 
     if(!user){
-      responseBuilder.buildResponse(res, 400, {success:false,
-        errors:[{errorCode:"INVALID_REQUEST_ERROR",
-        errorMessage:"invalid user::"+ userId}]});
-
-      return;
+      throw new RequestError(400, {errorCode:"INVALID_REQUEST_ERROR",
+                                  errorMessage:"invalid user::"+ userId }
+      );
     }
 
     var friends = user.friends;
@@ -64,15 +77,14 @@ FriendService.prototype.getFriends = function(req, res){
       query = query.where({_id:{$gt:lastUserId}});
     }
 
-    query.select('userId firstName lastName')
-    .limit(limit)
-    .exec(function(error, users){
-      if(error){
-        responseBuilder.buildResponseWithError(res, error); return;
-      }
-      logger.debug('found pending relationships::' + JSON.stringify(users));
-      responseBuilder.buildResponse(res, 200, {data:users});
-    });
+    return query.select('userId firstName lastName').limit(limit).exec();
+
+  }).then(function( users){
+    logger.debug('found friends::' + JSON.stringify(users));
+    responseBuilder.buildResponse(res, 200, {data:users});
+
+  }).catch(function(error){
+    responseBuilder.buildResponseWithError(res, error);
   });
 }
 /*get friend requests*/

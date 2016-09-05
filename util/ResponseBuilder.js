@@ -1,55 +1,70 @@
-var logger = require('../logger')
-
+var logger = require('../logger');
+var RequestError = require('../errors/RequestError');
 var ResponseBuilder = function(){}
 
 ResponseBuilder.prototype.buildResponse = function(res, statusCode, statusMessage){
   res.setHeader('Content-Type', 'application/json');
   res.status(statusCode);
-  res.send(statusMessage);
+  res.send(JSON.stringify(statusMessage));
 }
 
 ResponseBuilder.prototype.buildResponseWithError = function(res, error){
   var responseBuilder = this;
   logger.info("error::"+JSON.stringify(error));
 
+  var errorCode;
   var errors = [];
-  if(error.name){
-    switch(error.name){
-      case 'ValidationError':
-        for(field in error.errors){
-          errors.push({errorCode:"VALIDATION_ERROR",
-                       field:field,
-                       errorMessage:error.errors[field].message});
-        }
-        responseBuilder.buildResponse(res, 400, {success:false, errors:errors});
-        break;
+  switch(error.name){
+    case 'RequestError':
+      errorCode = error.code;
+      errors.push(error.message);
+      break;
+    case 'ValidationError':
+      errorCode = 400;
+      errors = this.parseMongooseValidationError(error);
+      break;
 
-      case 'CastError':
-        errors.push({errorCode:"VALIDATION_ERROR",
-                     errorMessage:"parameter value ["
-                        + error.value
-                        +"] is invalid, expected type:"+error.kind})
-        responseBuilder.buildResponse(res, 400, {success:false, errors:errors});
-        break;
+    case 'CastError':
+      errorCode = 400;
+      errors.push(this.parseMongooseCastError(error));
+      break;
 
-      case 'MongoError':
-        switch(error.code){
-          case 11000:
-            errors.push({errorCode:"DUPLICATION_ERROR", errorMessage:error.errmsg});
-            responseBuilder.buildResponse(res, 409, {success:false, errors:errors});
-            break;
-          default:
-            errors.push({errorCode:"DB_ERROR",
-                         errorMessage:"db error occurred::" + error.errmsg});
-            responseBuilder.buildResponse(res, 500, {success:false, errors:errors});
-        }
-        break;
+    case 'MongoError':
+      errorCode = 400;
+      errors.push(this.parseMongoError(error));
+      break;
 
-      default:
-        errors.push({errorCode:error.name, errorMessage:error.message});
-        responseBuilder.buildResponse(res, 500, {success:false, errors:errors});
-    }
+    default:
+      errorCode = 500;
+      errors.push({errorCode:error.name, errorMessage:error.message});
   }
+
+  responseBuilder.buildResponse(res, errorCode, {success:false, errors:errors});
+}
+
+ResponseBuilder.prototype.parseMongoError = function(mongoError){
+  switch(mongoError.code){
+    case 11000:
+      return {errorCode:"DUPLICATION_ERROR", errorMessage:mongoError.errmsg};
+    default:
+      return {errorCode:"DB_ERROR",errorMessage:"db error occurred::" + mongoError.errmsg};
+  }
+}
+
+ResponseBuilder.prototype.parseMongooseValidationError = function(validationError){
+  var errors = [];
+  for(field in validationError.errors){
+    errors.push({errorCode:"VALIDATION_ERROR",
+                 field:field,
+                 errorMessage:validationError.errors[field].message});
+  }
+  return errors;
+}
+
+ResponseBuilder.prototype.parseMongooseCastError = function(castError){
+  return {errorCode:"VALIDATION_ERROR",
+          errorMessage:"parameter value [" + castError.value + "] "
+                      +"is invalid, expected type:"+castError.kind};
 }
 
 module.exports = ResponseBuilder;

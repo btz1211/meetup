@@ -13,6 +13,105 @@ describe('friend service api', function(){
     });
   });
 
+  describe('GET /api/friend/:userId/:friendId - get friend', function(){
+    var testUserInfo = {
+      user1:{
+        firstName: 'john',
+        lastName: 'doe',
+        userId: 'johnd123',
+        password: 'testPassword'
+      },
+      user2:{
+        firstName: 'jane',
+        lastName: 'doe',
+        userId: 'janed123',
+        password: 'testPassword'
+      },
+      user3:{
+        firstName: 'test',
+        lastName: 'user',
+        userId: 'testUser',
+        password: 'testPassword'
+      }
+    };
+
+    context('users are friends', function(){
+      var testUser1 = new User(testUserInfo.user1);
+      var testUser2 = new User(testUserInfo.user2);
+      testUser1.friends.push(testUser2._id);
+      testUser2.friends.push(testUser1._id);
+
+      before(function(done){
+        var savePromises = [];
+        savePromises.push(testUser1.save());
+        savePromises.push(testUser2.save());
+
+        Promise.all(savePromises)
+        .then(function(){
+          done();
+        }).catch(function(error){
+          throw error;
+        });
+      });
+
+      it('should get a friend', function(done){
+        request(server)
+        .get('/api/friend/' + testUser1._id + '/' + testUser2._id)
+        .end(function(error, response){
+          if(error){ throw error; }
+          response.status.should.equal(200);
+          var friend = response.body.data;
+          friend._id.should.equal(testUser2._id + '');
+          friend.firstName.should.equal(testUser2.firstName);
+          friend.lastName.should.equal(testUser2.lastName);
+          done();
+        });
+      });
+    });
+
+    context('users are not friends', function(){
+      var testUser1 = new User(testUserInfo.user1);
+      var testUser2 = new User(testUserInfo.user2);
+
+      before(function(done){
+        var savePromises = [];
+        savePromises.push(testUser1.save());
+        savePromises.push(testUser2.save());
+
+        Promise.all(savePromises)
+        .then(function(){
+          done();
+        }).catch(function(error){
+          throw error;
+        });
+      });
+
+      it('should get 204, not friends', function(done){
+        request(server)
+        .get('/api/friend/' + testUser1._id + '/' + testUser2._id)
+        .end(function(error, response){
+          response.status.should.equal(404);
+          var error = response.body.errors[0];
+          error.errorCode.should.equal("INVALID_REQUEST_ERROR");
+          done();
+        });
+      });
+    });
+
+    context('bad user id(s)', function(){
+      it('should get 404 error, invalid user', function(done){
+        request(server)
+        .get('/api/friend/ffffffffffffffffffffffff/ffffffffffffffffffffffff')
+        .end(function(error, response){
+          response.status.should.equal(404);
+          var error = response.body.errors[0];
+          error.errorCode.should.equal("INVALID_REQUEST_ERROR");
+          done();
+        });
+      });
+    });
+  });
+
   describe('GET /api/friends/:userId - get friends', function(){
     var testUserInfo = {
       user1:{
