@@ -38,10 +38,11 @@ FriendService.prototype.getFriend = function(req, res){
   User.findOne({$and:[{_id:userId}, {friends:friendId}]})
   .exec()
   .then(function(user){
-    if(! user){ throw new RequestError(204); }
+    console.log(JSON.stringify(user));
+    if(! user){ throw new RequestError(404, { errorCode:"INVALID_REQUEST_ERROR", errorMessage:"users are not friends" }); }
     return User.findOne({ $and:[{ _id:friendId },{ friends:userId }] }).exec();
   }).then(function(user){
-    if(! user){ throw new RequestError(204); }
+    if(! user){ throw new RequestError(404, { errorCode:"INVALID_REQUEST_ERROR", errorMessage:"users are not friends" }); }
     responseBuilder.buildResponse(res, 200, {data: user});
   }).catch(function(error){
     responseBuilder.buildResponseWithError(res, error);
@@ -63,9 +64,8 @@ FriendService.prototype.getFriends = function(req, res){
   .then(function(user){
 
     if(!user){
-      throw new RequestError(400, { success:false,
-        errors:[{errorCode:"INVALID_REQUEST_ERROR",
-        errorMessage:"invalid user::"+ userId}] }
+      throw new RequestError(400, {errorCode:"INVALID_REQUEST_ERROR",
+                                  errorMessage:"invalid user::"+ userId }
       );
     }
 

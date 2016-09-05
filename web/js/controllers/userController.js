@@ -1,6 +1,6 @@
 'use strict'
 
-myApp.controller('userCtrl', function($scope, $cookies, $routeParams, $log, meetupApiService){
+myApp.controller('userCtrl', function($scope, $cookies, $routeParams, $log, alertService, meetupApiService){
     $scope.loggedInUser = $cookies.getObject('loggedInUser');
     $scope.addable = false;
     $scope.user = {};
@@ -20,12 +20,11 @@ myApp.controller('userCtrl', function($scope, $cookies, $routeParams, $log, meet
     $scope.setUserAddableAttribute = function(userId){
       meetupApiService.getFriend($scope.loggedInUser._id, userId)
       .$promise.then(function(response){
-        console.log('response:' + JSON.stringify(response));
+        console.log('users are friends');
         $scope.addable = $.isEmptyObject(response.data) && userId != $scope.loggedInUser._id;
         return;
       }).catch(function(error){
-        $log.error(JSON.stringify(error));
-        $log.warn('failed to verify if user is a friend');
+        $scope.addable = error.status == 404 && userId != $scope.loggedInUser._id;
       });
       $scope.addable = false;
     }
@@ -35,10 +34,11 @@ myApp.controller('userCtrl', function($scope, $cookies, $routeParams, $log, meet
       .$promise.then(
         function(response){
           $scope.setUserAddableAttribute($scope.user._id);
+          alertService.addAlert(alertService.alertType.SUCCESS, "friend request sent")
         }
       ).catch(
         function(error){
-          //warn user
+          alertService.addAlert(alertService.alertType.ERROR, "friend request did not send, due to::" + error)
           $log.warn(error);
         }
       )

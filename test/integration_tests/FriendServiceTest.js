@@ -90,7 +90,9 @@ describe('friend service api', function(){
         request(server)
         .get('/api/friend/' + testUser1._id + '/' + testUser2._id)
         .end(function(error, response){
-          response.status.should.equal(204);
+          response.status.should.equal(404);
+          var error = response.body.errors[0];
+          error.errorCode.should.equal("INVALID_REQUEST_ERROR");
           done();
         });
       });
@@ -101,7 +103,9 @@ describe('friend service api', function(){
         request(server)
         .get('/api/friend/ffffffffffffffffffffffff/ffffffffffffffffffffffff')
         .end(function(error, response){
-          response.status.should.equal(204);
+          response.status.should.equal(404);
+          var error = response.body.errors[0];
+          error.errorCode.should.equal("INVALID_REQUEST_ERROR");
           done();
         });
       });
