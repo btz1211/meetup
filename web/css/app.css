@@ -56,7 +56,7 @@ fieldset .form-group{
 }
 
 .modal-header{
-  background-color:#158cba;
+  background-color:#79a736;
 }
 
 .modal-header button{
@@ -67,6 +67,9 @@ fieldset .form-group{
   color:white;
 }
 
+.modal-content{
+  border: 1px solid #868686;
+}
 #map{
   height:45%;
   margin:15px;
@@ -79,9 +82,12 @@ fieldset .form-group{
 
 /**content container**/
 .content-container{
-  margin-top: 120px;
+  margin-top: 80px;
   background-color:white;
   padding:20px;
+  border-radius: 10px;
+  border: #d4d4d4 1px solid;
+  box-shadow: #dddddd 0px 1px 0px 0px;
 }
 
 .content-container .container{
@@ -104,10 +110,15 @@ fieldset .form-group{
 }
 
 .group-title{
+  border-bottom: 1px solid #dcdcdc;
+  margin-left: 5px;
+  margin-right: 20px;
+}
+.group-title-text{
   color:rgba(255, 119, 1, 0.74);
   font-weight: bold;
   padding-bottom: 5px;
-  padding-right:50px;
+  padding-right:15px;
   font-size:28px;
   position:relative;
   float:left;
@@ -129,6 +140,10 @@ fieldset .form-group{
 
 #meetups-container .meetup-status{
   font-weight: bold;
+}
+
+#meetups-container .meetups-table{
+  margin-top: 50px;
 }
 
 #editMeetupModal .form-group{
