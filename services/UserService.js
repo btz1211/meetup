@@ -60,12 +60,12 @@ UserService.prototype.getUsers = function(req, res){
 }
 
 //get user by _id
-UserService.prototype.getUser = function(req, res){
-  var userId = req.params.userId;
-  logger.debug('received get user for id::' + userId);
+UserService.prototype.getUserById = function(req, res){
+  var id = req.params.id;
+  logger.debug('received get user for id::' + id);
 
   if(mongoose.connection.readyState){
-    User.findOne({_id:userId})
+    User.findOne({_id:id})
     .select('userId firstName lastName createDate')
     .exec(function(error, user){
       if(error){
@@ -85,6 +85,31 @@ UserService.prototype.getUser = function(req, res){
   }
 }
 
+//get user by username
+UserService.prototype.getUserByUsername = function(req, res){
+  var username = req.params.username;
+  logger.debug('received get user for username::' + username);
+
+  if(mongoose.connection.readyState){
+    User.findOne({userId:username})
+    .select('userId firstName lastName createDate')
+    .exec(function(error, user){
+      if(error){
+        responseBuilder.buildResponseWithError(res, error);return;
+      }else{
+        if(user){
+          logger.debug('returning user::' + JSON.stringify(user))
+          responseBuilder.buildResponse(res, 200, {success:true, data:user});
+        }else{
+          responseBuilder.buildResponse(res, 404, {success:false});
+        }
+      }
+    });
+  }else{
+    responseBuilder.buildResponse(res, 500, {sucess:false,
+      errors:[{errorCode:"DB_ERROR", errorMessage:"database is unavailable"}]});
+  }
+}
 //authenticate user
 UserService.prototype.authenticateUser = function(req, res){
   var userId = req.params.userId;

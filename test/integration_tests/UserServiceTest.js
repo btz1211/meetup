@@ -13,7 +13,7 @@ describe('user service api', function(){
     });
   });
 
-  describe('GET /api/user/:userId - get user', function(){
+  describe('GET /api/user/id/:id - get user by id', function(){
     var testUserInfo = {
       firstName: 'john',
       lastName: 'doe',
@@ -32,7 +32,7 @@ describe('user service api', function(){
 
     it('should return user with given id', function(done){
       request(server)
-      .get('/api/user/' + testUser._id)
+      .get('/api/user/id/' + testUser._id)
       .end(function(error, response){
         if(error){ throw error; }
         response.status.should.equal(200);
@@ -44,6 +44,47 @@ describe('user service api', function(){
       });
     });
   });
+
+  describe('GET /api/user/username/:username - get user by username', function(){
+    var testUserInfo = {
+      firstName: 'john',
+      lastName: 'doe',
+      userId: 'johnd123',
+      password: 'testPassword',
+    };
+
+    var testUser =  new User(testUserInfo);
+    before(function(done){
+      testUser.save(function(error, user){
+        if(error){ throw error; }
+        done();
+      })
+    });
+
+    it('should return 200 because user with username is found', function(done){
+      request(server)
+      .get('/api/user/username/' + testUser.userId)
+      .end(function(error, response){
+        if(error){ throw error; }
+        response.status.should.equal(200);
+        response.body.data._id.should.equal(testUser._id + '');
+        response.body.data.userId.should.equal(testUser.userId);
+        response.body.data.firstName.should.equal(testUser.firstName);
+        response.body.data.lastName.should.equal(testUser.lastName);
+        done();
+      });
+    });
+
+    it('should return 404, user with username is not found', function(done){
+      request(server)
+      .get('/api/user/username/dummy-name')
+      .end(function(error, response){
+        if(error){ throw error; }
+        response.status.should.equal(404);
+        done();
+      });
+    });
+  })
 
   describe('GET /api/users/:searchString - search users', function(){
     var testUserInfo = {

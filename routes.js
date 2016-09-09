@@ -9,7 +9,8 @@ var setup = function(app){
 
   //user api
   app.post("/api/user", userService.createUser);
-  app.get("/api/user/:userId", userService.getUser);
+  app.get("/api/user/id/:id", userService.getUserById);
+  app.get("/api/user/username/:username", userService.getUserByUsername);
   app.get("/api/users/:searchString", userService.getUsers);
   app.get("/api/user/:userId/:password", userService.authenticateUser);
   app.put("/api/user/:userId/location", userService.updateLocation);
