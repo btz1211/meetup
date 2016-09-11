@@ -51,7 +51,7 @@ myApp.factory('meetupApiService', function($resource){
     },
 
     getUserById: function(userId){
-      return getUseByIdResource.get({userId:userId});
+      return getUserByIdResource.get({userId:userId});
     },
 
     getUserByUsername: function(username){

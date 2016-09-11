@@ -24,6 +24,7 @@ fieldset .form-group{
   margin-top:55px;
 }
 
+/*login page*/
 .top-half{
   padding-top:100px;
   padding-bottom:60px;
@@ -49,6 +50,19 @@ fieldset .form-group{
 .bottom-half .input-group .btn-login,.btn-signup, .btn-cancel{
   width: 100%;
   border: 0px;
+}
+
+.ng-dirty.ng-valid-username{
+  border-color: #22b24c;
+}
+
+.ng-dirty.ng-invalid{
+  border-color: red;
+}
+
+.help-block{
+  padding-left:15px;
+  color:red;
 }
 
 .no-padding{
