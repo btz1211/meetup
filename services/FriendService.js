@@ -38,7 +38,6 @@ FriendService.prototype.getFriend = function(req, res){
   User.findOne({$and:[{_id:userId}, {friends:friendId}]})
   .exec()
   .then(function(user){
-    console.log(JSON.stringify(user));
     if(! user){ throw new RequestError(404, { errorCode:"INVALID_REQUEST_ERROR", errorMessage:"users are not friends" }); }
     return User.findOne({ $and:[{ _id:friendId },{ friends:userId }] }).exec();
   }).then(function(user){
