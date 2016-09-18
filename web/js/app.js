@@ -21,4 +21,10 @@ var myApp = angular.module('myApp', ['ngResource', 'ngRoute', 'ngCookies', 'ngAn
       templateUrl: 'templates/user.html',
       controller: 'userCtrl'
     }).otherwise({redirectTo:'/login'});
+}).run(function($rootScope, $cookies, $location){
+  $rootScope.$on('$routeChangeStart', function (event) {
+    if(! $cookies.getObject('loggedInUser')){
+       $location.path('/login')
+     }
+   });
 });
