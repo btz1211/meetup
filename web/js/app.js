@@ -3,7 +3,14 @@ var myApp = angular.module('myApp', ['ngResource', 'ngRoute', 'ngCookies', 'ngAn
   $routeProvider
     .when('/login',{
       templateUrl: 'templates/login.html',
-      controller: 'loginCtrl'
+      controller: 'loginCtrl',
+      resolve:{
+        "check":function($location, $cookies){
+          if($cookies.getObject('loggedInUser')){
+            $location.path('/meetups')
+          }
+        }
+      }
     }).when('/meetups', {
       templateUrl: 'templates/meetups.html',
       controller: 'meetupsCtrl'

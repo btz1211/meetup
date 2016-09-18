@@ -1,6 +1,6 @@
 'use strict';
 
-myApp.controller('loginCtrl', function($scope, $window, $log, $cookies, alertService, meetupApiService){
+myApp.controller('loginCtrl', function($scope, $location, $log, $cookies, alertService, meetupApiService){
   $scope.isNewUser = false;
   $scope.errors;
   $scope.user = {};
@@ -27,7 +27,7 @@ myApp.controller('loginCtrl', function($scope, $window, $log, $cookies, alertSer
       function(response){
         $log.info(response);
         $cookies.putObject('loggedInUser', response.data);
-        $window.location.href = '#/meetups';
+        $location.path('/meetups')
       }
     ).catch(
       function(error){
