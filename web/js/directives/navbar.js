@@ -8,7 +8,7 @@ myApp.directive('navbar', function($log, meetupApiService){
         activeItem:"@",
       },
       templateUrl: 'templates/directive-templates/navbar.html',
-      controller: function($scope, $cookies, $window, meetupApiService){
+      controller: function($scope, $cookies, $location, meetupApiService){
         $scope.loggedInUser = $cookies.getObject('loggedInUser');
 
         $scope.searchUsers = function(searchString){
@@ -24,7 +24,11 @@ myApp.directive('navbar', function($log, meetupApiService){
         },
         $scope.onUserSelect = function(user){
           console.log('user::' + user);
-          $window.location.href = '#/user/' + user._id;
+          $location.path('/user/' + user._id);
+        },
+        $scope.logout = function(){
+          $cookies.remove("loggedInUser");
+          $location.path('/login')
         }
       }
     }

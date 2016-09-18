@@ -8,7 +8,8 @@ myApp.factory('meetupApiService', function($resource){
   var getMeetupersResource = $resource("/api/meetup/:meetupId/meetupers");
   var addMeetuperResource = $resource("/api/meetup/:meetupId/meetuper/:meetuperId", null, {'update':{method:'PUT'}});
 
-  var getUserResource = $resource("/api/user/:userId", {userId:"@userId"});
+  var getUserByIdResource = $resource("/api/user/id/:userId", {userId:"@userId"});
+  var getUserByUsernameResource = $resource("/api/user/username/:username", {username:"@username"});
   var searchUsersResource = $resource("/api/users/:searchString", {searchString:"@searchString"});
   var createUserResource = $resource("/api/user");
   var authenicateUserResource = $resource("/api/user/:userId/:password", {userId:"@userId", password:"@password"});
@@ -49,8 +50,12 @@ myApp.factory('meetupApiService', function($resource){
       return addMeetuperResource.update({'meetupId':meetupId, 'meetuperId':meetuperId}, null);
     },
 
-    getUser: function(userId){
-      return getUserResource.get({userId:userId});
+    getUserById: function(userId){
+      return getUserByIdResource.get({userId:userId});
+    },
+
+    getUserByUsername: function(username){
+      return getUserByUsernameResource.get({username:username});
     },
 
     createUser: function(user){

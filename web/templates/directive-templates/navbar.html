@@ -18,6 +18,7 @@
       <ul class="nav navbar-nav">
         <li ng-class="{active:activeItem=='meetups'}"><a href="#/meetups" >Meetups</a></li>
         <li ng-class="{active:activeItem=='user'}"><a ng-href="#" ng-click="$event.preventDefault(); onUserSelect(loggedInUser)">{{loggedInUser.firstName}}</a></li>
+        <li><a ng-href="#" ng-click="logout()">logout</a></li>
       </ul>
 
       <!--search form-->

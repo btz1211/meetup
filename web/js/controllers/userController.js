@@ -6,7 +6,7 @@ myApp.controller('userCtrl', function($scope, $cookies, $routeParams, $log, aler
     $scope.user = {};
 
     $scope.getUser = function(){
-      meetupApiService.getUser($routeParams.userId).
+      meetupApiService.getUserById($routeParams.userId).
       $promise.then(function(response){
         if(response.data){
           $scope.user = response.data;

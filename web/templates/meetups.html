@@ -4,18 +4,12 @@
 
 <!--Meetups container-->
 <div class="container content-container" id="meetups-container">
-  <div class="row">
-    <div class="col-md-6">
-      <div class="col-md-3">
-        <h2 class="group-title">My Meetups</h2>
-      </div>
-      <div class="col-md-3">
-        <button class="btn btn-success plus-btn"  ng-click="newMeetup()">+</button>
-      </div>
-    </div>
+  <div class="row group-title">
+    <h2 class="group-title-text">My Meetups</h2>
+    <button class="btn btn-success plus-btn"  ng-click="newMeetup()">+</button>
   </div>
 
-  <table class="meetup-table table table-hover" ng-show="meetups.length>0">
+  <table class="meetups-table table table-hover" ng-show="meetups.length>0">
     <thead>
       <tr>
         <th>Name</th>
@@ -45,16 +39,14 @@
     </tbody>
   </table>
   <div class="empty-message" ng-show="meetups==null || meetups.length ==0">
-    <p>You current do not have any meet ups</p>
+    <h4>You current do not have any meet ups</h4>
   </div>
 </div>
 
 <!--pending friend requests container-->
 <div class="container content-container" id="pending-relationship-container">
-  <div class="row">
-    <div class="col-md-8">
-      <h2 class="group-title">Friend Requests</h2>
-    </div>
+  <div class="row group-title">
+    <h2 class="group-title-text">Friend Requests</h2>
   </div>
   <table class="friend-invitations-table table table-hover" ng-show="friendInvitations.length > 0">
     <tr>
@@ -73,4 +65,7 @@
       </td>
     </tr>
   </table>
+  <div class="empty-message" ng-show="friendInvitations==null || friendInvitations.length ==0">
+    <h4>Sorry amigo, no invitations at the moment</h4>
+  </div>
 </div>
