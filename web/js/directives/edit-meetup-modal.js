@@ -8,7 +8,7 @@ myApp.directive('editMeetupModal', function(){
       meetup:"="
     },
     templateUrl: 'templates/directive-templates/edit-meetup-modal.html',
-    controller: function($scope, $cookies, mapService, meetupApiService){
+    controller: function($scope, $cookies, $log, mapService, meetupApiService){
       $scope.marker;
       $scope.currentLocation= {};
       $scope.defaultLatitude = 40;
@@ -17,6 +17,8 @@ myApp.directive('editMeetupModal', function(){
       $scope.mapElement = document.getElementById('modal-map');
       $scope.map = mapService.getMap($scope.mapElement, $scope.defaultLatitude, $scope.defaultLongitude, $scope.defaultZoom);
       $scope.loggedInUser = $cookies.getObject('loggedInUser');
+      $scope.startTimePicker;
+      $scope.endTimePicker;
 
       $scope.saveMeetup = function(){
         //update/save meetup
@@ -29,9 +31,7 @@ myApp.directive('editMeetupModal', function(){
         }
 
         saveMeetupPromise.then(function(response){
-          console.log(JSON.stringify(response));
-          $scope.getMeetups();
-          //$route.reload();
+          $log.warn(JSON.stringify(response));
         }).catch(function(error){
           $log.warn(error);
         });
@@ -75,7 +75,6 @@ myApp.directive('editMeetupModal', function(){
              $scope.marker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.currentLocation.address);
            }
            mapService.zoomIn($scope.map,$scope.meetup.latitude, $scope.meetup.longitude, 14);
-
          });
        }
 
@@ -88,22 +87,59 @@ myApp.directive('editMeetupModal', function(){
              $scope.marker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.currentLocation.address);
            }
            mapService.zoomIn($scope.map,$scope.meetup.latitude, $scope.meetup.longitude, 14);
+
+           //set start time and end time
+           $scope.startTimePicker.date(moment($scope.meetup.startTime).format('MM/DD/YYYY h:mm A'));
+           $scope.endTimePicker.date(moment($scope.meetup.endTime).format('MM/DD/YYYY h:mm A'));
+
          }else{
            //new meetup, remove marker and reset map zoom
            if($scope.marker){
              mapService.removeMarkerFromMap($scope.marker);
              $scope.marker = null;
            }
-
            mapService.zoomIn($scope.map, $scope.defaultLatitude, $scope.defaultLongitude, $scope.defaultZoom);
+
+           //set start time and end time to current time
+           $scope.startTimePicker.date(moment());
+           $scope.endTimePicker.date(moment());
          }
        }
 
        $scope.setupModal = function(){
-         $("#editMeetupModal").on('shown', $scope.onModalShow);
+         $("#editMeetupModal").on('shown.bs.modal', $scope.onModalShow);
+       }
+
+       $scope.setupDateTimePickers = function(){
+         //set on change event listeners
+         $('#startTimePicker').datetimepicker().on('dp.change', function(update){
+           $scope.meetup.startTime = update.date.format('MM/DD/YYYY h:mm A');
+         });
+         $('#endTimePicker').datetimepicker().on('dp.change', function(update){
+           $scope.meetup.endTime = update.date.format('MM/DD/YYYY h:mm A');
+         });
+
+         $scope.startTimePicker = $('#startTimePicker').datetimepicker().data("DateTimePicker");
+         $scope.endTimePicker = $('#endTimePicker').datetimepicker().data("DateTimePicker");
        }
 
        $scope.setupModal();
+       $scope.setupDateTimePickers();
+    }
+  }
+});
+
+//custom validation for start time
+myApp.directive('endTimeValidation', function(){
+  return{
+    require: 'ngModel',
+    link: function(scope, element, attr, ctrl) {
+      function endTimeValidation(value) {
+        ctrl.$setValidity('end-time', true);
+        return value
+      }
+      ctrl.$parsers.push(endTimeValidation);
+      ctrl.$formatters.push(endTimeValidation);
     }
   }
 });

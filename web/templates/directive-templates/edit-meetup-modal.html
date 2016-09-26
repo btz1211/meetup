@@ -11,7 +11,7 @@
             <div class="col-lg-12 row">
               <div class="col-lg-6">
                 <div class="form-group">
-                  <label for="name" class="col-lg-3 control-label">Name:</label>
+                  <label for="name" class="col-lg-4 control-label">Name:</label>
                   <div class="col-lg-8">
                     <input type="text" class="form-control" required ng-model="meetup.name"></input>
                   </div>
@@ -19,7 +19,7 @@
               </div>
               <div class="col-lg-6">
                 <div class="form-group">
-                  <label for="address" class="col-lg-3 control-label">Address:</label>
+                  <label for="address" class="col-lg-4 control-label">Address:</label>
                   <div class="col-lg-8">
                     <div class="input-group">
                       <input type="text" class="form-control" required ng-model="meetup.address" ng-model-options="{debounce:2000}" ng-change="updatePosition()"></input>
@@ -35,17 +35,27 @@
             <div class="col-lg-12 row">
               <div class="col-lg-6">
                 <div class="form-group">
-                  <label for="startTime" class="col-lg-3 control-label">Start Time:</label>
+                  <label for="startTime" class="col-lg-4 control-label">Start Time:</label>
                   <div class="col-lg-8">
-                    <input type="datetime-local" class="form-control" required ng-model="meetup.startTime"</input>
+                    <div class='input-group date' id='startTimePicker'>
+                      <input type='text' name="startTime" class="form-control" required ng-model="meetup.startTime"/>
+                      <span class="input-group-addon">
+                          <span class="glyphicon glyphicon-calendar"></span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
               <div class="col-lg-6">
                 <div class="form-group">
-                  <label for="endTime" class="col-lg-3 control-label">End Time:</label>
+                  <label for="endTime" class="col-lg-4 control-label">End Time:</label>
                   <div class="col-lg-8">
-                    <input type="datetime-local" class="form-control" required ng-model="meetup.endTime"></input>
+                    <div class='input-group date' id='endTimePicker'>
+                      <input type='text' name="endTime" class="form-control" required ng-model="meetup.endTime" end-time-validation/>
+                      <span class="input-group-addon">
+                          <span class="glyphicon glyphicon-calendar"></span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
