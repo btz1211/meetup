@@ -130,16 +130,27 @@ myApp.directive('editMeetupModal', function(){
 });
 
 //custom validation for start time
-myApp.directive('endTimeValidation', function(){
+myApp.directive('meetupTimeValidation', function(){
   return{
     require: 'ngModel',
     link: function(scope, element, attr, ctrl) {
-      function endTimeValidation(value) {
-        ctrl.$setValidity('end-time', true);
+      function meetupTimeValidation(value) {
+        var startMoment = moment(scope.meetup.startTime);
+        var valid = startMoment.isValid() && startMoment.isBefore(scope.meetup.endTime)
+
+        //set validity for elements
+        ctrl.$setValidity('meetup-time', valid);
+        scope.meetupForm.startTime.$setValidity('meetup-time', valid)
+        scope.meetupForm.endTime.$setValidity('meetup-time', valid)
+
+        //set error
+        if(!valid){
+          scope.error = "meetup start time must be before end time"
+        }
         return value
       }
-      ctrl.$parsers.push(endTimeValidation);
-      ctrl.$formatters.push(endTimeValidation);
+      ctrl.$parsers.push(meetupTimeValidation);
+      ctrl.$formatters.push(meetupTimeValidation);
     }
   }
 });

@@ -38,7 +38,7 @@
                   <label for="startTime" class="col-lg-4 control-label">Start Time:</label>
                   <div class="col-lg-8">
                     <div class='input-group date' id='startTimePicker'>
-                      <input type='text' name="startTime" class="form-control" required ng-model="meetup.startTime"/>
+                      <input type='text' name="startTime" class="form-control" required ng-model="meetup.startTime" meetup-time-validation/>
                       <span class="input-group-addon">
                           <span class="glyphicon glyphicon-calendar"></span>
                       </span>
@@ -51,7 +51,7 @@
                   <label for="endTime" class="col-lg-4 control-label">End Time:</label>
                   <div class="col-lg-8">
                     <div class='input-group date' id='endTimePicker'>
-                      <input type='text' name="endTime" class="form-control" required ng-model="meetup.endTime" end-time-validation/>
+                      <input type='text' name="endTime" class="form-control" required ng-model="meetup.endTime" meetup-time-validation/>
                       <span class="input-group-addon">
                           <span class="glyphicon glyphicon-calendar"></span>
                       </span>
@@ -62,6 +62,10 @@
             </div>
           </fieldset>
         </form>
+
+        <div class="alert alert-dismissible alert-danger" ng-show="meetupForm.$invalid">
+          <strong >{{error}}</strong>
+        </div>
 
         <!--google map-->
         <div class="row">
