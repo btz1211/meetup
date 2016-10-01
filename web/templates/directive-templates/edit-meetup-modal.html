@@ -1,4 +1,4 @@
-<div class="modal fade" role="dialog" id="editMeetupModal">
+<div class="modal fade" role="dialog" id="edit-meetup-modal">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -10,62 +10,75 @@
           <fieldset>
             <div class="col-lg-12 row">
               <div class="col-lg-6">
-                <div class="form-group">
+                <div class="form-group required">
                   <label for="name" class="col-lg-4 control-label">Name:</label>
                   <div class="col-lg-8">
-                    <input type="text" class="form-control" required ng-model="meetup.name"></input>
+                    <input type="text" name="name" class="form-control" required ng-model="meetup.name"></input>
+                  </div>
+                  <div class="help-block" ng-messages="meetupForm.name.$error" ng-if="meetupForm.name.$dirty">
+                    <p ng-message="required">Name is required.</p>
                   </div>
                 </div>
               </div>
               <div class="col-lg-6">
-                <div class="form-group">
+                <div class="form-group required">
                   <label for="address" class="col-lg-4 control-label">Address:</label>
-                  <div class="col-lg-8">
-                    <div class="input-group">
-                      <input type="text" class="form-control" required ng-model="meetup.address" ng-model-options="{debounce:2000}" ng-change="updatePosition()"></input>
-                      <span class="input-group-addon">
-                        <a ng-click="useCurrentAddress()"><i class="fa fa-map-marker"></i></a>
-                      </span>
-                    </div>
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="address" required ng-model="meetup.address" ng-model-options="{debounce:2000}" ng-change="updatePosition()"></input>
+                    <span class="input-group-addon">
+                      <a ng-click="useCurrentAddress()"><i class="fa fa-map-marker"></i></a>
+                    </span>
+                  </div>
+                  <div class="help-block" ng-messages="meetupForm.address.$error" ng-if="meetupForm.address.$dirty">
+                    <p ng-message="required">Address is required.</p>
                   </div>
                 </div>
+
               </div>
             </div>
 
             <div class="col-lg-12 row">
               <div class="col-lg-6">
-                <div class="form-group">
+                <div class="form-group required">
                   <label for="startTime" class="col-lg-4 control-label">Start Time:</label>
-                  <div class="col-lg-8">
-                    <div class='input-group date' id='startTimePicker'>
-                      <input type='text' name="startTime" class="form-control" required ng-model="meetup.startTime" meetup-time-validation/>
-                      <span class="input-group-addon">
-                          <span class="glyphicon glyphicon-calendar"></span>
-                      </span>
-                    </div>
+                  <div class='input-group date' id='startTimePicker'>
+                    <input type='text' name="startTime" class="form-control" required ng-model="meetup.startTime" meetup-time-validation/>
+                    <span class="input-group-addon">
+                        <span class="fa fa-calendar"></span>
+                    </span>
+                  </div>
+                  <div class="help-block" ng-messages="meetupForm.startTime.$error" ng-if="!meetupForm.startTime.$empty">
+                    <p ng-message="required" ng-if="meetupForm.startTime.$dirty">start time is required.</p>
+                    <p ng-message="meetup-time">start time must be before end time</p>
                   </div>
                 </div>
+
               </div>
               <div class="col-lg-6">
-                <div class="form-group">
+                <div class="form-group required">
                   <label for="endTime" class="col-lg-4 control-label">End Time:</label>
-                  <div class="col-lg-8">
-                    <div class='input-group date' id='endTimePicker'>
-                      <input type='text' name="endTime" class="form-control" required ng-model="meetup.endTime" meetup-time-validation/>
-                      <span class="input-group-addon">
-                          <span class="glyphicon glyphicon-calendar"></span>
-                      </span>
-                    </div>
+                  <div class='input-group date' id='endTimePicker'>
+                    <input type='text' name="endTime" class="form-control" required ng-model="meetup.endTime" end-time-validation meetup-time-validation/>
+                    <span class="input-group-addon">
+                        <span class="fa fa-calendar"></span>
+                    </span>
+                  </div>
+                  <div class="help-block" ng-messages="meetupForm.endTime.$error" ng-if="!meetupForm.endTime.$empty">
+                    <p ng-message="required" ng-if="meetupForm.endTime.$dirty">end time is required.</p>
+                    <p ng-message="end-time">end time cannot be in the past</p>
+                    <p ng-message="meetup-time">start time must be before end time</p>
                   </div>
                 </div>
+
               </div>
             </div>
           </fieldset>
+
+          <div class="col-sm-12 address-hint">
+            <i class="fa fa-map-marker"></i> <span>&nbspclick this icon to use current address</span>
+          </div>
         </form>
 
-        <div class="alert alert-dismissible alert-danger" ng-show="meetupForm.$invalid">
-          <strong >{{error}}</strong>
-        </div>
 
         <!--google map-->
         <div class="row">

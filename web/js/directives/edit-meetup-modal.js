@@ -107,16 +107,20 @@ myApp.directive('editMeetupModal', function(){
        }
 
        $scope.setupModal = function(){
-         $("#editMeetupModal").on('shown.bs.modal', $scope.onModalShow);
+         $("#edit-meetup-modal").on('shown.bs.modal', $scope.onModalShow);
        }
 
        $scope.setupDateTimePickers = function(){
          //set on change event listeners
          $('#startTimePicker').datetimepicker().on('dp.change', function(update){
-           $scope.meetup.startTime = update.date.format('MM/DD/YYYY h:mm A');
+           if(update){
+             $scope.meetup.startTime = update.date.format('MM/DD/YYYY h:mm A');
+           }
          });
          $('#endTimePicker').datetimepicker().on('dp.change', function(update){
-           $scope.meetup.endTime = update.date.format('MM/DD/YYYY h:mm A');
+           if(update){
+             $scope.meetup.endTime = update.date.format('MM/DD/YYYY h:mm A');
+           }
          });
 
          $scope.startTimePicker = $('#startTimePicker').datetimepicker().data("DateTimePicker");
@@ -125,6 +129,26 @@ myApp.directive('editMeetupModal', function(){
 
        $scope.setupModal();
        $scope.setupDateTimePickers();
+    }
+  }
+});
+
+myApp.directive('endTimeValidation', function(){
+  return{
+    require: 'ngModel',
+    link: function(scope, element, attr, ctrl) {
+      function endTimeValidation(value) {
+        var endMoment = moment(scope.meetup.endTime);
+        var valid = endMoment.isValid() && endMoment.isAfter(moment())
+
+        //set validity for elements
+        ctrl.$setValidity('end-time', valid);
+        scope.meetupForm.endTime.$setValidity('end-time', valid)
+
+        return value
+      }
+      ctrl.$parsers.push(endTimeValidation);
+      ctrl.$formatters.push(endTimeValidation);
     }
   }
 });
@@ -143,10 +167,6 @@ myApp.directive('meetupTimeValidation', function(){
         scope.meetupForm.startTime.$setValidity('meetup-time', valid)
         scope.meetupForm.endTime.$setValidity('meetup-time', valid)
 
-        //set error
-        if(!valid){
-          scope.error = "meetup start time must be before end time"
-        }
         return value
       }
       ctrl.$parsers.push(meetupTimeValidation);

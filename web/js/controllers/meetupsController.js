@@ -67,7 +67,7 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route
 
   /******helper functions*******/
   $scope.showModal = function(){
-    $("#editMeetupModal").modal('show');
+    $("#edit-meetup-modal").modal('show');
   }
 
   $scope.parseDate = function(date){
