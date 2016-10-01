@@ -17,11 +17,7 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route
     $promise.then(
       function(response){
         if(response.data){
-          $scope.meetups = response.data.map(function(meetup){
-            meetup.startTime = new Date( Date.parse(meetup.startTime));
-            meetup.endTime = new Date( Date.parse(meetup.endTime));
-            return meetup;
-          });
+          $scope.meetups = response.data;
         }
       }).catch(
         function(error){
@@ -71,7 +67,7 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route
 
   /******helper functions*******/
   $scope.showModal = function(){
-    $("#editMeetupModal").modal('show');
+    $("#edit-meetup-modal").modal('show');
   }
 
   $scope.parseDate = function(date){
@@ -88,7 +84,7 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route
 
   $interval(function(){
     $scope.getMeetups();
-  }, 5000);
+  }, 2500);
 
   $scope.getMeetups();
   $scope.updateLocation();
