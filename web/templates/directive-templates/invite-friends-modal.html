@@ -39,7 +39,7 @@
                   <h5>Friends</h5>
                   <hr/>
                   <table class="friends-table table table-hover" ng-show="friends.length > 0">
-                    <tr ng-repeat="friend in friends" ng-click="onFriendSelect(friend)">
+                    <tr class="friend" ng-repeat="friend in friends" ng-click="onFriendSelect(friend)">
                       <td>
                           <img ng-src="favicon.ico" width="18" ng-show="!isFriendSelected(friend)">
                           <i class="fa fa-check" ng-show="isFriendSelected(friend)"></i>
@@ -54,7 +54,7 @@
                   <h5>Selected Friends ({{getNumberOfSelectedFriends()}})</h5>
                   <hr/>
                   <table class="selected-friends-table table table-hover" >
-                    <tr ng-repeat="(id, friend) in selectedFriends">
+                    <tr class="selected-friend" ng-repeat="(id, friend) in selectedFriends" ng-click="onFriendUnselect(friend)">
                       <td><i class="fa fa-remove"></i>&nbsp;</td>
                       <td>{{friend.firstName + ' ' + friend.lastName}}</td>
                     </tr>

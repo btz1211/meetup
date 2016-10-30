@@ -251,6 +251,13 @@ fieldset .form-group{
   float: right
 }
 
+#meetup-container .refocus-icon:hover{
+  color: #2780e3;
+}
+#meetup-container .refocus-icon:hover, .meetuper:hover{
+  cursor: pointer;
+}
+
 #meetup-container .fa-compass{
   color: #28B62C;
 }
@@ -264,6 +271,10 @@ fieldset .form-group{
 #meetup-container #meetupers-container legend{
   font-size:16px;
   margin-bottom:10px;
+}
+
+#inviteFriendsModal .friend:hover, .selected-friend:hover{
+  cursor: pointer;
 }
 
 /**add friend container**/

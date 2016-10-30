@@ -67,6 +67,12 @@ myApp.directive('inviteFriendsModal', function(){
         }
       }
 
+      $scope.onFriendUnselect = function(friend){
+        if($scope.isFriendSelected(friend)){
+          delete $scope.selectedFriends[friend._id];
+        }
+      }
+
       $scope.isFriendSelected = function(friend){
         return $scope.selectedFriends.hasOwnProperty(friend._id);
       }

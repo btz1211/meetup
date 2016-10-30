@@ -16,9 +16,9 @@
 
     <!--meetupers-->
     <div class="col-lg-3" id="meetupers-container">
-      <legend>Meetupers<span class="fa fa-compass refocus-icon" ng-mouseover="refocus()"></span></legend><hr/>
+      <legend>Meetupers<span class="fa fa-compass refocus-icon" ng-click="refocus()"></span></legend><hr/>
       <table class="meetupers-table table table-hover table-striped">
-        <tr ng-repeat="meetuper in meetupers track by meetuper._id" ng-mouseover="focusOnMeetuper(meetuper)">
+        <tr class="meetuper" ng-repeat="meetuper in meetupers track by meetuper._id" ng-click="focusOnMeetuper(meetuper)">
           <td><img ng-src="favicon.ico" width="18"></td>
           <td>{{meetuper.firstName + ' ' + meetuper.lastName}}</td>
         </tr>
@@ -27,7 +27,7 @@
     </div>
   </div>
   <div class="row col-lg-12 map-hint">
-    <span class="fa fa-compass"></span>&nbsp;hover to refocus map
+    <span class="fa fa-compass"></span>&nbsp;click to refocus map, and click meetuper to focus on him/her
   </div>
 
 </div>
