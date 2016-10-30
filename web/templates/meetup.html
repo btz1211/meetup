@@ -16,7 +16,7 @@
 
     <!--meetupers-->
     <div class="col-lg-3" id="meetupers-container">
-      <legend>Meetupers</legend><hr/>
+      <legend>Meetupers<span class="fa fa-compass refocus-icon" ng-mouseover="refocus()"></span></legend><hr/>
       <table class="meetupers-table table table-hover table-striped">
         <tr ng-repeat="meetuper in meetupers track by meetuper._id" ng-mouseover="focusOnMeetuper(meetuper)">
           <td><img ng-src="favicon.ico" width="18"></td>
@@ -26,6 +26,8 @@
       <h6 ng-show="meetup.meetupers.length ==0">hit &nbsp;<i class="fa fa-user-plus"></i>&nbsp; to invite friends!</h6>
     </div>
   </div>
-
+  <div class="row col-lg-12 map-hint">
+    <span class="fa fa-compass"></span>&nbsp;hover to refocus map
+  </div>
 
 </div>

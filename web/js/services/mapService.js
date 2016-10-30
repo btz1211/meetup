@@ -2,6 +2,7 @@
 
 myApp.factory('mapService', function($log){
   var geocoder = new google.maps.Geocoder;
+  var defaultZoom = 15;
 
   return {
     getMap: function(mapElement, lat, lng, zoom){
@@ -87,5 +88,15 @@ myApp.factory('mapService', function($log){
       map.panTo(center);
       map.setCenter(center);
     },
+
+    refocus: function(map, markers, zoom){
+      var latlngBounds = new google.maps.LatLngBounds();
+
+      markers.forEach(function(marker){
+        latlngBounds.extend(marker.position)
+      });
+      map.setCenter(latlngBounds.getCenter());
+      map.fitBounds(latlngBounds);
+    }
   }
 });

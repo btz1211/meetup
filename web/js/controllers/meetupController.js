@@ -48,9 +48,15 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $log, ma
 
   $scope.focusOnMeetuper = function(meetuper){
     var marker = $scope.meetuperMarkers[meetuper._id];
-    mapService.zoomIn($scope.map, meetuper.lastKnownLatitude, meetuper.lastKnownLongitude);
+    mapService.zoomIn($scope.map, meetuper.lastKnownLatitude, meetuper.lastKnownLongitude, 16);
     console.log('focusing on meetuper::' + JSON.stringify(meetuper));
   }
+
+  $scope.refocus = function(){
+    var markers = Object.values($scope.meetuperMarkers).concat($scope.meetupMarker);
+    mapService.refocus($scope.map, markers);
+  }
+
   $scope.getMeetup();
   $scope.getMeetupers();
 });

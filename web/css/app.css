@@ -236,6 +236,25 @@ fieldset .form-group{
   color:#FF4136;
 }
 
+#meetup-container .map-hint{
+  font-size: 12px;
+  padding-left:40px;
+  margin-top:-30px;
+}
+
+#meetup-container .map-hint .fa{
+  font-size: 12px;
+}
+
+#meetup-container .refocus-icon{
+  font-size:25px;
+  float: right
+}
+
+#meetup-container .fa-compass{
+  color: #28B62C;
+}
+
 #meetup-container #meetupers-container{
   margin-top:10px;
   height:45%;
