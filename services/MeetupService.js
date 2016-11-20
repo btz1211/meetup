@@ -1,9 +1,8 @@
 var mongoose = require('mongoose');
-var logger = require('../logger')
-var ResponseBuilder = require('../util/ResponseBuilder.js')
-var ObjectUtil = require('../util/ObjectUtil.js')
-// require('../models/user');
-// require('../models/meetup');
+var logger = require('../logger');
+var server = require('../server');
+var ResponseBuilder = require('../util/ResponseBuilder.js');
+var ObjectUtil = require('../util/ObjectUtil.js');
 
 var MeetupService = function(){}
 
