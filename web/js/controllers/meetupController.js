@@ -30,6 +30,26 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
     }
   });
 
+  /* location update logic */
+  $scope.onLocationUpdate = function(position){
+    var coordinates = position.coords;
+
+    $scope.socket.emit('locationUpdate', { user: $scope.loggedInUser,
+      latitude: position.coords.latitude, longitude: position.coords.longitude });
+  }
+
+  $scope.onLocationUpdateError = function(error){
+    console.warn('ERROR(' + error.code + '): ' + error.message);
+  }
+
+  $scope.LocationOptions = {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0
+  };
+
+  navigator.geolocation.watchPosition($scope.onLocationUpdate, $scope.onLocationUpdateError, $scope.LocationOptions);
+
   $scope.getMeetup = function(){
     meetupApiService.getMeetup($routeParams.meetupId)
     .$promise.then(function(response){
@@ -76,22 +96,11 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
     mapService.refocus($scope.map, markers);
   }
 
-  $scope.updateLocation = function(){
-    navigator.geolocation.getCurrentPosition(function(position, error){
-      $scope.socket.emit('locationUpdate', { user: $scope.loggedInUser,
-        latitude: position.coords.latitude, longitude: position.coords.longitude });
-    });
-  }
-
-  //close socket when user navigates away from this page
+  /* close socket when user navigates away from this page */
   $scope.$on('$locationChangeStart', function (event, next, current) {
     $scope.socket.onclose = function(){}; // disable onclose handler first
     $scope.socket.close()  ;
   });
-
-  $interval(function(){
-    $scope.updateLocation();
-  }, 2500);
 
   $scope.getMeetup();
   $scope.getMeetupers();
