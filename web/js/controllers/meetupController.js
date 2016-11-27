@@ -8,11 +8,27 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
   $scope.meetuperMarkers = {};
   $scope.mapElement = document.getElementById('map');
   $scope.map = mapService.getMap($scope.mapElement, 40, -95, 4);
-  $scope.socket = io();
 
   //meetup
   $scope.meetup = {};
   $scope.meetupers = [];
+
+  //meetup socket
+  $scope.socket = io();
+  $scope.socket.on('locationUpdate', function(locationInfo){
+    console.log('update received::' + JSON.stringify(locationInfo));
+
+    if($scope.meetuperMarkers[locationInfo.user._id]){
+      mapService.moveMarker($scope.meetuperMarkers[locationInfo.user._id], locationInfo.latitude, locationInfo.longitude);
+    }else{
+      $scope.meetuperMarkers[locationInfo.user._id] = mapService.addMarker($scope.map,
+                                             locationInfo.latitude,
+                                             locationInfo.longitude,
+                                             locationInfo.user.firstName + " " + locationInfo.user.lastName,
+                                             "",
+                                             "images/meetuper-marker.png");
+    }
+  });
 
   $scope.getMeetup = function(){
     meetupApiService.getMeetup($routeParams.meetupId)
@@ -23,15 +39,6 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
       //map meetup
       $scope.meetupMarker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.meetup.name, "", "images/destination-marker.png");
       mapService.zoomIn( $scope.map, $scope.meetup.latitude, $scope.meetup.longitude, 14);
-
-      // listen for socket
-      $scope.socket.on('locationUpdate', function(locationInfo){
-        console.log('update received::' + JSON.stringify(locationInfo));
-
-        if(Object.keys($scope.meetuperMarkers).includes(locationInfo.userId)){
-          mapService.moveMarker($scope.meetuperMarkers[locationInfo.userId], locationInfo.latitude, locationInfo.longitude);
-        }
-      });
     }).catch(
       function(error){
         $log.warn(error);
@@ -46,6 +53,8 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
 
       //map meetupers
       $scope.meetupers.map(function(meetuper){
+        $scope.meetuperMarkers[meetuper._id] = null;
+
         if(meetuper.lastKnownLatitude && meetuper.lastKnownLongitude){
           $scope.meetuperMarkers[meetuper._id] = mapService.addMarker($scope.map, meetuper.lastKnownLatitude,
             meetuper.lastKnownLongitude, meetuper.firstName + ' ' +meetuper.lastName,
@@ -69,7 +78,7 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
 
   $scope.updateLocation = function(){
     navigator.geolocation.getCurrentPosition(function(position, error){
-      $scope.socket.emit('locationUpdate', { userId: $scope.loggedInUser._id,
+      $scope.socket.emit('locationUpdate', { user: $scope.loggedInUser,
         latitude: position.coords.latitude, longitude: position.coords.longitude });
     });
   }
