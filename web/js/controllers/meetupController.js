@@ -15,9 +15,7 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
   $scope.meetupers = {};
 
   /* socket logic */
-  $scope.io = io();
-  $scope.socket = $scope.io.connect();
-  $scope.socket.emit('userLive', $scope.loggedInUser);
+  $scope.socket = io.connect();
 
   $scope.socket.on('locationUpdate', function(locationInfo){
     console.log('update received::' + JSON.stringify(locationInfo));
@@ -53,7 +51,10 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
   $scope.$on('$locationChangeStart', function (event, next, current) {
     $scope.socket.emit('userExitLive', $scope.loggedInUser);
     $scope.socket.close();
+    $scope.socket.io.disconnect();
   });
+
+  $scope.socket.emit('userLive', $scope.loggedInUser);
 
   /* location update logic */
   $scope.onLocationUpdate = function(position){
