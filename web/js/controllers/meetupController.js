@@ -1,9 +1,10 @@
 'use strict';
 
-myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interval, $log, mapService, meetupApiService){
+myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interval, $log, mapService, alertService, meetupApiService){
   $scope.loggedInUser = $cookies.getObject('loggedInUser');
 
   //map
+  $scope.lastPosition = {};
   $scope.meetupMarker = {};
   $scope.meetuperMarkers = {};
   $scope.mapElement = document.getElementById('map');
@@ -11,10 +12,13 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
 
   //meetup
   $scope.meetup = {};
-  $scope.meetupers = [];
+  $scope.meetupers = {};
 
-  //meetup socket
-  $scope.socket = io();
+  /* socket logic */
+  $scope.io = io();
+  $scope.socket = $scope.io.connect();
+  $scope.socket.emit('userLive', $scope.loggedInUser);
+
   $scope.socket.on('locationUpdate', function(locationInfo){
     console.log('update received::' + JSON.stringify(locationInfo));
 
@@ -30,12 +34,33 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
     }
   });
 
+  $scope.socket.on('userLive', function(meetuper){
+    alertService.addAlert(alertService.alertType.SUCCESS,
+      $scope.loggedInUser.firstName + " " +$scope.loggedInUser.lastName + " is now live");
+  });
+
+  $scope.socket.on('userExitLive', function(meetuper){
+    alertService.addAlert(alertService.alertType.WARNING,
+      $scope.loggedInUser.firstName + " " +$scope.loggedInUser.lastName + " has exited");
+  });
+
+  $scope.socket.onclose = function(){
+    if($scope.lastCoords){
+      meetupApiService.updateLocation($scope.loggedInUser._id, $scope.lastCoords);
+    }
+  }
+
+  $scope.$on('$locationChangeStart', function (event, next, current) {
+    $scope.socket.emit('userExitLive', $scope.loggedInUser);
+    $scope.socket.close();
+  });
+
   /* location update logic */
   $scope.onLocationUpdate = function(position){
-    var coordinates = position.coords;
+    $scope.lastCoords = position.coords;
 
     $scope.socket.emit('locationUpdate', { user: $scope.loggedInUser,
-      latitude: position.coords.latitude, longitude: position.coords.longitude });
+      latitude: $scope.lastCoords.latitude, longitude: $scope.lastCoords.longitude });
   }
 
   $scope.onLocationUpdateError = function(error){
@@ -50,6 +75,7 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
 
   navigator.geolocation.watchPosition($scope.onLocationUpdate, $scope.onLocationUpdateError, $scope.LocationOptions);
 
+  /* controller functions */
   $scope.getMeetup = function(){
     meetupApiService.getMeetup($routeParams.meetupId)
     .$promise.then(function(response){
@@ -69,10 +95,9 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
     meetupApiService.getMeetupers($routeParams.meetupId)
     .$promise.then(function(response){
       $log.info("meetupers::"+JSON.stringify(response.data));
-      $scope.meetupers = response.data;
 
-      //map meetupers
-      $scope.meetupers.map(function(meetuper){
+      response.data.map(function(meetuper){
+        $scope.meetupers[meetuper._id] = meetuper;
         $scope.meetuperMarkers[meetuper._id] = null;
 
         if(meetuper.lastKnownLatitude && meetuper.lastKnownLongitude){
@@ -95,12 +120,6 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
     var markers = Object.values($scope.meetuperMarkers).concat($scope.meetupMarker);
     mapService.refocus($scope.map, markers);
   }
-
-  /* close socket when user navigates away from this page */
-  $scope.$on('$locationChangeStart', function (event, next, current) {
-    $scope.socket.onclose = function(){}; // disable onclose handler first
-    $scope.socket.close()  ;
-  });
 
   $scope.getMeetup();
   $scope.getMeetupers();

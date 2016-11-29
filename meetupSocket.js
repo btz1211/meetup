@@ -5,10 +5,25 @@ var MeetupSocket = function(http){
     meetupSocket =  socketio(http);
 
     meetupSocket.sockets.on('connection', function(socket){
-      console.log('meetup connected:' + JSON.stringify(socket.id));
+      console.log("socket connected:" + socket.id)
 
       socket.on('locationUpdate', function(locationInfo){
         socket.broadcast.emit('locationUpdate', locationInfo);
+      });
+
+      socket.on('userLive', function(meetuper){
+        console.log(meetuper.firstName + " " + meetuper.lastName + " is live");
+        socket.broadcast.emit('userLive', meetuper);
+      });
+
+      socket.on('userExitLive', function(meetuper){
+        console.log(meetuper.firstName + " " + meetuper.lastName + " has exited live");
+        socket.broadcast.emit('userExitLive', meetuper);
+        socket.disconnect();
+      });
+
+      socket.on('disconnect', function() {
+         console.log('socket disconnected ' + socket.id);
       });
     });
 

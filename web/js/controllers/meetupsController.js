@@ -82,11 +82,6 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route
     });
   }
 
-  $interval(function(){
-    $scope.getMeetups();
-    $scope.getInvitations();
-  }, 5000);
-
   $scope.getMeetups();
   $scope.updateLocation();
   $scope.getInvitations();
