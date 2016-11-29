@@ -16,12 +16,6 @@ var MeetupSocket = function(http){
         socket.broadcast.emit('userLive', meetuper);
       });
 
-      socket.on('userExitLive', function(meetuper){
-        console.log(meetuper.firstName + " " + meetuper.lastName + " has exited live");
-        socket.broadcast.emit('userExitLive', meetuper);
-        socket.disconnect();
-      });
-
       socket.on('disconnect', function() {
          console.log('socket disconnected ' + socket.id);
       });
