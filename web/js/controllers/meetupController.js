@@ -6,7 +6,6 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
   $scope.loggedInUser = $cookies.getObject('loggedInUser');
 
   //map
-  $scope.lastPosition = {};
   $scope.meetupMarker = {};
   $scope.meetuperMarkers = {};
   $scope.mapElement = document.getElementById('map');
@@ -37,11 +36,6 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
       meetuper.firstName + " " + meetuper.lastName + " is now live");
   });
 
-  socketService.on('userExitLive', function(meetuper){
-    alertService.addAlert(alertService.alertType.WARNING,
-      meetuper.firstName + " " + meetuper.lastName + " has exited");
-  });
-
   socketService.on('connect', function(){
     console.log('connection established');
 
@@ -60,16 +54,12 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
     locationService.getCurrentPosition(function(position){
       meetupApiService.updateLocation($scope.loggedInUser._id, position.coords);
     });
-
-    //notify users
-    socketService.emit('userExitLive', $scope.loggedInUser);
   });
 
   /* controller functions */
   $scope.getMeetup = function(){
     meetupApiService.getMeetup($routeParams.meetupId)
     .$promise.then(function(response){
-      $log.info("meetup:"+ JSON.stringify(response));
       $scope.meetup = response.data;
 
       //map meetup
@@ -84,8 +74,8 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
   $scope.getMeetupers = function(){
     meetupApiService.getMeetupers($routeParams.meetupId)
     .$promise.then(function(response){
-      $log.info("meetupers::"+JSON.stringify(response.data));
 
+      //map meetupers on map
       response.data.map(function(meetuper){
         $scope.meetupers[meetuper._id] = meetuper;
         $scope.meetuperMarkers[meetuper._id] = null;

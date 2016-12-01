@@ -16,8 +16,8 @@ myApp.factory('locationService', function(socketService){
       }
 
       var locationOptions = {
-        enableHighAccuracy: true,
-        timeout: 5000,
+        enableHighAccuracy: false,
+        timeout: 10000,
         maximumAge: 0
       };
 
@@ -26,6 +26,7 @@ myApp.factory('locationService', function(socketService){
 
     stop: function(){
       if(locationWatchId){
+        console.log('location watch has been stopped');
         navigator.geolocation.clearWatch(locationWatchId);
       }
     },

@@ -55,9 +55,12 @@ MeetupService.prototype.createMeetup = function(req, res){
   var meetup = req.body;
 
   if(mongoose.connection.readyState){
-    meetup.status="INPROGRESS";
+    var meetuper = new Meetuper({user:meetup.owner, status: "INPROGRESS"});
+
+    meetup.status = "INPROGRESS";
+    meetup.meetupers = [meetuper];
     var newMeetup = new Meetup(meetup);
-    logger.debug('creating meetup::'+ JSON.stringify(meetup));
+    logger.debug('creating meetup::'+ JSON.stringify(newMeetup));
 
     //save meetup
     newMeetup.save(function(error, meetup){
