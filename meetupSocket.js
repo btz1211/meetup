@@ -11,7 +11,7 @@ var MeetupSocket = function(http){
         console.log("location update: [" + locationInfo.latitude + "," + locationInfo.longitude +
                     "] received from: " + locationInfo.user);
 
-        socket.emit('locationUpdate', locationInfo);
+        meetupSocket.sockets.emit('locationUpdate', locationInfo);
       });
 
       socket.on('userLive', function(meetuper){
