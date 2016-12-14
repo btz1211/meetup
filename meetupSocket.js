@@ -8,7 +8,10 @@ var MeetupSocket = function(http){
       console.log("socket connected:" + socket.id)
 
       socket.on('locationUpdate', function(locationInfo){
-        socket.broadcast.emit('locationUpdate', locationInfo);
+        console.log("location update: [" + locationInfo.latitude + "," + locationInfo.longitude +
+                    "] received from: " + locationInfo.user + )
+
+        socket.emit('locationUpdate', locationInfo);
       });
 
       socket.on('userLive', function(meetuper){
