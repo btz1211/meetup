@@ -7,6 +7,9 @@ myApp.factory('locationService', function(socketService){
     start: function(user){
 
       var onLocationUpdate = function(position){
+        console.log("location update received from navigator: ["
+            +  position.coords.latitude + "," + position.coords.longitude + "]");
+
         socketService.emit('locationUpdate', { user: user,
           latitude: position.coords.latitude, longitude: position.coords.longitude });
       }
@@ -16,8 +19,8 @@ myApp.factory('locationService', function(socketService){
       }
 
       var locationOptions = {
-        enableHighAccuracy: false,
-        timeout: 10000,
+        enableHighAccuracy: true,
+        timeout: 5000,
         maximumAge: 0
       };
 
