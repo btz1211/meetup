@@ -7,7 +7,7 @@ myApp.factory('locationService', function(socketService){
     start: function(user){
 
       var onLocationUpdate = function(position){
-        console.log("location update received from navigator: ["
+        alert("location update received from navigator: ["
             +  position.coords.latitude + "," + position.coords.longitude + "]");
 
         socketService.emit('locationUpdate', { user: user,
@@ -21,7 +21,7 @@ myApp.factory('locationService', function(socketService){
       var locationOptions = {
         enableHighAccuracy: true,
         timeout: 5000,
-        maximumAge: 0
+        maximumAge: 5000
       };
 
       locationWatchId = navigator.geolocation.watchPosition(onLocationUpdate, onLocationUpdateError, locationOptions);
