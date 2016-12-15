@@ -17,8 +17,8 @@ myApp.factory('locationService', function(socketService){
 
       var locationOptions = {
         enableHighAccuracy: true,
-        timeout: 30000,
-        maximumAge: 30000
+        timeout: 5000,
+        maximumAge: 5000
       };
 
       locationWatchId = navigator.geolocation.watchPosition(onLocationUpdate, onLocationUpdateError, locationOptions);
