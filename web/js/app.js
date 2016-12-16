@@ -22,9 +22,12 @@ var myApp = angular.module('myApp', ['ngResource', 'ngRoute', 'ngCookies', 'ngAn
       controller: 'userCtrl'
     }).otherwise({redirectTo:'/login'});
 }).run(function($rootScope, $cookies, $location, $window){
-  if ($location.protocol() !== 'https') {
+  //redirect to use https in order for geolocation to work
+  if ($location.protocol() !== 'https' && location.hostname !== "localhost") {
     $window.location.href = $location.absUrl().replace(/http/g, 'https');
   }
+
+  //redirect to login if no user is logged in
   $rootScope.$on('$routeChangeStart', function (event) {
     if(! $cookies.getObject('loggedInUser')){
        $location.path('/login')

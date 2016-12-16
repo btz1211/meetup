@@ -14,6 +14,7 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
   //meetup
   $scope.meetup = {};
   $scope.meetupers = {};
+  $scope.meetuperToFollow = {};
 
   /* socket logic */
   socketService.on('locationUpdate', function(locationInfo){
@@ -28,6 +29,11 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
                                              locationInfo.user.firstName + " " + locationInfo.user.lastName,
                                              "",
                                              "images/meetuper-marker.png");
+    }
+
+    //refocus the map to the meetuper to follow
+    if(locationInfo.user._id === $scope.meetuperToFollow){
+      mapService.zoomIn($scope.map, locationInfo.latitude, locationInfo.longitude, 16);
     }
   });
 
@@ -92,13 +98,18 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
 
   $scope.focusOnMeetuper = function(meetuper){
     var marker = $scope.meetuperMarkers[meetuper._id];
-    mapService.zoomIn($scope.map, meetuper.lastKnownLatitude, meetuper.lastKnownLongitude, 16);
-    console.log('focusing on meetuper::' + JSON.stringify(meetuper));
+    mapService.zoomIn($scope.map, marker.position.lat(), marker.position.lng(), 16);
+
+    //set the meetuper to be the one to follow
+    $scope.meetuperToFollow = meetuper._id;
   }
 
   $scope.refocus = function(){
     var markers = Object.values($scope.meetuperMarkers).concat($scope.meetupMarker);
     mapService.refocus($scope.map, markers);
+
+    //clear the focus
+    $scope.meetuperToFocus = meetuper._id;
   }
 
   $scope.getMeetup();
