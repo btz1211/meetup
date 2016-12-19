@@ -10,7 +10,6 @@ myApp.directive('editMeetupModal', function(){
     templateUrl: 'templates/directive-templates/edit-meetup-modal.html',
     controller: function($scope, $cookies, $log, mapService, meetupApiService){
       $scope.marker;
-      $scope.currentLocation= {};
       $scope.defaultLatitude = 40;
       $scope.defaultLongitude = -95;
       $scope.defaultZoom = 4;
@@ -49,13 +48,7 @@ myApp.directive('editMeetupModal', function(){
              if(address){
                $scope.meetup.address = address;
                $scope.$apply();
-
-               if($scope.marker){
-                 mapService.moveMarker($scope.marker, $scope.meetup.latitude, $scope.meetup.longitude);
-               }else{
-                 $scope.marker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.meetup.name);
-               }
-               mapService.zoomIn($scope.map,$scope.meetup.latitude, $scope.meetup.longitude, 14);
+               $scope.moveMarker($scope.meetup.latitude, $scope.meetup.longitude, 14, address);
              }
            });
          });
@@ -68,36 +61,21 @@ myApp.directive('editMeetupModal', function(){
          mapService.getLocation($scope.meetup.address, function(position){
            $scope.meetup.latitude = position.lat();
            $scope.meetup.longitude = position.lng();
-
-           if($scope.marker){
-             mapService.moveMarker($scope.marker, $scope.meetup.latitude, $scope.meetup.longitude);
-           }else{
-             $scope.marker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.currentLocation.address);
-           }
-           mapService.zoomIn($scope.map,$scope.meetup.latitude, $scope.meetup.longitude, 14);
+           $scope.moveMarker($scope.meetup.latitude, $scope.meetup.longitude, 14, $scope.meetup.address);
          });
        }
 
        $scope.onModalShow = function(){
+         mapService.removeMarkerFromMap($scope.marker);
+
          if(! jQuery.isEmptyObject($scope.meetup)){
-           //existing meetup, move marker to meetup location and zoom in
-           if($scope.marker){
-             mapService.moveMarker($scope.marker, $scope.meetup.latitude, $scope.meetup.longitude);
-           }else{
-             $scope.marker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.currentLocation.address);
-           }
-           mapService.zoomIn($scope.map,$scope.meetup.latitude, $scope.meetup.longitude, 14);
+           $scope.moveMarker($scope.meetup.latitude, $scope.meetup.longitude, 14, $scope.meetup.address);
 
            //set start time and end time
            $scope.startTimePicker.date(moment($scope.meetup.startTime).format('MM/DD/YYYY h:mm A'));
            $scope.endTimePicker.date(moment($scope.meetup.endTime).format('MM/DD/YYYY h:mm A'));
 
          }else{
-           //new meetup, remove marker and reset map zoom
-           if($scope.marker){
-             mapService.removeMarkerFromMap($scope.marker);
-             $scope.marker = null;
-           }
            mapService.zoomIn($scope.map, $scope.defaultLatitude, $scope.defaultLongitude, $scope.defaultZoom);
 
            //set start time and end time to current time
@@ -125,6 +103,14 @@ myApp.directive('editMeetupModal', function(){
 
          $scope.startTimePicker = $('#startTimePicker').datetimepicker().data("DateTimePicker");
          $scope.endTimePicker = $('#endTimePicker').datetimepicker().data("DateTimePicker");
+       }
+
+       $scope.moveMarker = function(lat, lng, zoom, title){
+         if($scope.marker){
+           mapService.removeMarkerFromMap($scope.marker);
+         }
+         $scope.marker = mapService.addMarker($scope.map, lat, lng, title);
+         mapService.zoomInOnMarker($scope.map, $scope.marker, zoom);
        }
 
        $scope.setupModal();

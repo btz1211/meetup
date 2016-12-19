@@ -48,7 +48,6 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route
     .$promise.then(
       function(response){
         $scope.friendInvitations = response.data;
-        console.log("friend invitations::"+JSON.stringify(response.data));
     }).catch(
       function(error){
         $log.warn(error);
@@ -77,16 +76,11 @@ myApp.controller('meetupsCtrl', function($scope, $log, $window, $cookies, $route
   //update user's current location on the backend
   $scope.updateLocation = function(){
     navigator.geolocation.getCurrentPosition(function(position, error){
-      console.log('position received::' + JSON.stringify(position.coords));
       meetupApiService.updateLocation($scope.loggedInUser._id, position.coords);
     });
   }
 
-  $interval(function(){
-    $scope.getMeetups();
-  }, 2500);
-
   $scope.getMeetups();
   $scope.updateLocation();
-  $scope.getInvitations()
+  $scope.getInvitations();
 });

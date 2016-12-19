@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var ResponseBuilder = require('../util/ResponseBuilder.js')
 var ObjectUtil = require('../util/ObjectUtil.js')
+var MeetupSocket = require('../meetupSocket');
 var logger = require('../logger')
 require('../models/user');
 require('../models/meetup');
@@ -9,6 +10,7 @@ var UserService = function(){}
 
 var objectUtil = new ObjectUtil();
 var responseBuilder = new ResponseBuilder();
+var meetupSocket = new MeetupSocket();
 var User = mongoose.model('User');
 
 //create user
@@ -163,6 +165,8 @@ UserService.prototype.updateLocation = function(req, res){
         responseBuilder.buildResponseWithError(res, error); return;
       }else{
         responseBuilder.buildResponse(res, 200);
+        // meetupSocket.getSocket().emit('locationUpdate',
+            // {userId: userId, latitude: req.body.latitude, longitude: req.body.longitude});
       }
     });
   }else{

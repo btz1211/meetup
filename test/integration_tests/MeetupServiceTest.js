@@ -361,7 +361,7 @@ describe('meetup service api', function(){
       .end(function(error, response){
         if(error){ throw error; }
         response.status.should.equal(400);
-        response.body.errors.length.should.equal(7);
+
         var errorJson = helper.covertArrayToObjectWithId(response.body.errors, 'field');
         logger.info('missing params::' + JSON.stringify(errorJson));
         errorJson['name'].errorMessage.should.equal('name is required');

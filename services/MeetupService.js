@@ -1,9 +1,8 @@
 var mongoose = require('mongoose');
-var logger = require('../logger')
-var ResponseBuilder = require('../util/ResponseBuilder.js')
-var ObjectUtil = require('../util/ObjectUtil.js')
-// require('../models/user');
-// require('../models/meetup');
+var logger = require('../logger');
+var server = require('../server');
+var ResponseBuilder = require('../util/ResponseBuilder.js');
+var ObjectUtil = require('../util/ObjectUtil.js');
 
 var MeetupService = function(){}
 
@@ -56,9 +55,12 @@ MeetupService.prototype.createMeetup = function(req, res){
   var meetup = req.body;
 
   if(mongoose.connection.readyState){
-    meetup.status="INPROGRESS";
+    var meetuper = new Meetuper({user:meetup.owner, status: "INPROGRESS"});
+
+    meetup.status = "INPROGRESS";
+    meetup.meetupers = [meetuper];
     var newMeetup = new Meetup(meetup);
-    logger.debug('creating meetup::'+ JSON.stringify(meetup));
+    logger.debug('creating meetup::'+ JSON.stringify(newMeetup));
 
     //save meetup
     newMeetup.save(function(error, meetup){
