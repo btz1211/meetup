@@ -69,7 +69,8 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
       $scope.meetup = response.data;
 
       //map meetup
-      $scope.meetupMarker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.meetup.name, "", "images/destination-marker.png");
+      $scope.meetupMarker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude,
+          $scope.meetup.name, "", "images/destination-marker.png");
       mapService.zoomInOnMarker($scope.map, $scope.meetupMarker, 14);
     }).catch(
       function(error){
@@ -88,7 +89,9 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
 
         if(meetuper.lastKnownLatitude && meetuper.lastKnownLongitude){
           $scope.meetuperMarkers[meetuper._id] = mapService.addMarker($scope.map, meetuper.lastKnownLatitude,
-            meetuper.lastKnownLongitude, meetuper.firstName + ' ' +meetuper.lastName);
+            meetuper.lastKnownLongitude, meetuper.firstName + ' ' +meetuper.lastName,
+            "",
+            "images/meetuper-marker.png");
         }
       });
     });
@@ -108,7 +111,7 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
     mapService.refocus($scope.map, markers);
 
     //clear the focus
-    $scope.meetuperToFocus = meetuper._id;
+    $scope.meetuperToFollow = {};
   }
 
   $scope.getMeetup();

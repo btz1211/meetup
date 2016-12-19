@@ -109,7 +109,7 @@ myApp.directive('editMeetupModal', function(){
          if($scope.marker){
            mapService.removeMarkerFromMap($scope.marker);
          }
-         $scope.marker = mapService.addMarker($scope.map, lat, lng, title);
+         $scope.marker = mapService.addMarker($scope.map, lat, lng, title, "", "images/destination-marker.png");
          mapService.zoomInOnMarker($scope.map, $scope.marker, zoom);
        }
 
