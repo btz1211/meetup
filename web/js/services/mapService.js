@@ -3,6 +3,20 @@
 myApp.factory('mapService', function($log){
   var geocoder = new google.maps.Geocoder;
   var defaultZoom = 15;
+  var markerInFocus = null;
+
+  var zoomIn = function(map, lat, lng, zoom){
+    google.maps.event.trigger(map, 'resize');
+
+    if(!zoom){
+      zoom = map.getZoom();
+    }
+
+    var center = new google.maps.LatLng(lat, lng);
+    map.setZoom(zoom);
+    map.panTo(center);
+    map.setCenter(center);
+  };
 
   return {
     getMap: function(mapElement, lat, lng, zoom){
@@ -64,7 +78,9 @@ myApp.factory('mapService', function($log){
               });
 
       marker.addListener('click', function(){
+        this.setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
         infoWindow.open(map, marker);
+        infoWindow.setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
       });
 
       return marker;
@@ -75,18 +91,16 @@ myApp.factory('mapService', function($log){
     },
 
     removeMarkerFromMap : function(marker){
-      marker.setMap(null);
+      if(marker){
+        marker.setMap(null);
+      }
     },
 
-    zoomIn: function(map, lat, lng, zoom){
-      google.maps.event.trigger(map, 'resize');
-      if(!zoom){
-        zoom = map.getZoom();
-      }
-      var center = new google.maps.LatLng(lat, lng);
-      map.setZoom(zoom);
-      map.panTo(center);
-      map.setCenter(center);
+    zoomIn: zoomIn,
+
+    zoomInOnMarker: function(map, marker, zoom){
+      google.maps.event.trigger(marker, 'click');
+      zoomIn(map, marker.position.lat(), marker.position.lng(), zoom);
     },
 
     refocus: function(map, markers, zoom){

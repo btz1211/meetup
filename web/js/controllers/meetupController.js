@@ -33,7 +33,7 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
 
     //refocus the map to the meetuper to follow
     if(locationInfo.user._id === $scope.meetuperToFollow){
-      mapService.zoomIn($scope.map, locationInfo.latitude, locationInfo.longitude, 16);
+      mapService.zoomInOnMarker($scope.map, $scope.meetuperMarkers[locationInfo.user._id]);
     }
   });
 
@@ -70,7 +70,7 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
 
       //map meetup
       $scope.meetupMarker = mapService.addMarker($scope.map, $scope.meetup.latitude, $scope.meetup.longitude, $scope.meetup.name, "", "images/destination-marker.png");
-      mapService.zoomIn( $scope.map, $scope.meetup.latitude, $scope.meetup.longitude, 14);
+      mapService.zoomInOnMarker($scope.map, $scope.meetupMarker, 14);
     }).catch(
       function(error){
         $log.warn(error);
@@ -88,9 +88,7 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
 
         if(meetuper.lastKnownLatitude && meetuper.lastKnownLongitude){
           $scope.meetuperMarkers[meetuper._id] = mapService.addMarker($scope.map, meetuper.lastKnownLatitude,
-            meetuper.lastKnownLongitude, meetuper.firstName + ' ' +meetuper.lastName,
-            "",
-            "images/meetuper-marker.png");
+            meetuper.lastKnownLongitude, meetuper.firstName + ' ' +meetuper.lastName);
         }
       });
     });
@@ -98,7 +96,8 @@ myApp.controller('meetupCtrl', function($scope, $cookies, $routeParams, $interva
 
   $scope.focusOnMeetuper = function(meetuper){
     var marker = $scope.meetuperMarkers[meetuper._id];
-    mapService.zoomIn($scope.map, marker.position.lat(), marker.position.lng(), 16);
+
+    mapService.zoomInOnMarker($scope.map, marker, 16);
 
     //set the meetuper to be the one to follow
     $scope.meetuperToFollow = meetuper._id;
